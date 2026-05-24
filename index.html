@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>SIMGROUP TEAM JAKARTA</title>
+    <title>SIMGROUP JAKARTA</title>
     <style>
         /* Pengaturan Background dan Font */
         body {
@@ -83,7 +83,6 @@
             box-shadow: 0 4px 10px rgba(0,0,0,0.2);
             overflow: hidden;
         }
-        /* Ganti link src di bawah ini jika sudah punya link logo SIM Group */
         .logo-circle img {
             width: 60%;
             opacity: 0.8;
@@ -107,7 +106,6 @@
             background-color: #D19B74;
             color: white;
             border-radius: 8px;
-            margin-bottom: 15px; /* <--- HAPUS BARIS INI */
             font-weight: bold;
             font-size: 14px;
             box-shadow: 0 4px 6px rgba(0,0,0,0.1);
@@ -117,13 +115,13 @@
             text-transform: uppercase;
         }
 
-    /* Khusus tombol tanpa dropdown (Direct Link) */
+        /* Khusus tombol tanpa dropdown (Direct Link) - Disimpan untuk cadangan */
         .menu-btn {
             text-decoration: none;
             display: block;
             padding: 18px 20px;
             border: none;
-            margin-bottom: 15px; /* <--- TAMBAHKAN DI SINI */
+            margin-bottom: 15px;
         }
         .menu-btn:hover, summary:hover {
             background-color: #c28c66;
@@ -135,29 +133,27 @@
             width: 100%;
         }
         summary {
+            margin: 0; /* Kunci agar jarak tidak dobel */
             padding: 18px 20px;
-            list-style: none; /* Menghilangkan panah bawaan browser */
+            list-style: none; 
             display: flex;
             justify-content: space-between;
             align-items: center;
         }
-        /* Menghapus panah bawaan khusus untuk browser Safari/Chrome */
+        /* Menghapus panah bawaan browser */
         summary::-webkit-details-marker { display: none; }
         
-        /* Membuat icon Panah Kustom (▼) */
         summary:after {
             content: "▼";
             font-size: 12px;
         }
-        /* Ubah panah ke atas saat dropdown dibuka */
         details[open] summary:after {
             content: "▲";
         }
 
-        /* Kotak isi link di dalam dropdown */
         .dropdown-content {
             background-color: rgba(255, 255, 255, 0.95);
-            margin-top: -10px; /* Menempel dengan tombol utama */
+            margin-top: 0; 
             padding: 15px;
             border-bottom-left-radius: 8px;
             border-bottom-right-radius: 8px;
@@ -182,7 +178,7 @@
 
     <div id="login-screen">
         <div class="login-box">
-            <h2 style="font-size: 20px; margin-bottom: 5px; color: white;">PORTAL SOURCING</h2>
+            <h2 style="font-size: 20px; margin-bottom: 5px; color: white;">INFORMATION PORTAL SYSTEM JAKARTA</h2>
             <p style="font-size: 13px; margin-bottom: 20px; color: #eee;">Masukkan PIN untuk otorisasi akses</p>
             <input type="password" id="pin-input" placeholder="PIN Tim">
             <button class="btn-login" onclick="checkPIN()">MASUK</button>
@@ -193,68 +189,66 @@
     <div id="dashboard">
         
         <div class="logo-circle">
-            <img src="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQ9DzA0IW1UHYhij3VwwXXRKSXTfD6r7IJfFA&s" alt="Logo Placeholder">
+            <img src="https://upload.wikimedia.org/wikipedia/commons/thumb/1/12/User_icon_2.svg/2048px-User_icon_2.svg.png" alt="Logo Simgroup">
         </div>
         
-        <h1>SIMGROUP BODETABEK - BANTEN</h1>
+        <h1>TEAM JAKARTANS </h1>
         <p class="subtitle">Pilih menu untuk melanjutkan</p>
 
         <details>
-            <summary>REPORTING DAILY</summary>
+            <summary>MONITORING (ALL REVO ACCESS)</summary>
             <div class="dropdown-content">
-                <a href="#">Form Laporan - Sourcing Area</a>
-                <a href="#">Rekap Target CMO KB Finansia</a>
-                <a href="#">Rekap Database Kandidat Harian</a>
+                <a href="#">TAD Daily</a>
+                <a href="#">Dashboard Internal</a>
+                <a href="#">Client Self Service - CSS</a>
+                <a href="#">Visitting Monitoring - BEYOND</a>
+                <a href="#">Kalkulator perhitungan PPH21</a>
+                <a href="#">ORS - OUTSOURCING RECRUITMENT SYSTEM</a>
+                <a href="#">Worksheet pengajuan kontrak kerja</a>
+                <a href="#">BPR </a>
+                <a href="#">CS SISKA</a>
+                <a href="#">G-FORM UPLOAD LPJ</a>
             </div>
         </details>
 
         <details>
-            <summary>WEBSITE</summary>
+            <summary>ALAT KERJA REVO FIF</summary>
             <div class="dropdown-content">
-                <a href="#">Portal HRIS SIM Group</a>
-                <a href="#">Web Karir Internal</a>
+                <a href="#">Memo Bankout FIF GROUP</a>
+                <a href="#">Lampiran Overtime FIF GROUP</a>
+                <a href="#">Alat kerja Reenginering REVO</a>
             </div>
         </details>
 
         <details>
-            <summary>RM</summary>
+            <summary>ALAT KERJA REVO ADIRA</summary>
             <div class="dropdown-content">
-                <a href="#">Panduan The Gen Z Interview Playbook</a>
-                <a href="#">Dokumen MoU & Kerjasama Akademik</a>
+                <a href="#">Menu Buffer Egilible SIM - ADIRA</a>
+                <a href="#">Menu Target Buffer & QC Weekly REVO to AKB</a>
+                <a href="#">Menu AKB Adira</a>
             </div>
         </details>
 
         <details>
-            <summary>REVO</summary>
+            <summary>ALAT KERJA REVO MF</summary>
             <div class="dropdown-content">
-                <a href="#">Modul Assessment & Interview</a>
-                <a href="#">SOP Operasional Recruiter</a>
+                <a href="#">Alat kerja BRIF - SIM GROUP</a>
+                <a href="#">Alat Kerja KB Finansia - SIM GROUP</a>
+                <a href="#">Alat Kerja APP Sheet BFI Finance</a>
             </div>
         </details>
 
-        <a href="#" class="menu-btn">MOM</a>
-
-        <a href="#" class="menu-btn">RS PROVIDER ASURANSI & FAQ</a>
-
-        <a href="#" class="menu-btn">TUTOR ORS</a>
-
-        <a href="#" class="menu-btn">FORM</a>
+        <details>
+            <summary>INFORMATION MENU</summary>
+            <div class="dropdown-content">
+                <a href="#">RS Provider Asuransi & FAQ</a>
+                <a href="#">Form Template</a>
+                <a href="#">Link Tutorial Alat kerja & Aplikasi SIM Group</a>
+            </div>
+        </details>
 
     </div>
 
     <script>
         function checkPIN() {
-            var pin = document.getElementById("pin-input").value;
-            
-            // Password PIN yang aktif saat ini adalah 12345
-            if (pin === "12345") { 
-                document.getElementById("login-screen").style.display = "none";
-                document.getElementById("dashboard").style.display = "block";
-            } else {
-                document.getElementById("error-msg").style.display = "block";
-            }
-        }
-    </script>
-
-</body>
-</html>
+            var pin = document.getElementById("pin-
