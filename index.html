@@ -17,10 +17,7 @@
             --glass-border: rgba(255,255,255,0.22);
             --text-dim: rgba(255,255,255,0.65);
         }
-
         *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
-
-        /* ─── BODY & BACKGROUND ─────────────────────────────────────── */
         body {
             font-family: 'DM Sans', sans-serif;
             background: linear-gradient(135deg, #0a5565 0%, #138A9F 45%, #0e7a8e 70%, #0a4f5e 100%);
@@ -28,8 +25,6 @@
             overflow-x: hidden;
             color: var(--white);
         }
-
-        /* animated mesh blobs */
         body::before, body::after {
             content: '';
             position: fixed;
@@ -55,8 +50,6 @@
             0%,100% { transform: translateY(0) scale(1); }
             50%      { transform: translateY(-40px) scale(1.05); }
         }
-
-        /* ─── LOGIN SCREEN ─────────────────────────────────────────── */
         #login-screen {
             position: fixed; inset: 0;
             display: flex; align-items: center; justify-content: center;
@@ -64,7 +57,6 @@
             transition: opacity 0.5s ease, visibility 0.5s ease;
         }
         #login-screen.hidden { opacity: 0; visibility: hidden; }
-
         .login-card {
             position: relative;
             background: var(--glass);
@@ -82,7 +74,6 @@
             from { opacity:0; transform: translateY(40px); }
             to   { opacity:1; transform: translateY(0); }
         }
-
         .login-logo {
             width: 72px; height: 72px;
             background: linear-gradient(135deg, var(--copper), #e8b98a);
@@ -92,7 +83,6 @@
             box-shadow: 0 8px 24px rgba(209,155,116,0.4);
             font-size: 30px;
         }
-
         .login-title {
             font-family: 'Syne', sans-serif;
             font-size: 15px; font-weight: 700;
@@ -103,7 +93,6 @@
             font-size: 12px; color: var(--text-dim);
             margin-bottom: 32px; line-height: 1.5;
         }
-
         .pin-label {
             font-size: 11px; letter-spacing: 1.5px; text-transform: uppercase;
             color: var(--text-dim); margin-bottom: 10px; display: block;
@@ -125,11 +114,9 @@
             box-shadow: 0 0 10px rgba(209,155,116,0.6);
             transform: scale(1.15);
         }
-
         #pin-input {
             position: absolute; opacity: 0; pointer-events: none; width: 1px; height: 1px;
         }
-
         .numpad {
             display: grid; grid-template-columns: repeat(3, 1fr);
             gap: 10px; margin-bottom: 16px;
@@ -147,14 +134,9 @@
         .numpad-btn:hover  { background: rgba(255,255,255,0.2); transform: translateY(-1px); }
         .numpad-btn:active { transform: scale(0.95); }
         .numpad-btn.del    { font-size: 14px; }
-        .numpad-btn.enter  { background: var(--copper); border-color: var(--copper); grid-column: span 1; }
-        .numpad-btn.enter:hover { background: var(--copper-dark); }
         .numpad-btn.zero   { grid-column: span 2; }
-
-        /* ripple */
         .ripple { position:absolute; border-radius:50%; background:rgba(255,255,255,0.3); transform:scale(0); animation:rippleAnim .4s linear; }
         @keyframes rippleAnim { to { transform:scale(4); opacity:0; } }
-
         #error-msg {
             color: #ffb3b3;
             font-size: 12px; margin-top: 8px;
@@ -166,8 +148,6 @@
             20%,60% { transform: translateX(-8px); }
             40%,80% { transform: translateX(8px); }
         }
-
-        /* ─── DASHBOARD ─────────────────────────────────────────────── */
         #dashboard {
             display: none;
             width: 100%; max-width: 560px;
@@ -177,11 +157,7 @@
             transition: opacity 0.5s ease, transform 0.5s ease;
         }
         #dashboard.visible { opacity: 1; transform: translateY(0); }
-
-        /* header */
-        .dash-header {
-            text-align: center; margin-bottom: 40px;
-        }
+        .dash-header { text-align: center; margin-bottom: 40px; }
         .brand-icon {
             width: 80px; height: 80px;
             background: white;
@@ -201,23 +177,16 @@
             font-size: 12px; color: var(--text-dim);
             letter-spacing: 1px; text-transform: uppercase;
         }
-
-        /* divider */
         .divider {
             height: 1px;
             background: linear-gradient(90deg, transparent, rgba(255,255,255,0.25), transparent);
             margin: 32px 0;
         }
-
-        /* section label */
         .section-label {
             font-size: 10px; letter-spacing: 2.5px; text-transform: uppercase;
             color: var(--text-dim); margin-bottom: 14px; padding-left: 4px;
         }
-
-        /* ─── ACCORDION ─────────────────────────────────────────────── */
         .menu-group { margin-bottom: 10px; }
-
         .acc-toggle {
             width: 100%;
             display: flex; align-items: center; justify-content: space-between;
@@ -254,10 +223,7 @@
             border-bottom-right-radius: 0;
             border-bottom-color: transparent;
         }
-
-        .acc-icon {
-            display: flex; align-items: center; gap: 12px;
-        }
+        .acc-icon { display: flex; align-items: center; gap: 12px; }
         .acc-emoji {
             font-size: 16px;
             width: 32px; height: 32px;
@@ -275,7 +241,6 @@
             flex-shrink: 0;
         }
         .acc-toggle.open .acc-chevron { transform: rotate(180deg); }
-
         .acc-body {
             background: rgba(255,255,255,0.96);
             border: 1px solid var(--glass-border);
@@ -285,8 +250,7 @@
             max-height: 0; overflow: hidden;
             transition: max-height 0.4s cubic-bezier(0.4,0,0.2,1);
         }
-        .acc-body.open { max-height: 500px; }
-
+        .acc-body.open { max-height: 600px; }
         .acc-link {
             display: flex; align-items: center; gap: 12px;
             padding: 13px 20px;
@@ -318,42 +282,16 @@
             border-radius: 50%; flex-shrink: 0;
             opacity: 0.6;
         }
-
-        /* ─── DIRECT MENU BTN ───────────────────────────────────────── */
-        .direct-btn {
-            display: block; width: 100%;
-            background: linear-gradient(135deg, var(--copper), #e8b98a);
-            color: white; text-decoration: none;
-            padding: 17px 20px;
-            border-radius: 14px;
-            font-family: 'Syne', sans-serif;
-            font-size: 13px; font-weight: 700;
-            letter-spacing: 0.8px; text-transform: uppercase;
-            text-align: center; margin-bottom: 10px;
-            box-shadow: 0 6px 20px rgba(209,155,116,0.35);
-            transition: all 0.2s ease;
-            border: none; cursor: pointer;
-        }
-        .direct-btn:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 10px 28px rgba(209,155,116,0.5);
-        }
-
-        /* ─── FOOTER ────────────────────────────────────────────────── */
         .footer {
             text-align: center; margin-top: 40px;
             color: rgba(255,255,255,0.35);
             font-size: 11px; letter-spacing: 0.5px;
         }
-
-        /* ─── STAGGER ANIMATION ─────────────────────────────────────── */
         .stagger { opacity: 0; transform: translateY(16px); }
         .stagger.shown {
             opacity: 1; transform: translateY(0);
             transition: opacity 0.4s ease, transform 0.4s ease;
         }
-
-        /* ─── SCROLLBAR ─────────────────────────────────────────────── */
         ::-webkit-scrollbar { width: 4px; }
         ::-webkit-scrollbar-track { background: transparent; }
         ::-webkit-scrollbar-thumb { background: rgba(255,255,255,0.2); border-radius: 2px; }
@@ -361,15 +299,11 @@
 </head>
 <body>
 
-<!-- ═══════════════════════════════════════════
-     LOGIN SCREEN
-═══════════════════════════════════════════ -->
 <div id="login-screen">
     <div class="login-card">
         <div class="login-logo">🏢</div>
         <div class="login-title">SIMGROUP JAKARTA</div>
         <p class="login-sub">Information Portal System<br>Masukkan PIN untuk melanjutkan</p>
-
         <span class="pin-label">Masukkan PIN Anda</span>
         <div class="pin-dots" id="pin-dots">
             <div class="pin-dot" id="d0"></div>
@@ -377,9 +311,7 @@
             <div class="pin-dot" id="d2"></div>
             <div class="pin-dot" id="d3"></div>
         </div>
-
         <input type="password" id="pin-input" inputmode="numeric" autocomplete="off">
-
         <div class="numpad">
             <button class="numpad-btn" onclick="numpadPress('1')">1</button>
             <button class="numpad-btn" onclick="numpadPress('2')">2</button>
@@ -393,16 +325,11 @@
             <button class="numpad-btn zero" onclick="numpadPress('0')">0</button>
             <button class="numpad-btn del" onclick="numpadDel()">⌫</button>
         </div>
-
         <p id="error-msg">❌ PIN Salah! Silakan coba lagi.</p>
     </div>
 </div>
 
-<!-- ═══════════════════════════════════════════
-     DASHBOARD
-═══════════════════════════════════════════ -->
 <div id="dashboard">
-
     <div class="dash-header stagger">
         <div class="brand-icon">🏢</div>
         <div class="brand-name">SIMGROUP JAKARTA</div>
@@ -410,104 +337,83 @@
     </div>
 
     <div class="divider stagger"></div>
-
     <p class="section-label stagger">Menu Navigasi</p>
 
     <!-- MONITORING -->
     <div class="menu-group stagger">
         <button class="acc-toggle" onclick="toggleAcc(this)">
-            <span class="acc-icon">
-                <span class="acc-emoji">📊</span>
-                Monitoring (All Revo Access)
-            </span>
+            <span class="acc-icon"><span class="acc-emoji">📊</span>Monitoring (All Revo Access)</span>
             <span class="acc-chevron">▾</span>
         </button>
         <div class="acc-body">
-            <a class="acc-link" href="https://drive.google.com/drive/folders/13EBl-P1guUUx3O7UMevLONNTEL28Nc3g"> <target>="_blank" rel="noopener noreferrer" <span class="acc-link-dot"></span>TAD DAILY </a>
-            <a class="acc-link" href="#"><span class="acc-link-dot"> <target>="_blank" rel="noopener noreferrer"</span>DASHBOAR INTERNAL</a>
-            <a class="acc-link" href="https://css.simgroup.co.id/login/Request"><span class="acc-link-dot"></span>CLIENT SELF SERVICE (CSS)</a>
-            <a class="acc-link" href="http://visitapp.pkp.co.id:1000/"><span class="acc-link-dot"></span>VISITING MONITORING — BEYOND</a>
-            <a class="acc-link" href="https://docs.google.com/spreadsheets/d/1vZrM8vFC5PEHwmlUOSDZMedU6kXUUbjl/edit?usp=sharing&ouid=116864210133684271874&rtpof=true&sd=true"><span class="acc-link-dot"></span>KALKULATOR PERHITUNGAN PPH21</a>
-            <a class="acc-link" href="https://ors.simgroup.co.id/"><span class="acc-link-dot"></span>ORS - OUTSOURCING RECRUITMENT SYSTEM</a>
-            <a class="acc-link" href="https://docs.google.com/spreadsheets/d/1mOo5HFeSqriTZgCOVts_Z8WLE-Q4VgmJ3B6QkLLnpwo/edit?usp=sharing"><span class="acc-link-dot"></span>WORKSHEET PENGAJUAN KONTRAK KERJA</a>
-            <a class="acc-link" href="https://sysbpr.simgroup.co.id/intranet/login.php"><span class="acc-link-dot"></span>BPR - BUSSINES PERSONALIA REPORT</a>
-            <a class="acc-link" href="https://cs.sim.co.id/#login"><span class="acc-link-dot"></span>CS SISKA</a>
-            <a class="acc-link" href="https://docs.google.com/spreadsheets/d/1-wOfH6EljK0-CUtOs2N54YnVp1HWIkWPmRviVBXh6EY/edit?gid=164367939#gid=164367939"><span class="acc-link-dot"></span>TIMELINE BS</a>
+            <a class="acc-link" target="_blank" rel="noopener noreferrer" href="https://drive.google.com/drive/folders/13EBl-P1guUUx3O7UMevLONNTEL28Nc3g"><span class="acc-link-dot"></span>TAD DAILY</a>
+            <a class="acc-link" target="_blank" rel="noopener noreferrer" href="#"><span class="acc-link-dot"></span>DASHBOAR INTERNAL</a>
+            <a class="acc-link" target="_blank" rel="noopener noreferrer" href="https://css.simgroup.co.id/login/Request"><span class="acc-link-dot"></span>CLIENT SELF SERVICE (CSS)</a>
+            <a class="acc-link" target="_blank" rel="noopener noreferrer" href="http://visitapp.pkp.co.id:1000/"><span class="acc-link-dot"></span>VISITING MONITORING — BEYOND</a>
+            <a class="acc-link" target="_blank" rel="noopener noreferrer" href="https://docs.google.com/spreadsheets/d/1vZrM8vFC5PEHwmlUOSDZMedU6kXUUbjl/edit?usp=sharing&ouid=116864210133684271874&rtpof=true&sd=true"><span class="acc-link-dot"></span>KALKULATOR PERHITUNGAN PPH21</a>
+            <a class="acc-link" target="_blank" rel="noopener noreferrer" href="https://ors.simgroup.co.id/"><span class="acc-link-dot"></span>ORS - OUTSOURCING RECRUITMENT SYSTEM</a>
+            <a class="acc-link" target="_blank" rel="noopener noreferrer" href="https://docs.google.com/spreadsheets/d/1mOo5HFeSqriTZgCOVts_Z8WLE-Q4VgmJ3B6QkLLnpwo/edit?usp=sharing"><span class="acc-link-dot"></span>WORKSHEET PENGAJUAN KONTRAK KERJA</a>
+            <a class="acc-link" target="_blank" rel="noopener noreferrer" href="https://sysbpr.simgroup.co.id/intranet/login.php"><span class="acc-link-dot"></span>BPR - BUSSINES PERSONALIA REPORT</a>
+            <a class="acc-link" target="_blank" rel="noopener noreferrer" href="https://cs.sim.co.id/#login"><span class="acc-link-dot"></span>CS SISKA</a>
+            <a class="acc-link" target="_blank" rel="noopener noreferrer" href="https://docs.google.com/spreadsheets/d/1-wOfH6EljK0-CUtOs2N54YnVp1HWIkWPmRviVBXh6EY/edit?gid=164367939#gid=164367939"><span class="acc-link-dot"></span>TIMELINE BS</a>
         </div>
     </div>
 
     <!-- FIF -->
     <div class="menu-group stagger">
         <button class="acc-toggle" onclick="toggleAcc(this)">
-            <span class="acc-icon">
-                <span class="acc-emoji">🔧</span>
-                ALAT KERJA REVO FIF
-            </span>
+            <span class="acc-icon"><span class="acc-emoji">🔧</span>ALAT KERJA REVO FIF</span>
             <span class="acc-chevron">▾</span>
         </button>
         <div class="acc-body">
-            <a class="acc-link" href="#"><span class="acc-link-dot"></span>G-DRIVE MEMO BANKOUT</a>
-            <a class="acc-link" href="#"><span class="acc-link-dot"></span>ALAT KERJA RE-ENGINERING</a>
+            <a class="acc-link" target="_blank" rel="noopener noreferrer" href="#"><span class="acc-link-dot"></span>G-DRIVE MEMO BANKOUT</a>
+            <a class="acc-link" target="_blank" rel="noopener noreferrer" href="#"><span class="acc-link-dot"></span>ALAT KERJA RE-ENGINERING</a>
         </div>
     </div>
 
     <!-- ADIRA -->
     <div class="menu-group stagger">
         <button class="acc-toggle" onclick="toggleAcc(this)">
-            <span class="acc-icon">
-                <span class="acc-emoji">📋</span>
-                ALAT KERJA REVO ADIRA
-            </span>
+            <span class="acc-icon"><span class="acc-emoji">📋</span>ALAT KERJA REVO ADIRA</span>
             <span class="acc-chevron">▾</span>
         </button>
         <div class="acc-body">
-            <a class="acc-link" href="https://bit.ly/adirasimgroup"><span class="acc-link-dot"></span>SHEET BUFFER EGILIBLE SIM x ADIRA</a>
-            <a class="acc-link" href="https://docs.google.com/spreadsheets/d/1-N0KT0lSEoFYO_SVZX8fekw4EKa-Q4oETJSNmXfbOM0/edit?usp=sharing"><span class="acc-link-dot"></span>SHEET TARGET BUFFER & QC WEEKLY REVO to AKB</a>
-            <a class="acc-link" href="https://docs.google.com/spreadsheets/d/1e_xH5vGom20cs6uhqJrzrfYc3we3PMtpWw4LGSkFdp0/edit?usp=sharing"><span class="acc-link-dot"></span>SHEET AKB ADIRA</a>
+            <a class="acc-link" target="_blank" rel="noopener noreferrer" href="https://bit.ly/adirasimgroup"><span class="acc-link-dot"></span>SHEET BUFFER EGILIBLE SIM x ADIRA</a>
+            <a class="acc-link" target="_blank" rel="noopener noreferrer" href="https://docs.google.com/spreadsheets/d/1-N0KT0lSEoFYO_SVZX8fekw4EKa-Q4oETJSNmXfbOM0/edit?usp=sharing"><span class="acc-link-dot"></span>SHEET TARGET BUFFER & QC WEEKLY REVO to AKB</a>
+            <a class="acc-link" target="_blank" rel="noopener noreferrer" href="https://docs.google.com/spreadsheets/d/1e_xH5vGom20cs6uhqJrzrfYc3we3PMtpWw4LGSkFdp0/edit?usp=sharing"><span class="acc-link-dot"></span>SHEET AKB ADIRA</a>
         </div>
     </div>
 
     <!-- MF -->
     <div class="menu-group stagger">
         <button class="acc-toggle" onclick="toggleAcc(this)">
-            <span class="acc-icon">
-                <span class="acc-emoji">💼</span>
-                ALAT KERJA REVO MF
-            </span>
+            <span class="acc-icon"><span class="acc-emoji">💼</span>ALAT KERJA REVO MF</span>
             <span class="acc-chevron">▾</span>
         </button>
         <div class="acc-body">
-            <a class="acc-link" href="https://docs.google.com/spreadsheets/d/1D_jLXZFOUXDc6ymSYg5TIPk3boqjO3b4BWLAFGpQhkg/edit?gid=1322029011#gid=1322029011"><span class="acc-link-dot"></span>SHEET BRIF x SIM Group</a>
-            <a class="acc-link" href="https://docs.google.com/spreadsheets/d/1sdZ0FRPE3BG3FrcKfEF6eZHmOVV8skdrg2MKos3p44s/edit?pli=1&gid=676359146#gid=676359146"><span class="acc-link-dot"></span>SHEET KB Finansia MF x SIM Group</a>
-            <a class="acc-link" href="https://www.appsheet.com/start/09875b4f-f649-467b-8cff-a503905e87d1?platform=desktop#appName=PortalOS-840667114&vss=H4sIAAAAAAAAA6WOyw7CIBREf8XMmi9ga1wY4yOpcSMusNwmRAoNULUh_LvU51pd3rk5ZybhrOlSRVmfwPfpcy1oAEcS2A4dCXCBqbPROyPABFayfYQb56M0k3UlkJEP7CWIFMDTlzz_s59BK7JRN5r8KBvRInmC5T1iJXhDyAxtH-XR0H1zgXIuWePqPpDalTG_jAhzO7t20qqlU8XZSBMo3wAQktiOagEAAA==&view=Portal%20OS"><span class="acc-link-dot"></span>App Sheet BFI Finance</a>
+            <a class="acc-link" target="_blank" rel="noopener noreferrer" href="https://docs.google.com/spreadsheets/d/1D_jLXZFOUXDc6ymSYg5TIPk3boqjO3b4BWLAFGpQhkg/edit?gid=1322029011#gid=1322029011"><span class="acc-link-dot"></span>SHEET BRIF x SIM Group</a>
+            <a class="acc-link" target="_blank" rel="noopener noreferrer" href="https://docs.google.com/spreadsheets/d/1sdZ0FRPE3BG3FrcKfEF6eZHmOVV8skdrg2MKos3p44s/edit?pli=1&gid=676359146#gid=676359146"><span class="acc-link-dot"></span>SHEET KB Finansia MF x SIM Group</a>
+            <a class="acc-link" target="_blank" rel="noopener noreferrer" href="https://www.appsheet.com/start/09875b4f-f649-467b-8cff-a503905e87d1?platform=desktop#appName=PortalOS-840667114&vss=H4sIAAAAAAAAA6WOyw7CIBREf8XMmi9ga1wY4yOpcSMusNwmRAoNULUh_LvU51pd3rk5ZybhrOlSRVmfwPfpcy1oAEcS2A4dCXCBqbPROyPABFayfYQb56M0k3UlkJEP7CWIFMDTlzz_s59BK7JRN5r8KBvRInmC5T1iJXhDyAxtH-XR0H1zgXIuWePqPpDalTG_jAhzO7t20qqlU8XZSBMo3wAQktiOagEAAA==&view=Portal%20OS"><span class="acc-link-dot"></span>App Sheet BFI Finance</a>
         </div>
     </div>
 
     <!-- INFORMATION -->
     <div class="menu-group stagger">
         <button class="acc-toggle" onclick="toggleAcc(this)">
-            <span class="acc-icon">
-                <span class="acc-emoji">ℹ️</span>
-                Information Menu
-            </span>
+            <span class="acc-icon"><span class="acc-emoji">ℹ️</span>Information Menu</span>
             <span class="acc-chevron">▾</span>
         </button>
         <div class="acc-body">
-            <a class="acc-link" href="https://drive.google.com/drive/folders/1ZTRBt8hCuFnOiiau0uypzXf7wQDg6-6a"><span class="acc-link-dot"></span>MASTER DATA ASURANSI & FAQ</a>
-            <a class="acc-link" href="https://drive.google.com/drive/folders/1H-OWg1-utK9O68DdNTjctwndTV7ZtO5u?usp=sharing"><span class="acc-link-dot"></span>FORM TEMPLATE</a>
-                </div>
+            <a class="acc-link" target="_blank" rel="noopener noreferrer" href="https://drive.google.com/drive/folders/1ZTRBt8hCuFnOiiau0uypzXf7wQDg6-6a"><span class="acc-link-dot"></span>MASTER DATA ASURANSI & FAQ</a>
+            <a class="acc-link" target="_blank" rel="noopener noreferrer" href="https://drive.google.com/drive/folders/1H-OWg1-utK9O68DdNTjctwndTV7ZtO5u?usp=sharing"><span class="acc-link-dot"></span>FORM TEMPLATE</a>
+        </div>
     </div>
 
     <div class="divider stagger"></div>
-
-    <div class="footer stagger">
-        © 2025 SIMGROUP JAKARTA &nbsp;·&nbsp; Portal Informasi Internal
-    </div>
-
+    <div class="footer stagger">© 2025 SIMGROUP TEAM JAKARTA &nbsp;·&nbsp; Portal Informasi Internal</div>
 </div>
 
 <script>
-    /* ── PIN NUMPAD ── */
     let pin = '';
     const CORRECT = '1312';
 
@@ -519,7 +425,6 @@
 
     function numpadPress(num) {
         if (pin.length >= 4) return;
-        // ripple
         const btn = event.currentTarget;
         const r = document.createElement('span');
         r.classList.add('ripple');
@@ -528,7 +433,6 @@
         r.style.cssText = `width:${size}px;height:${size}px;left:${event.clientX - rect.left - size/2}px;top:${event.clientY - rect.top - size/2}px`;
         btn.appendChild(r);
         setTimeout(() => r.remove(), 450);
-
         pin += num;
         updateDots();
         if (pin.length === 4) setTimeout(checkPIN, 300);
@@ -556,31 +460,25 @@
         }
     }
 
-    /* keyboard support */
     document.addEventListener('keydown', e => {
         if (e.key >= '0' && e.key <= '9') { numpadPress(e.key); return; }
         if (e.key === 'Backspace') numpadDel();
         if (e.key === 'Enter' && pin.length === 4) checkPIN();
     });
 
-    /* ── ACCORDION ── */
     function toggleAcc(btn) {
         const body = btn.nextElementSibling;
         const isOpen = btn.classList.contains('open');
-
-        // close all
         document.querySelectorAll('.acc-toggle.open').forEach(b => {
             b.classList.remove('open');
             b.nextElementSibling.classList.remove('open');
         });
-
         if (!isOpen) {
             btn.classList.add('open');
             body.classList.add('open');
         }
     }
 
-    /* ── STAGGER ANIMATION ── */
     function animateStagger() {
         const els = document.querySelectorAll('.stagger');
         els.forEach((el, i) => {
