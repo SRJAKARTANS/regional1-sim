@@ -115,7 +115,7 @@
             text-transform: uppercase;
         }
 
-        /* Khusus tombol tanpa dropdown (Direct Link) - Disimpan untuk cadangan */
+        /* Khusus tombol tanpa dropdown (Direct Link) */
         .menu-btn {
             text-decoration: none;
             display: block;
@@ -178,9 +178,11 @@
 
     <div id="login-screen">
         <div class="login-box">
-            <h2 style="font-size: 20px; margin-bottom: 5px; color: white;">INFORMATION PORTAL SYSTEM JAKARTA</h2>
+            <h2 style="font-size: 18px; margin-bottom: 5px; color: white;">INFORMATION PORTAL SYSTEM JAKARTA</h2>
             <p style="font-size: 13px; margin-bottom: 20px; color: #eee;">Masukkan PIN untuk otorisasi akses</p>
-            <input type="password" id="pin-input" placeholder="PIN Tim">
+            
+            <input type="password" id="pin-input" placeholder="•••••" onkeypress="handleKeyPress(event)">
+            
             <button class="btn-login" onclick="checkPIN()">MASUK</button>
             <p id="error-msg" style="color: #ffb3b3; display: none; font-size: 13px; margin-top: 15px;">PIN Salah! Silakan coba lagi.</p>
         </div>
@@ -192,7 +194,7 @@
             <img src="https://upload.wikimedia.org/wikipedia/commons/thumb/1/12/User_icon_2.svg/2048px-User_icon_2.svg.png" alt="Logo Simgroup">
         </div>
         
-        <h1>TEAM JAKARTANS </h1>
+        <h1>SIMGROUP JAKARTA</h1>
         <p class="subtitle">Pilih menu untuk melanjutkan</p>
 
         <details>
@@ -203,20 +205,18 @@
                 <a href="#">Client Self Service - CSS</a>
                 <a href="#">Visitting Monitoring - BEYOND</a>
                 <a href="#">Kalkulator perhitungan PPH21</a>
-                <a href="#">ORS - OUTSOURCING RECRUITMENT SYSTEM</a>
+                <a href="#">ORS</a>
                 <a href="#">Worksheet pengajuan kontrak kerja</a>
-                <a href="#">BPR </a>
-                <a href="#">CS SISKA</a>
-                <a href="#">G-FORM UPLOAD LPJ</a>
+                <a href="#">BPR</a>
+                <a href="#">CS Siska</a>
             </div>
         </details>
 
         <details>
             <summary>ALAT KERJA REVO FIF</summary>
             <div class="dropdown-content">
-                <a href="#">Memo Bankout FIF GROUP</a>
-                <a href="#">Lampiran Overtime FIF GROUP</a>
-                <a href="#">Alat kerja Reenginering REVO</a>
+                <a href="#">Memo Bankout</a>
+                <a href="#">Alat kerja Reenginering</a>
             </div>
         </details>
 
@@ -232,8 +232,8 @@
         <details>
             <summary>ALAT KERJA REVO MF</summary>
             <div class="dropdown-content">
-                <a href="#">Alat kerja BRIF - SIM GROUP</a>
-                <a href="#">Alat Kerja KB Finansia - SIM GROUP</a>
+                <a href="#">Alat kerja BRIF - SIM</a>
+                <a href="#">Alat Kerja KB Finansia - SIM</a>
                 <a href="#">Alat Kerja APP Sheet BFI Finance</a>
             </div>
         </details>
@@ -251,4 +251,23 @@
 
     <script>
         function checkPIN() {
-            var pin = document.getElementById("pin-
+            var pin = document.getElementById("pin-input").value;
+            
+            if (pin === "12345") { 
+                document.getElementById("login-screen").style.display = "none";
+                document.getElementById("dashboard").style.display = "block";
+                document.getElementById("error-msg").style.display = "none"; 
+            } else {
+                document.getElementById("error-msg").style.display = "block";
+            }
+        }
+
+        function handleKeyPress(event) {
+            if (event.key === "Enter") {
+                checkPIN();
+            }
+        }
+    </script>
+
+</body>
+</html>
