@@ -3,272 +3,591 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>SIMGROUP JAKARTA</title>
+    <title>SIMGROUP JAKARTA — Portal Informasi</title>
+    <link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;600;700;800&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet">
     <style>
-        /* Pengaturan Background dan Font */
+        :root {
+            --teal:     #138A9F;
+            --teal-dark:#0d6b7a;
+            --teal-light:#1aafca;
+            --copper:   #D19B74;
+            --copper-dark:#b07d58;
+            --white:    #ffffff;
+            --glass:    rgba(255,255,255,0.12);
+            --glass-border: rgba(255,255,255,0.22);
+            --text-dim: rgba(255,255,255,0.65);
+        }
+
+        *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+        /* ─── BODY & BACKGROUND ─────────────────────────────────────── */
         body {
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-            background-color: #138A9F; /* Warna dasar Tosca */
-            color: white;
-            margin: 0;
-            padding: 0;
-            display: flex;
-            flex-direction: column;
-            align-items: center;
+            font-family: 'DM Sans', sans-serif;
+            background: linear-gradient(135deg, #0a5565 0%, #138A9F 45%, #0e7a8e 70%, #0a4f5e 100%);
             min-height: 100vh;
+            overflow-x: hidden;
+            color: var(--white);
         }
 
-        /* --- HALAMAN LOGIN --- */
-        #login-screen {
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            justify-content: center;
-            height: 100vh;
-            width: 100%;
-        }
-        .login-box {
-            background-color: rgba(255, 255, 255, 0.1);
-            padding: 30px;
-            border-radius: 12px;
-            text-align: center;
-            width: 85%;
-            max-width: 350px;
-            border: 1px solid rgba(255, 255, 255, 0.2);
-        }
-        #pin-input {
-            padding: 12px;
-            width: 80%;
-            margin: 15px 0;
-            border: none;
-            border-radius: 8px;
-            font-size: 16px;
-            text-align: center;
-            color: #333;
-        }
-        .btn-login {
-            background-color: #D19B74;
-            color: white;
-            padding: 12px;
-            border: none;
-            border-radius: 8px;
-            font-size: 16px;
-            font-weight: bold;
-            width: 100%;
-            cursor: pointer;
-            box-shadow: 0 4px 6px rgba(0,0,0,0.1);
-        }
-
-        /* --- HALAMAN DASHBOARD UTAMA --- */
-        #dashboard {
-            display: none; /* Disembunyikan sebelum PIN diisi */
-            width: 100%;
-            max-width: 600px;
-            padding: 40px 20px;
-            box-sizing: border-box;
-            text-align: center;
-        }
-        
-        /* Lingkaran Logo */
-        .logo-circle {
-            width: 90px;
-            height: 90px;
-            background-color: white;
+        /* animated mesh blobs */
+        body::before, body::after {
+            content: '';
+            position: fixed;
             border-radius: 50%;
-            display: inline-flex;
-            align-items: center;
-            justify-content: center;
-            margin-bottom: 20px;
-            border: 4px solid #D19B74;
-            box-shadow: 0 4px 10px rgba(0,0,0,0.2);
-            overflow: hidden;
+            filter: blur(80px);
+            opacity: 0.25;
+            pointer-events: none;
+            z-index: 0;
+            animation: float 12s ease-in-out infinite;
         }
-        .logo-circle img {
-            width: 60%;
-            opacity: 0.8;
+        body::before {
+            width: 600px; height: 600px;
+            background: radial-gradient(circle, #1aafca, transparent);
+            top: -200px; left: -150px;
         }
-
-        h1 {
-            font-size: 20px;
-            margin: 0 0 8px 0;
-            text-transform: uppercase;
-            letter-spacing: 0.5px;
-            text-shadow: 1px 1px 2px rgba(0,0,0,0.2);
+        body::after {
+            width: 500px; height: 500px;
+            background: radial-gradient(circle, #D19B74, transparent);
+            bottom: -150px; right: -100px;
+            animation-delay: -6s;
         }
-        p.subtitle {
-            font-size: 13px;
-            margin-bottom: 35px;
-            font-weight: 400;
+        @keyframes float {
+            0%,100% { transform: translateY(0) scale(1); }
+            50%      { transform: translateY(-40px) scale(1.05); }
         }
 
-        /* Gaya Umum Tombol (Warna Coklat Muda) */
-        .menu-btn, summary {
-            background-color: #D19B74;
-            color: white;
+        /* ─── LOGIN SCREEN ─────────────────────────────────────────── */
+        #login-screen {
+            position: fixed; inset: 0;
+            display: flex; align-items: center; justify-content: center;
+            z-index: 100;
+            transition: opacity 0.5s ease, visibility 0.5s ease;
+        }
+        #login-screen.hidden { opacity: 0; visibility: hidden; }
+
+        .login-card {
+            position: relative;
+            background: var(--glass);
+            backdrop-filter: blur(24px);
+            -webkit-backdrop-filter: blur(24px);
+            border: 1px solid var(--glass-border);
+            border-radius: 24px;
+            padding: 48px 36px;
+            width: 90%; max-width: 380px;
+            text-align: center;
+            box-shadow: 0 32px 80px rgba(0,0,0,0.3), inset 0 1px 0 rgba(255,255,255,0.15);
+            animation: slideUp 0.7s cubic-bezier(0.22,1,0.36,1) both;
+        }
+        @keyframes slideUp {
+            from { opacity:0; transform: translateY(40px); }
+            to   { opacity:1; transform: translateY(0); }
+        }
+
+        .login-logo {
+            width: 72px; height: 72px;
+            background: linear-gradient(135deg, var(--copper), #e8b98a);
+            border-radius: 20px;
+            display: inline-flex; align-items: center; justify-content: center;
+            margin-bottom: 24px;
+            box-shadow: 0 8px 24px rgba(209,155,116,0.4);
+            font-size: 30px;
+        }
+
+        .login-title {
+            font-family: 'Syne', sans-serif;
+            font-size: 15px; font-weight: 700;
+            letter-spacing: 2px; text-transform: uppercase;
+            color: var(--white); margin-bottom: 6px;
+        }
+        .login-sub {
+            font-size: 12px; color: var(--text-dim);
+            margin-bottom: 32px; line-height: 1.5;
+        }
+
+        .pin-label {
+            font-size: 11px; letter-spacing: 1.5px; text-transform: uppercase;
+            color: var(--text-dim); margin-bottom: 10px; display: block;
+        }
+        .pin-dots {
+            display: flex; justify-content: center; gap: 12px;
+            margin-bottom: 28px;
+        }
+        .pin-dot {
+            width: 14px; height: 14px;
+            border-radius: 50%;
+            border: 2px solid rgba(255,255,255,0.4);
+            background: transparent;
+            transition: all 0.2s ease;
+        }
+        .pin-dot.filled {
+            background: var(--copper);
+            border-color: var(--copper);
+            box-shadow: 0 0 10px rgba(209,155,116,0.6);
+            transform: scale(1.15);
+        }
+
+        #pin-input {
+            position: absolute; opacity: 0; pointer-events: none; width: 1px; height: 1px;
+        }
+
+        .numpad {
+            display: grid; grid-template-columns: repeat(3, 1fr);
+            gap: 10px; margin-bottom: 16px;
+        }
+        .numpad-btn {
+            background: rgba(255,255,255,0.1);
+            border: 1px solid rgba(255,255,255,0.15);
+            border-radius: 12px; color: white;
+            font-family: 'Syne', sans-serif;
+            font-size: 18px; font-weight: 600;
+            padding: 14px; cursor: pointer;
+            transition: all 0.15s ease;
+            position: relative; overflow: hidden;
+        }
+        .numpad-btn:hover  { background: rgba(255,255,255,0.2); transform: translateY(-1px); }
+        .numpad-btn:active { transform: scale(0.95); }
+        .numpad-btn.del    { font-size: 14px; }
+        .numpad-btn.enter  { background: var(--copper); border-color: var(--copper); grid-column: span 1; }
+        .numpad-btn.enter:hover { background: var(--copper-dark); }
+        .numpad-btn.zero   { grid-column: span 2; }
+
+        /* ripple */
+        .ripple { position:absolute; border-radius:50%; background:rgba(255,255,255,0.3); transform:scale(0); animation:rippleAnim .4s linear; }
+        @keyframes rippleAnim { to { transform:scale(4); opacity:0; } }
+
+        #error-msg {
+            color: #ffb3b3;
+            font-size: 12px; margin-top: 8px;
+            display: none;
+            animation: shake 0.4s ease;
+        }
+        @keyframes shake {
+            0%,100% { transform: translateX(0); }
+            20%,60% { transform: translateX(-8px); }
+            40%,80% { transform: translateX(8px); }
+        }
+
+        /* ─── DASHBOARD ─────────────────────────────────────────────── */
+        #dashboard {
+            display: none;
+            width: 100%; max-width: 560px;
+            margin: 0 auto; padding: 40px 20px 60px;
+            position: relative; z-index: 1;
+            opacity: 0; transform: translateY(20px);
+            transition: opacity 0.5s ease, transform 0.5s ease;
+        }
+        #dashboard.visible { opacity: 1; transform: translateY(0); }
+
+        /* header */
+        .dash-header {
+            text-align: center; margin-bottom: 40px;
+        }
+        .brand-icon {
+            width: 80px; height: 80px;
+            background: white;
+            border-radius: 24px;
+            display: inline-flex; align-items: center; justify-content: center;
+            margin-bottom: 18px;
+            box-shadow: 0 12px 40px rgba(0,0,0,0.2), 0 0 0 4px rgba(255,255,255,0.15);
+            font-size: 36px;
+        }
+        .brand-name {
+            font-family: 'Syne', sans-serif;
+            font-size: 22px; font-weight: 800;
+            letter-spacing: 2px; text-transform: uppercase;
+            margin-bottom: 4px;
+        }
+        .brand-sub {
+            font-size: 12px; color: var(--text-dim);
+            letter-spacing: 1px; text-transform: uppercase;
+        }
+
+        /* divider */
+        .divider {
+            height: 1px;
+            background: linear-gradient(90deg, transparent, rgba(255,255,255,0.25), transparent);
+            margin: 32px 0;
+        }
+
+        /* section label */
+        .section-label {
+            font-size: 10px; letter-spacing: 2.5px; text-transform: uppercase;
+            color: var(--text-dim); margin-bottom: 14px; padding-left: 4px;
+        }
+
+        /* ─── ACCORDION ─────────────────────────────────────────────── */
+        .menu-group { margin-bottom: 10px; }
+
+        .acc-toggle {
+            width: 100%;
+            display: flex; align-items: center; justify-content: space-between;
+            background: var(--glass);
+            backdrop-filter: blur(12px);
+            -webkit-backdrop-filter: blur(12px);
+            border: 1px solid var(--glass-border);
+            border-radius: 14px;
+            padding: 16px 20px;
+            color: white; cursor: pointer;
+            font-family: 'Syne', sans-serif;
+            font-size: 13px; font-weight: 700;
+            letter-spacing: 0.8px; text-transform: uppercase;
+            transition: all 0.2s ease;
+            position: relative; overflow: hidden;
+        }
+        .acc-toggle::before {
+            content: '';
+            position: absolute; inset: 0;
+            background: linear-gradient(90deg, transparent, rgba(255,255,255,0.05), transparent);
+            transform: translateX(-100%);
+            transition: transform 0.4s ease;
+        }
+        .acc-toggle:hover::before { transform: translateX(100%); }
+        .acc-toggle:hover {
+            background: rgba(255,255,255,0.18);
+            border-color: rgba(255,255,255,0.3);
+            transform: translateY(-1px);
+            box-shadow: 0 8px 24px rgba(0,0,0,0.15);
+        }
+        .acc-toggle.open {
+            background: rgba(255,255,255,0.18);
+            border-bottom-left-radius: 0;
+            border-bottom-right-radius: 0;
+            border-bottom-color: transparent;
+        }
+
+        .acc-icon {
+            display: flex; align-items: center; gap: 12px;
+        }
+        .acc-emoji {
+            font-size: 16px;
+            width: 32px; height: 32px;
+            background: rgba(255,255,255,0.12);
             border-radius: 8px;
-            font-weight: bold;
-            font-size: 14px;
-            box-shadow: 0 4px 6px rgba(0,0,0,0.1);
-            width: 100%;
-            box-sizing: border-box;
-            cursor: pointer;
-            text-transform: uppercase;
+            display: flex; align-items: center; justify-content: center;
         }
+        .acc-chevron {
+            width: 20px; height: 20px;
+            border: 2px solid rgba(255,255,255,0.5);
+            border-radius: 50%;
+            display: flex; align-items: center; justify-content: center;
+            font-size: 10px;
+            transition: transform 0.3s ease;
+            flex-shrink: 0;
+        }
+        .acc-toggle.open .acc-chevron { transform: rotate(180deg); }
 
-        /* Khusus tombol tanpa dropdown (Direct Link) */
-        .menu-btn {
+        .acc-body {
+            background: rgba(255,255,255,0.96);
+            border: 1px solid var(--glass-border);
+            border-top: none;
+            border-bottom-left-radius: 14px;
+            border-bottom-right-radius: 14px;
+            max-height: 0; overflow: hidden;
+            transition: max-height 0.4s cubic-bezier(0.4,0,0.2,1);
+        }
+        .acc-body.open { max-height: 500px; }
+
+        .acc-link {
+            display: flex; align-items: center; gap: 12px;
+            padding: 13px 20px;
+            color: var(--teal-dark);
             text-decoration: none;
-            display: block;
-            padding: 18px 20px;
-            border: none;
-            margin-bottom: 15px;
+            font-size: 13px; font-weight: 500;
+            border-bottom: 1px solid rgba(19,138,159,0.08);
+            transition: all 0.2s ease;
+            position: relative;
         }
-        .menu-btn:hover, summary:hover {
-            background-color: #c28c66;
+        .acc-link::before {
+            content: '';
+            position: absolute; left: 0; top: 0; bottom: 0;
+            width: 3px; background: var(--copper);
+            border-radius: 0 2px 2px 0;
+            transform: scaleY(0);
+            transition: transform 0.2s ease;
         }
-
-        /* --- PENGATURAN DROPDOWN (ACCORDION) --- */
-        details {
-            margin-bottom: 15px;
-            width: 100%;
+        .acc-link:hover {
+            background: rgba(19,138,159,0.06);
+            padding-left: 24px;
+            color: var(--teal);
         }
-        summary {
-            margin: 0; /* Kunci agar jarak tidak dobel */
-            padding: 18px 20px;
-            list-style: none; 
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-        }
-        /* Menghapus panah bawaan browser */
-        summary::-webkit-details-marker { display: none; }
-        
-        summary:after {
-            content: "▼";
-            font-size: 12px;
-        }
-        details[open] summary:after {
-            content: "▲";
+        .acc-link:hover::before { transform: scaleY(1); }
+        .acc-link:last-child { border-bottom: none; }
+        .acc-link-dot {
+            width: 6px; height: 6px;
+            background: var(--copper);
+            border-radius: 50%; flex-shrink: 0;
+            opacity: 0.6;
         }
 
-        .dropdown-content {
-            background-color: rgba(255, 255, 255, 0.95);
-            margin-top: 0; 
-            padding: 15px;
-            border-bottom-left-radius: 8px;
-            border-bottom-right-radius: 8px;
-            text-align: left;
+        /* ─── DIRECT MENU BTN ───────────────────────────────────────── */
+        .direct-btn {
+            display: block; width: 100%;
+            background: linear-gradient(135deg, var(--copper), #e8b98a);
+            color: white; text-decoration: none;
+            padding: 17px 20px;
+            border-radius: 14px;
+            font-family: 'Syne', sans-serif;
+            font-size: 13px; font-weight: 700;
+            letter-spacing: 0.8px; text-transform: uppercase;
+            text-align: center; margin-bottom: 10px;
+            box-shadow: 0 6px 20px rgba(209,155,116,0.35);
+            transition: all 0.2s ease;
+            border: none; cursor: pointer;
         }
-        .dropdown-content a {
-            color: #138A9F;
-            text-decoration: none;
-            display: block;
-            padding: 10px 0;
-            border-bottom: 1px solid #ddd;
-            font-weight: bold;
-            font-size: 13px;
-        }
-        .dropdown-content a:last-child {
-            border-bottom: none;
+        .direct-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 10px 28px rgba(209,155,116,0.5);
         }
 
+        /* ─── FOOTER ────────────────────────────────────────────────── */
+        .footer {
+            text-align: center; margin-top: 40px;
+            color: rgba(255,255,255,0.35);
+            font-size: 11px; letter-spacing: 0.5px;
+        }
+
+        /* ─── STAGGER ANIMATION ─────────────────────────────────────── */
+        .stagger { opacity: 0; transform: translateY(16px); }
+        .stagger.shown {
+            opacity: 1; transform: translateY(0);
+            transition: opacity 0.4s ease, transform 0.4s ease;
+        }
+
+        /* ─── SCROLLBAR ─────────────────────────────────────────────── */
+        ::-webkit-scrollbar { width: 4px; }
+        ::-webkit-scrollbar-track { background: transparent; }
+        ::-webkit-scrollbar-thumb { background: rgba(255,255,255,0.2); border-radius: 2px; }
     </style>
 </head>
 <body>
 
-    <div id="login-screen">
-        <div class="login-box">
-            <h2 style="font-size: 18px; margin-bottom: 5px; color: white;">INFORMATION PORTAL SYSTEM JAKARTA</h2>
-            <p style="font-size: 13px; margin-bottom: 20px; color: #eee;">Masukkan PIN untuk otorisasi akses</p>
-            
-            <input type="password" id="pin-input" placeholder="•••••" onkeypress="handleKeyPress(event)">
-            
-            <button class="btn-login" onclick="checkPIN()">MASUK</button>
-            <p id="error-msg" style="color: #ffb3b3; display: none; font-size: 13px; margin-top: 15px;">PIN Salah! Silakan coba lagi.</p>
+<!-- ═══════════════════════════════════════════
+     LOGIN SCREEN
+═══════════════════════════════════════════ -->
+<div id="login-screen">
+    <div class="login-card">
+        <div class="login-logo">🏢</div>
+        <div class="login-title">SIMGROUP JAKARTA</div>
+        <p class="login-sub">Information Portal System<br>Masukkan PIN untuk melanjutkan</p>
+
+        <span class="pin-label">Masukkan PIN Anda</span>
+        <div class="pin-dots" id="pin-dots">
+            <div class="pin-dot" id="d0"></div>
+            <div class="pin-dot" id="d1"></div>
+            <div class="pin-dot" id="d2"></div>
+            <div class="pin-dot" id="d3"></div>
+        </div>
+
+        <input type="password" id="pin-input" inputmode="numeric" autocomplete="off">
+
+        <div class="numpad">
+            <button class="numpad-btn" onclick="numpadPress('1')">1</button>
+            <button class="numpad-btn" onclick="numpadPress('2')">2</button>
+            <button class="numpad-btn" onclick="numpadPress('3')">3</button>
+            <button class="numpad-btn" onclick="numpadPress('4')">4</button>
+            <button class="numpad-btn" onclick="numpadPress('5')">5</button>
+            <button class="numpad-btn" onclick="numpadPress('6')">6</button>
+            <button class="numpad-btn" onclick="numpadPress('7')">7</button>
+            <button class="numpad-btn" onclick="numpadPress('8')">8</button>
+            <button class="numpad-btn" onclick="numpadPress('9')">9</button>
+            <button class="numpad-btn zero" onclick="numpadPress('0')">0</button>
+            <button class="numpad-btn del" onclick="numpadDel()">⌫</button>
+        </div>
+
+        <p id="error-msg">❌ PIN Salah! Silakan coba lagi.</p>
+    </div>
+</div>
+
+<!-- ═══════════════════════════════════════════
+     DASHBOARD
+═══════════════════════════════════════════ -->
+<div id="dashboard">
+
+    <div class="dash-header stagger">
+        <div class="brand-icon">🏢</div>
+        <div class="brand-name">SIMGROUP JAKARTA</div>
+        <div class="brand-sub">Information Portal System</div>
+    </div>
+
+    <div class="divider stagger"></div>
+
+    <p class="section-label stagger">Menu Navigasi</p>
+
+    <!-- MONITORING -->
+    <div class="menu-group stagger">
+        <button class="acc-toggle" onclick="toggleAcc(this)">
+            <span class="acc-icon">
+                <span class="acc-emoji">📊</span>
+                Monitoring (All Revo Access)
+            </span>
+            <span class="acc-chevron">▾</span>
+        </button>
+        <div class="acc-body">
+            <a class="acc-link" href="#"><span class="acc-link-dot"></span>TAD Daily</a>
+            <a class="acc-link" href="#"><span class="acc-link-dot"></span>Dashboard Internal</a>
+            <a class="acc-link" href="#"><span class="acc-link-dot"></span>Client Self Service (CSS)</a>
+            <a class="acc-link" href="#"><span class="acc-link-dot"></span>Visiting Monitoring — Beyond</a>
+            <a class="acc-link" href="#"><span class="acc-link-dot"></span>Kalkulator Perhitungan PPH21</a>
+            <a class="acc-link" href="#"><span class="acc-link-dot"></span>ORS</a>
+            <a class="acc-link" href="#"><span class="acc-link-dot"></span>Worksheet Pengajuan Kontrak Kerja</a>
+            <a class="acc-link" href="#"><span class="acc-link-dot"></span>BPR</a>
+            <a class="acc-link" href="#"><span class="acc-link-dot"></span>CS SISKA</a>
+            <a class="acc-link" href="#"><span class="acc-link-dot"></span>Timeline BS</a>
         </div>
     </div>
 
-    <div id="dashboard">
-        
-        <div class="logo-circle">
-            <img src="https://upload.wikimedia.org/wikipedia/commons/thumb/1/12/User_icon_2.svg/2048px-User_icon_2.svg.png" alt="Logo Simgroup">
+    <!-- FIF -->
+    <div class="menu-group stagger">
+        <button class="acc-toggle" onclick="toggleAcc(this)">
+            <span class="acc-icon">
+                <span class="acc-emoji">🔧</span>
+                Alat Kerja Revo FIF
+            </span>
+            <span class="acc-chevron">▾</span>
+        </button>
+        <div class="acc-body">
+            <a class="acc-link" href="#"><span class="acc-link-dot"></span>Memo Bankout</a>
+            <a class="acc-link" href="#"><span class="acc-link-dot"></span>Alat Kerja Re-Engineering</a>
         </div>
-        
-        <h1>SIMGROUP JAKARTA</h1>
-        <p class="subtitle">Pilih menu untuk melanjutkan</p>
-
-        <details>
-            <summary>MONITORING (ALL REVO ACCESS)</summary>
-            <div class="dropdown-content">
-                <a href="#">TAD Daily</a>
-                <a href="#">DASHBOAR INTERNAL</a>
-                <a href="#">CLIENT SELF SERVICE - CSS</a>
-                <a href="#">VISITING MONITORING - BEYOND</a>
-                <a href="#">KALKULATOR PERHITUNGAN PPH21</a>
-                <a href="#">ORS</a>
-                <a href="#">WORKSHEET PENGAJUAN KONTRAK KERJA</a>
-                <a href="#">BPR</a>
-                <a href="#">CS SISKA</a>
-                <a href="#">TIMELINE BS</a>
-            </div>
-        </details>
-
-        <details>
-            <summary>ALAT KERJA REVO FIF</summary>
-            <div class="dropdown-content">
-                <a href="#">MEMO BANKOUT</a>
-                <a href="#">ALAT KERJA RE-RENGINERING</a>
-            </div>
-        </details>
-
-        <details>
-            <summary>ALAT KERJA REVO ADIRA</summary>
-            <div class="dropdown-content">
-                <a href="#">MENU BUFFER EGILIBLE SIM - ADIRA</a>
-                <a href="#">MENU TARGET BUFFER & QC WEEKLY REVO to AKB</a>
-                <a href="#">MENU AKB ADIRA</a>
-            </div>
-        </details>
-
-        <details>
-            <summary>ALAT KERJA REVO MF</summary>
-            <div class="dropdown-content">
-                <a href="#">ALAT KERJA BRIF - SIM GROUP</a>
-                <a href="#">ALAT KERJA KB FINANSIA MF - SIM GROUP</a>
-                <a href="#">ALAT KERJA APP SHEET BFI FINANCE</a>
-            </div>
-        </details>
-
-        <details>
-            <summary>INFORMATION MENU</summary>
-            <div class="dropdown-content">
-                <a href="#">RS PROVIDER ASURANSI & FAQ</a>
-                <a href="#">FORM TEMPLATE</a>
-                <a href="#">LINK TUTORIAL ALAT KERJA & APLIKASI SIM GROUP</a>
-            </div>
-        </details>
-
     </div>
 
-    <script>
-        function checkPIN() {
-            var pin = document.getElementById("pin-input").value;
-            
-            if (pin === "1312") { 
-                document.getElementById("login-screen").style.display = "none";
-                document.getElementById("dashboard").style.display = "block";
-                document.getElementById("error-msg").style.display = "none"; 
-            } else {
-                document.getElementById("error-msg").style.display = "block";
-            }
-        }
+    <!-- ADIRA -->
+    <div class="menu-group stagger">
+        <button class="acc-toggle" onclick="toggleAcc(this)">
+            <span class="acc-icon">
+                <span class="acc-emoji">📋</span>
+                Alat Kerja Revo ADIRA
+            </span>
+            <span class="acc-chevron">▾</span>
+        </button>
+        <div class="acc-body">
+            <a class="acc-link" href="#"><span class="acc-link-dot"></span>Menu Buffer Eligible SIM — ADIRA</a>
+            <a class="acc-link" href="#"><span class="acc-link-dot"></span>Menu Target Buffer & QC Weekly Revo to AKB</a>
+            <a class="acc-link" href="#"><span class="acc-link-dot"></span>Menu AKB ADIRA</a>
+        </div>
+    </div>
 
-        function handleKeyPress(event) {
-            if (event.key === "Enter") {
-                checkPIN();
-            }
-        }
-    </script>
+    <!-- MF -->
+    <div class="menu-group stagger">
+        <button class="acc-toggle" onclick="toggleAcc(this)">
+            <span class="acc-icon">
+                <span class="acc-emoji">💼</span>
+                Alat Kerja Revo MF
+            </span>
+            <span class="acc-chevron">▾</span>
+        </button>
+        <div class="acc-body">
+            <a class="acc-link" href="#"><span class="acc-link-dot"></span>Alat Kerja BRIF — SIM Group</a>
+            <a class="acc-link" href="#"><span class="acc-link-dot"></span>Alat Kerja KB Finansia MF — SIM Group</a>
+            <a class="acc-link" href="#"><span class="acc-link-dot"></span>Alat Kerja App Sheet BFI Finance</a>
+        </div>
+    </div>
 
+    <!-- INFORMATION -->
+    <div class="menu-group stagger">
+        <button class="acc-toggle" onclick="toggleAcc(this)">
+            <span class="acc-icon">
+                <span class="acc-emoji">ℹ️</span>
+                Information Menu
+            </span>
+            <span class="acc-chevron">▾</span>
+        </button>
+        <div class="acc-body">
+            <a class="acc-link" href="#"><span class="acc-link-dot"></span>RS Provider Asuransi & FAQ</a>
+            <a class="acc-link" href="#"><span class="acc-link-dot"></span>Form Template</a>
+            <a class="acc-link" href="#"><span class="acc-link-dot"></span>Link Tutorial Alat Kerja & Aplikasi SIM Group</a>
+        </div>
+    </div>
+
+    <div class="divider stagger"></div>
+
+    <div class="footer stagger">
+        © 2025 SIMGROUP JAKARTA &nbsp;·&nbsp; Portal Informasi Internal
+    </div>
+
+</div>
+
+<script>
+    /* ── PIN NUMPAD ── */
+    let pin = '';
+    const CORRECT = '1312';
+
+    function updateDots() {
+        for (let i = 0; i < 4; i++) {
+            document.getElementById('d' + i).classList.toggle('filled', i < pin.length);
+        }
+    }
+
+    function numpadPress(num) {
+        if (pin.length >= 4) return;
+        // ripple
+        const btn = event.currentTarget;
+        const r = document.createElement('span');
+        r.classList.add('ripple');
+        const rect = btn.getBoundingClientRect();
+        const size = Math.max(rect.width, rect.height);
+        r.style.cssText = `width:${size}px;height:${size}px;left:${event.clientX - rect.left - size/2}px;top:${event.clientY - rect.top - size/2}px`;
+        btn.appendChild(r);
+        setTimeout(() => r.remove(), 450);
+
+        pin += num;
+        updateDots();
+        if (pin.length === 4) setTimeout(checkPIN, 300);
+    }
+
+    function numpadDel() {
+        pin = pin.slice(0, -1);
+        updateDots();
+        document.getElementById('error-msg').style.display = 'none';
+    }
+
+    function checkPIN() {
+        if (pin === CORRECT) {
+            document.getElementById('login-screen').classList.add('hidden');
+            const dash = document.getElementById('dashboard');
+            dash.style.display = 'block';
+            setTimeout(() => {
+                dash.classList.add('visible');
+                animateStagger();
+            }, 50);
+        } else {
+            document.getElementById('error-msg').style.display = 'block';
+            pin = '';
+            updateDots();
+        }
+    }
+
+    /* keyboard support */
+    document.addEventListener('keydown', e => {
+        if (e.key >= '0' && e.key <= '9') { numpadPress(e.key); return; }
+        if (e.key === 'Backspace') numpadDel();
+        if (e.key === 'Enter' && pin.length === 4) checkPIN();
+    });
+
+    /* ── ACCORDION ── */
+    function toggleAcc(btn) {
+        const body = btn.nextElementSibling;
+        const isOpen = btn.classList.contains('open');
+
+        // close all
+        document.querySelectorAll('.acc-toggle.open').forEach(b => {
+            b.classList.remove('open');
+            b.nextElementSibling.classList.remove('open');
+        });
+
+        if (!isOpen) {
+            btn.classList.add('open');
+            body.classList.add('open');
+        }
+    }
+
+    /* ── STAGGER ANIMATION ── */
+    function animateStagger() {
+        const els = document.querySelectorAll('.stagger');
+        els.forEach((el, i) => {
+            setTimeout(() => el.classList.add('shown'), i * 80);
+        });
+    }
+</script>
 </body>
 </html>
