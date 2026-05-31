@@ -1,14 +1,12 @@
+```html
 <!DOCTYPE html>
 <html lang="id">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Dashboard Internal - SIMGROUP JAKARTA</title>
-    <!-- Tailwind CSS -->
     <script src="https://cdn.tailwindcss.com"></script>
-    <!-- Font Awesome -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-    <!-- Chart.js -->
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     
     <script>
@@ -16,8 +14,8 @@
             theme: {
                 extend: {
                     colors: {
-                        primary: '#148e9e', // Deep Teal menyesuaikan gambar
-                        secondary: '#0d6470', // Teal lebih gelap untuk gradien
+                        primary: '#148e9e', // Deep Teal
+                        secondary: '#0d6470',
                         glass: 'rgba(255, 255, 255, 0.08)',
                         glassBorder: 'rgba(255, 255, 255, 0.15)',
                     }
@@ -27,29 +25,15 @@
     </script>
     <style>
         @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap');
-        body {
-            font-family: 'Inter', sans-serif;
-        }
-        /* Custom Scrollbar for Dark Theme */
-        ::-webkit-scrollbar {
-            width: 8px;
-            height: 8px;
-        }
-        ::-webkit-scrollbar-track {
-            background: rgba(0,0,0,0.1); 
-        }
-        ::-webkit-scrollbar-thumb {
-            background: rgba(255,255,255,0.2); 
-            border-radius: 10px;
-        }
-        ::-webkit-scrollbar-thumb:hover {
-            background: rgba(255,255,255,0.4); 
-        }
+        body { font-family: 'Inter', sans-serif; }
+        ::-webkit-scrollbar { width: 8px; height: 8px; }
+        ::-webkit-scrollbar-track { background: rgba(0,0,0,0.1); }
+        ::-webkit-scrollbar-thumb { background: rgba(255,255,255,0.2); border-radius: 10px; }
+        ::-webkit-scrollbar-thumb:hover { background: rgba(255,255,255,0.4); }
     </style>
 </head>
 <body class="bg-gradient-to-br from-primary to-secondary h-screen overflow-hidden flex text-slate-800">
 
-    <!-- Sidebar (Glassmorphism) -->
     <aside class="w-64 bg-glass backdrop-blur-xl border-r border-glassBorder hidden md:flex flex-col z-20">
         <div class="h-20 flex items-center justify-center border-b border-glassBorder">
             <div class="flex items-center gap-2 text-white font-bold text-xl tracking-wider">
@@ -59,40 +43,34 @@
         </div>
         <div class="flex-1 overflow-y-auto py-4">
             <nav class="space-y-2 px-3">
-                <!-- Active Menu -->
                 <a href="dashboard-internal.html" class="flex items-center gap-3 px-4 py-3 bg-white/20 text-white rounded-lg font-semibold transition-all shadow-sm">
                     <i class="fa-solid fa-chart-pie w-5 text-center"></i>
                     Dashboard Internal
                 </a>
-                <!-- Inactive Menus -->
-                <!-- GANTI ISI href DI BAWAH INI DENGAN LINK/FILE TUJUAN KAMU -->
-                <a href="tad-daily-log.html" class="flex items-center gap-3 px-4 py-3 text-white/70 hover:bg-white/10 hover:text-white rounded-lg font-medium transition-all">
+                <a href="#" class="flex items-center gap-3 px-4 py-3 text-white/70 hover:bg-white/10 hover:text-white rounded-lg font-medium transition-all">
                     <i class="fa-solid fa-users w-5 text-center"></i>
                     TAD Daily Log
                 </a>
-                <a href="visiting-monitoring.html" class="flex items-center gap-3 px-4 py-3 text-white/70 hover:bg-white/10 hover:text-white rounded-lg font-medium transition-all">
+                <a href="#" class="flex items-center gap-3 px-4 py-3 text-white/70 hover:bg-white/10 hover:text-white rounded-lg font-medium transition-all">
                     <i class="fa-solid fa-map-location-dot w-5 text-center"></i>
                     Visiting Monitoring
                 </a>
-                <a href="report-client.html" class="flex items-center gap-3 px-4 py-3 text-white/70 hover:bg-white/10 hover:text-white rounded-lg font-medium transition-all">
+                <a href="#" class="flex items-center gap-3 px-4 py-3 text-white/70 hover:bg-white/10 hover:text-white rounded-lg font-medium transition-all">
                     <i class="fa-solid fa-file-invoice w-5 text-center"></i>
                     Report Client
                 </a>
             </nav>
         </div>
         <div class="p-4 border-t border-glassBorder">
-            <!-- Tombol Kembali ke Portal Utama -->
-            <a href="index.html" class="flex items-center justify-center gap-2 w-full py-2.5 bg-glass border border-glassBorder text-white rounded-lg hover:bg-white/20 transition-all font-medium text-sm">
-                <i class="fa-solid fa-arrow-left"></i>
-                Kembali ke Portal
-            </a>
+            <button onclick="handleLogout()" class="flex items-center justify-center gap-2 w-full py-2.5 bg-rose-500/20 border border-rose-500/30 text-white rounded-lg hover:bg-rose-500/40 transition-all font-medium text-sm">
+                <i class="fa-solid fa-arrow-right-from-bracket"></i>
+                Sign Out
+            </button>
         </div>
     </aside>
 
-    <!-- Main Content -->
     <div class="flex-1 flex flex-col h-screen overflow-hidden relative">
         
-        <!-- Top Header (Glassmorphism) -->
         <header class="h-20 bg-glass backdrop-blur-sm border-b border-glassBorder flex items-center justify-between px-6 lg:px-10 z-10">
             <div class="flex items-center gap-4 text-white">
                 <button class="md:hidden text-white/80 hover:text-white transition">
@@ -102,205 +80,198 @@
             </div>
             
             <div class="flex items-center gap-6">
-                <!-- Search Bar -->
-                <div class="relative hidden md:block">
-                    <i class="fa-solid fa-search absolute left-3 top-1/2 transform -translate-y-1/2 text-white/60"></i>
-                    <input type="text" placeholder="Search data..." class="pl-10 pr-4 py-2 bg-black/10 border border-white/20 rounded-full text-sm text-white placeholder-white/60 focus:ring-2 focus:ring-white/50 focus:outline-none w-64 transition-all backdrop-blur-md">
-                </div>
-                <!-- Notif -->
                 <button class="relative text-white/80 hover:text-white transition">
                     <i class="fa-regular fa-bell text-xl"></i>
-                    <span class="absolute -top-1 -right-1 bg-red-500 text-white text-[10px] font-bold w-4 h-4 rounded-full flex items-center justify-center border-2 border-[#148e9e]">3</span>
+                    <span class="absolute -top-1 -right-1 bg-red-500 text-white text-[10px] font-bold w-4 h-4 rounded-full flex items-center justify-center border-2 border-[#148e9e]">5</span>
                 </button>
-                <!-- Profile -->
-                <div class="flex items-center gap-3 border-l border-white/20 pl-6 cursor-pointer group">
+                <div class="flex items-center gap-3 border-l border-white/20 pl-6 cursor-pointer group" id="user-profile">
                     <div class="text-right hidden sm:block">
-                        <p class="text-sm font-semibold text-white group-hover:text-white/90 transition">Anya</p>
-                        <p class="text-xs text-white/70 group-hover:text-white/80 transition">Regional Manager</p>
+                        <p class="text-sm font-semibold text-white group-hover:text-white/90 transition" id="profile-name">Loading...</p>
+                        <p class="text-xs text-white/70 group-hover:text-white/80 transition" id="profile-role">Loading...</p>
                     </div>
-                    <img src="https://ui-avatars.com/api/?name=Anya&background=ffffff&color=148e9e" alt="Profile" class="w-10 h-10 rounded-full shadow-lg ring-2 ring-white/30">
+                    <img src="https://ui-avatars.com/api/?name=User&background=ffffff&color=148e9e" id="profile-avatar" alt="Profile" class="w-10 h-10 rounded-full shadow-lg ring-2 ring-white/30">
                 </div>
             </div>
         </header>
 
-        <!-- Scrollable Main Content -->
         <main class="flex-1 overflow-x-hidden overflow-y-auto p-6 lg:p-10 z-0">
             
-            <!-- Welcome Text -->
             <div class="mb-8 text-white flex items-center justify-between">
                 <div class="animate-fade-in-up">
-                    <h2 class="text-2xl lg:text-3xl font-bold mb-1 tracking-tight">Good Evening, Anya! ✨</h2>
-                    <p class="text-white/80 max-w-lg text-sm md:text-base font-light">*All good so far!* Ini adalah ringkasan performa tim regional Jakarta hari ini. Ada beberapa *pending task* yang perlu kamu *review*.</p>
+                    <h2 class="text-2xl lg:text-3xl font-bold mb-1 tracking-tight" id="welcome-greeting">Welcome! ✨</h2>
+                    <p class="text-white/80 max-w-2xl text-sm md:text-base font-light">Berikut adalah ringkasan operasional terkini: Status pemenuhan *Service Order* (SO), antrean *Buffer* Kandidat dari form registrasi, dan daftar *Sourcing Partner*.</p>
                 </div>
             </div>
 
-            <!-- KPI Cards -->
-            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
-                <!-- Card 1 -->
-                <div class="bg-white rounded-2xl p-6 shadow-xl border-none hover:-translate-y-1 transition-transform duration-300">
-                    <div class="flex items-center justify-between mb-4">
-                        <div class="w-12 h-12 rounded-full bg-blue-50 text-blue-500 flex items-center justify-center text-xl shadow-inner">
-                            <i class="fa-solid fa-users"></i>
-                        </div>
-                        <span class="text-xs font-semibold text-emerald-600 bg-emerald-50 px-2 py-1 rounded-full border border-emerald-100">+12% <i class="fa-solid fa-arrow-up ml-1"></i></span>
-                    </div>
-                    <h3 class="text-slate-500 text-sm font-medium mb-1">Total Karyawan (TAD)</h3>
-                    <p class="text-3xl font-bold text-slate-800">1,248</p>
-                </div>
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mb-8">
                 
-                <!-- Card 2 -->
-                <div class="bg-white rounded-2xl p-6 shadow-xl border-none hover:-translate-y-1 transition-transform duration-300">
+                <div class="bg-white p-6 rounded-2xl shadow-xl border-none hover:-translate-y-1 transition-transform duration-300">
                     <div class="flex items-center justify-between mb-4">
-                        <div class="w-12 h-12 rounded-full bg-purple-50 text-purple-500 flex items-center justify-center text-xl shadow-inner">
-                            <i class="fa-solid fa-building-user"></i>
-                        </div>
-                        <span class="text-xs font-semibold text-slate-500 bg-slate-50 px-2 py-1 rounded-full border border-slate-200">Tetap</span>
+                        <h3 class="font-bold text-slate-800">Status SO (Fulfillment)</h3>
+                        <div class="p-2 bg-slate-50 rounded-lg text-slate-400"><i class="fa-solid fa-chart-pie"></i></div>
                     </div>
-                    <h3 class="text-slate-500 text-sm font-medium mb-1">Klien Aktif</h3>
-                    <p class="text-3xl font-bold text-slate-800">45</p>
+                    <div class="relative h-48 w-full flex justify-center">
+                        <canvas id="soFulfillChart"></canvas>
+                    </div>
+                    <div class="mt-4 flex justify-center gap-6 text-xs font-medium text-slate-600">
+                        <div class="flex items-center gap-2"><span class="w-3 h-3 rounded-full bg-[#148e9e] block shadow-sm"></span> Ter-Fulfill (75%)</div>
+                        <div class="flex items-center gap-2"><span class="w-3 h-3 rounded-full bg-[#f43f5e] block shadow-sm"></span> Belum Fulfill (25%)</div>
+                    </div>
                 </div>
 
-                <!-- Card 3 -->
-                <div class="bg-white rounded-2xl p-6 shadow-xl border-none hover:-translate-y-1 transition-transform duration-300">
+                <div class="bg-white p-6 rounded-2xl shadow-xl border-none hover:-translate-y-1 transition-transform duration-300">
                     <div class="flex items-center justify-between mb-4">
-                        <div class="w-12 h-12 rounded-full bg-emerald-50 text-emerald-500 flex items-center justify-center text-xl shadow-inner">
-                            <i class="fa-solid fa-check-double"></i>
-                        </div>
-                        <span class="text-xs font-semibold text-emerald-600 bg-emerald-50 px-2 py-1 rounded-full border border-emerald-100">+5% <i class="fa-solid fa-arrow-up ml-1"></i></span>
+                        <h3 class="font-bold text-slate-800">Status SO (Offering)</h3>
+                        <div class="p-2 bg-slate-50 rounded-lg text-slate-400"><i class="fa-solid fa-handshake"></i></div>
                     </div>
-                    <h3 class="text-slate-500 text-sm font-medium mb-1">Penyelesaian Tugas</h3>
-                    <p class="text-3xl font-bold text-slate-800">92.4%</p>
+                    <div class="relative h-48 w-full flex justify-center">
+                        <canvas id="soOfferingChart"></canvas>
+                    </div>
+                    <div class="mt-4 flex justify-center gap-6 text-xs font-medium text-slate-600">
+                        <div class="flex items-center gap-2"><span class="w-3 h-3 rounded-full bg-[#10b981] block shadow-sm"></span> Sudah Offering (60%)</div>
+                        <div class="flex items-center gap-2"><span class="w-3 h-3 rounded-full bg-[#fbbf24] block shadow-sm"></span> Belum Offering (40%)</div>
+                    </div>
                 </div>
 
-                <!-- Card 4 -->
-                <div class="bg-white rounded-2xl p-6 shadow-xl border-none hover:-translate-y-1 transition-transform duration-300">
-                    <div class="flex items-center justify-between mb-4">
-                        <div class="w-12 h-12 rounded-full bg-rose-50 text-rose-500 flex items-center justify-center text-xl shadow-inner">
-                            <i class="fa-solid fa-triangle-exclamation"></i>
-                        </div>
-                        <span class="text-xs font-semibold text-rose-600 bg-rose-50 px-2 py-1 rounded-full border border-rose-100">-2% <i class="fa-solid fa-arrow-down ml-1"></i></span>
-                    </div>
-                    <h3 class="text-slate-500 text-sm font-medium mb-1">Tiket Kendala Terbuka</h3>
-                    <p class="text-3xl font-bold text-slate-800">18</p>
-                </div>
             </div>
 
-            <!-- Charts Section -->
-            <div class="grid grid-cols-1 lg:grid-cols-3 gap-6 mb-8">
-                <!-- Bar Chart -->
-                <div class="lg:col-span-2 bg-white p-6 rounded-2xl shadow-xl border-none">
-                    <div class="flex items-center justify-between mb-6">
-                        <h3 class="font-bold text-slate-800">Performa Area (Monitoring Kunjungan)</h3>
-                        <select class="bg-slate-50 border border-slate-200 text-sm text-slate-600 rounded-lg py-1.5 px-3 focus:ring-2 focus:ring-[#148e9e] focus:outline-none cursor-pointer outline-none">
-                            <option>Minggu Ini</option>
-                            <option>Bulan Ini</option>
-                        </select>
-                    </div>
-                    <div class="relative h-64 w-full">
-                        <canvas id="areaChart"></canvas>
-                    </div>
-                </div>
-
-                <!-- Doughnut Chart -->
-                <div class="bg-white p-6 rounded-2xl shadow-xl border-none">
-                    <div class="flex items-center justify-between mb-6">
-                        <h3 class="font-bold text-slate-800">Status Pekerjaan</h3>
-                        <button class="w-8 h-8 rounded-full hover:bg-slate-50 flex items-center justify-center transition">
-                            <i class="fa-solid fa-ellipsis text-slate-400"></i>
-                        </button>
-                    </div>
-                    <div class="relative h-56 w-full flex justify-center">
-                        <canvas id="statusChart"></canvas>
-                    </div>
-                    <div class="mt-6 flex justify-center gap-4 text-xs font-medium text-slate-600">
-                        <div class="flex items-center gap-1.5"><span class="w-3 h-3 rounded-full bg-[#148e9e] block"></span> Selesai</div>
-                        <div class="flex items-center gap-1.5"><span class="w-3 h-3 rounded-full bg-[#fbbf24] block"></span> Proses</div>
-                        <div class="flex items-center gap-1.5"><span class="w-3 h-3 rounded-full bg-[#f43f5e] block"></span> Kendala</div>
-                    </div>
-                </div>
-            </div>
-
-            <!-- Candidate Status & Officer Flagging Table -->
             <div class="bg-white rounded-2xl shadow-xl border-none overflow-hidden mb-8">
-                <div class="p-6 border-b border-slate-100 flex items-center justify-between">
+                <div class="p-6 border-b border-slate-100 flex flex-col md:flex-row md:items-center justify-between gap-4">
                     <div>
-                        <h3 class="font-bold text-slate-800">Status Akhir Kandidat & Flagging Officer</h3>
-                        <p class="text-xs text-slate-500 mt-1">Sistem otomatis mem-flag Officer berdasarkan update status terakhir.</p>
+                        <h3 class="font-bold text-slate-800 text-lg">Buffer Kandidat (GForm All REVO)</h3>
+                        <p class="text-xs text-slate-500 mt-1">Data pelamar baru yang siap di-follow up. Silakan klik "Ambil Alih" untuk memproses.</p>
                     </div>
-                    <button class="text-sm text-white bg-[#148e9e] hover:bg-[#0d6470] px-4 py-2 rounded-lg font-medium transition-colors shadow-sm flex items-center gap-2">
-                        <i class="fa-solid fa-user-plus"></i> Manage Officer
-                    </button>
+                    <div class="relative">
+                        <i class="fa-solid fa-search absolute left-3 top-1/2 transform -translate-y-1/2 text-slate-400 text-sm"></i>
+                        <input type="text" placeholder="Cari kandidat/klien..." class="pl-9 pr-4 py-2 bg-slate-50 border border-slate-200 rounded-lg text-sm text-slate-700 focus:ring-2 focus:ring-primary focus:outline-none w-full md:w-64 transition-all">
+                    </div>
                 </div>
                 <div class="overflow-x-auto">
                     <table class="w-full text-left border-collapse">
                         <thead>
-                            <tr class="bg-slate-50/50 text-slate-500 text-xs uppercase tracking-wider">
+                            <tr class="bg-slate-50/80 text-slate-500 text-xs uppercase tracking-wider">
                                 <th class="p-4 font-semibold">Nama Kandidat</th>
-                                <th class="p-4 font-semibold">Posisi / Klien</th>
-                                <th class="p-4 font-semibold">Status Akhir</th>
-                                <th class="p-4 font-semibold">Officer Ter-Flag (PIC)</th>
-                                <th class="p-4 font-semibold">Waktu Update</th>
+                                <th class="p-4 font-semibold">Penempatan (Klien - Cabang)</th>
+                                <th class="p-4 font-semibold">Status Kandidat</th>
+                                <th class="p-4 font-semibold">REVO Flagging (PIC)</th>
+                                <th class="p-4 font-semibold text-center">Action</th>
                             </tr>
                         </thead>
                         <tbody class="text-sm divide-y divide-slate-100">
-                            <tr class="hover:bg-slate-50/80 transition-colors">
-                                <td class="p-4 font-medium text-slate-700">Reza Rahadian</td>
-                                <td class="p-4 text-slate-600">Customer Service - PT. Maju Jaya</td>
+                            <tr class="hover:bg-slate-50 transition-colors">
+                                <td class="p-4 font-medium text-slate-800">Raditya Dika</td>
                                 <td class="p-4">
-                                    <span class="bg-emerald-100 text-emerald-700 border border-emerald-200 text-xs px-3 py-1 rounded-full font-medium">Lolos User</span>
+                                    <p class="text-slate-700 font-medium">PT. FIF Group</p>
+                                    <p class="text-slate-500 text-xs">Cabang: Jakarta Pusat</p>
                                 </td>
                                 <td class="p-4">
-                                    <div class="flex items-center gap-3">
-                                        <div class="relative">
-                                            <img src="https://ui-avatars.com/api/?name=Sarah+O&background=148e9e&color=fff" class="w-8 h-8 rounded-full ring-2 ring-white shadow-sm">
-                                            <!-- Ping Indicator -->
-                                            <span class="absolute -bottom-1 -right-1 flex h-3 w-3">
-                                              <span class="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-75"></span>
-                                              <span class="relative inline-flex rounded-full h-3 w-3 bg-emerald-500 border border-white"></span>
-                                            </span>
-                                        </div>
-                                        <span class="font-medium text-slate-700">Sarah O. <span class="text-xs font-normal text-slate-400 block">Tim Onboarding</span></span>
-                                    </div>
+                                    <span class="bg-blue-50 text-blue-600 border border-blue-200 text-xs px-2.5 py-1 rounded-md font-medium">Review CV</span>
                                 </td>
-                                <td class="p-4 text-slate-500 text-xs font-medium">Hari ini, 10:45 WIB</td>
+                                <td class="p-4" id="revo-flag-1">
+                                    <span class="text-slate-400 italic text-xs">Belum ada PIC</span>
+                                </td>
+                                <td class="p-4 text-center">
+                                    <button onclick="flagOfficer('revo-flag-1')" class="text-xs bg-white hover:bg-primary hover:text-white text-primary px-4 py-2 rounded-lg transition-colors font-semibold border border-primary/30 hover:border-primary shadow-sm flex items-center justify-center mx-auto gap-2">
+                                        <i class="fa-solid fa-flag"></i> Ambil
+                                    </button>
+                                </td>
                             </tr>
-                            <tr class="hover:bg-slate-50/80 transition-colors">
-                                <td class="p-4 font-medium text-slate-700">Andi Saputra</td>
-                                <td class="p-4 text-slate-600">IT Support - SIMGROUP</td>
+                            
+                            <tr class="hover:bg-slate-50 transition-colors">
+                                <td class="p-4 font-medium text-slate-800">Chelsea Islan</td>
                                 <td class="p-4">
-                                    <span class="bg-amber-100 text-amber-700 border border-amber-200 text-xs px-3 py-1 rounded-full font-medium">Pemberkasan</span>
+                                    <p class="text-slate-700 font-medium">Adira Finance</p>
+                                    <p class="text-slate-500 text-xs">Cabang: Kelapa Gading</p>
                                 </td>
                                 <td class="p-4">
+                                    <span class="bg-purple-50 text-purple-600 border border-purple-200 text-xs px-2.5 py-1 rounded-md font-medium">Interview User</span>
+                                </td>
+                                <td class="p-4" id="revo-flag-2">
                                     <div class="flex items-center gap-3">
                                         <div class="relative">
-                                            <img src="https://ui-avatars.com/api/?name=Budi+S&background=fbbf24&color=fff" class="w-8 h-8 rounded-full ring-2 ring-white shadow-sm">
-                                            <span class="absolute -bottom-1 -right-1 flex h-3 w-3">
-                                              <span class="relative inline-flex rounded-full h-3 w-3 bg-emerald-500 border border-white"></span>
-                                            </span>
+                                            <img src="https://ui-avatars.com/api/?name=Ali&background=148e9e&color=fff" class="w-8 h-8 rounded-full shadow-sm">
                                         </div>
-                                        <span class="font-medium text-slate-700">Budi S. <span class="text-xs font-normal text-slate-400 block">Admin HR</span></span>
+                                        <span class="font-medium text-slate-700">Ali <span class="text-xs font-normal text-slate-400 block">REVO FIF JKT</span></span>
                                     </div>
                                 </td>
-                                <td class="p-4 text-slate-500 text-xs font-medium">Kemarin, 15:30 WIB</td>
+                                <td class="p-4 text-center">
+                                    <button onclick="flagOfficer('revo-flag-2')" class="text-xs bg-slate-100 hover:bg-slate-200 text-slate-600 px-4 py-2 rounded-lg transition-colors font-medium border border-slate-200 flex items-center justify-center mx-auto gap-2">
+                                        <i class="fa-solid fa-rotate"></i> Override
+                                    </button>
+                                </td>
                             </tr>
-                            <tr class="hover:bg-slate-50/80 transition-colors">
-                                <td class="p-4 font-medium text-slate-700">Dina Mariana</td>
-                                <td class="p-4 text-slate-600">Telesales - Bank ABC</td>
+
+                            <tr class="hover:bg-slate-50 transition-colors">
+                                <td class="p-4 font-medium text-slate-800">Nicholas Saputra</td>
                                 <td class="p-4">
-                                    <span class="bg-rose-100 text-rose-700 border border-rose-200 text-xs px-3 py-1 rounded-full font-medium">Gagal Interview</span>
+                                    <p class="text-slate-700 font-medium">Multifinance Mandiri</p>
+                                    <p class="text-slate-500 text-xs">Cabang: Taman Palem</p>
                                 </td>
                                 <td class="p-4">
-                                    <div class="flex items-center gap-3">
-                                        <div class="relative">
-                                            <img src="https://ui-avatars.com/api/?name=Citra+W&background=f43f5e&color=fff" class="w-8 h-8 rounded-full ring-2 ring-white shadow-sm">
-                                            <span class="absolute -bottom-1 -right-1 flex h-3 w-3">
-                                              <span class="relative inline-flex rounded-full h-3 w-3 bg-slate-400 border border-white"></span>
-                                            </span>
-                                        </div>
-                                        <span class="font-medium text-slate-700">Citra W. <span class="text-xs font-normal text-slate-400 block">Recruiter</span></span>
-                                    </div>
+                                    <span class="bg-amber-50 text-amber-600 border border-amber-200 text-xs px-2.5 py-1 rounded-md font-medium">Psikotes</span>
                                 </td>
-                                <td class="p-4 text-slate-500 text-xs font-medium">Kemarin, 11:20 WIB</td>
+                                <td class="p-4" id="revo-flag-3">
+                                    <span class="text-slate-400 italic text-xs">Belum ada PIC</span>
+                                </td>
+                                <td class="p-4 text-center">
+                                    <button onclick="flagOfficer('revo-flag-3')" class="text-xs bg-white hover:bg-primary hover:text-white text-primary px-4 py-2 rounded-lg transition-colors font-semibold border border-primary/30 hover:border-primary shadow-sm flex items-center justify-center mx-auto gap-2">
+                                        <i class="fa-solid fa-flag"></i> Ambil
+                                    </button>
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+
+            <div class="bg-white rounded-2xl shadow-xl border-none overflow-hidden mb-8">
+                <div class="p-6 border-b border-slate-100">
+                    <h3 class="font-bold text-slate-800 text-lg">Daftar Sourcing Partner Aktif</h3>
+                    <p class="text-xs text-slate-500 mt-1">Database instansi/sekolah yang bekerjasama untuk suplai kandidat.</p>
+                </div>
+                <div class="overflow-x-auto">
+                    <table class="w-full text-left border-collapse">
+                        <thead>
+                            <tr class="bg-slate-50/80 text-slate-500 text-xs uppercase tracking-wider">
+                                <th class="p-4 font-semibold">Nama Mitra / Instansi</th>
+                                <th class="p-4 font-semibold">PIC Sourcing</th>
+                                <th class="p-4 font-semibold">Kontak (WhatsApp)</th>
+                                <th class="p-4 font-semibold">Kategori</th>
+                            </tr>
+                        </thead>
+                        <tbody class="text-sm divide-y divide-slate-100">
+                            <tr class="hover:bg-slate-50 transition-colors">
+                                <td class="p-4 font-medium text-slate-800 flex items-center gap-3">
+                                    <div class="w-8 h-8 rounded bg-teal-50 text-teal-600 flex items-center justify-center"><i class="fa-solid fa-school"></i></div>
+                                    BKK SMKN 1 Jakarta
+                                </td>
+                                <td class="p-4 text-slate-600">Bpk. Haryanto</td>
+                                <td class="p-4">
+                                    <a href="#" class="text-primary hover:underline font-medium flex items-center gap-1.5"><i class="fa-brands fa-whatsapp text-emerald-500"></i> 0812-3456-7890</a>
+                                </td>
+                                <td class="p-4"><span class="bg-slate-100 text-slate-600 text-xs px-2.5 py-1 rounded font-medium">Sekolah/Kampus</span></td>
+                            </tr>
+                            <tr class="hover:bg-slate-50 transition-colors">
+                                <td class="p-4 font-medium text-slate-800 flex items-center gap-3">
+                                    <div class="w-8 h-8 rounded bg-blue-50 text-blue-600 flex items-center justify-center"><i class="fa-solid fa-users-viewfinder"></i></div>
+                                    Komunitas Sales JABODETABEK
+                                </td>
+                                <td class="p-4 text-slate-600">Ibu Dian Sastro</td>
+                                <td class="p-4">
+                                    <a href="#" class="text-primary hover:underline font-medium flex items-center gap-1.5"><i class="fa-brands fa-whatsapp text-emerald-500"></i> 0857-9988-7766</a>
+                                </td>
+                                <td class="p-4"><span class="bg-slate-100 text-slate-600 text-xs px-2.5 py-1 rounded font-medium">Komunitas</span></td>
+                            </tr>
+                            <tr class="hover:bg-slate-50 transition-colors">
+                                <td class="p-4 font-medium text-slate-800 flex items-center gap-3">
+                                    <div class="w-8 h-8 rounded bg-orange-50 text-orange-600 flex items-center justify-center"><i class="fa-solid fa-building-ngo"></i></div>
+                                    Disnaker Jakarta Selatan
+                                </td>
+                                <td class="p-4 text-slate-600">Ibu Sri Wahyuni</td>
+                                <td class="p-4">
+                                    <a href="#" class="text-primary hover:underline font-medium flex items-center gap-1.5"><i class="fa-solid fa-phone text-slate-400"></i> (021) 7654321</a>
+                                </td>
+                                <td class="p-4"><span class="bg-slate-100 text-slate-600 text-xs px-2.5 py-1 rounded font-medium">Pemerintah</span></td>
                             </tr>
                         </tbody>
                     </table>
@@ -310,83 +281,96 @@
         </main>
     </div>
 
-    <!-- Chart.js Scripts -->
     <script>
-        // Set default font family for charts
-        Chart.defaults.font.family = "'Inter', sans-serif";
-        Chart.defaults.color = '#64748b'; // slate-500
-
-        // Data Dummy untuk Bar Chart
-        const ctxArea = document.getElementById('areaChart').getContext('2d');
-        new Chart(ctxArea, {
-            type: 'bar',
-            data: {
-                labels: ['Jaksel', 'Jakpus', 'Jakbar', 'Jaktim', 'Jakut'],
-                datasets: [{
-                    label: 'Target Kunjungan',
-                    data: [85, 70, 90, 60, 75],
-                    backgroundColor: '#e2e8f0', // slate-200
-                    borderRadius: 6,
-                    borderSkipped: false,
-                },
-                {
-                    label: 'Realisasi',
-                    data: [80, 75, 85, 55, 70],
-                    backgroundColor: '#148e9e', // Sesuai warna tema utama
-                    borderRadius: 6,
-                    borderSkipped: false,
-                }]
-            },
-            options: {
-                responsive: true,
-                maintainAspectRatio: false,
-                scales: {
-                    y: {
-                        beginAtZero: true,
-                        grid: { borderDash: [4, 4], color: '#f1f5f9' },
-                        border: { display: false }
-                    },
-                    x: {
-                        grid: { display: false },
-                        border: { display: false }
-                    }
-                },
-                plugins: {
-                    legend: { 
-                        position: 'top', 
-                        align: 'end', 
-                        labels: { usePointStyle: true, boxWidth: 8, padding: 20 } 
-                    }
-                }
+        // INIT DASHBOARD LOGIN DATA
+        let activeUser = null;
+        
+        function initDashboard() {
+            const userString = localStorage.getItem('currentUser');
+            if (!userString) {
+                window.location.href = 'login.html';
+                return;
             }
-        });
 
-        // Data Dummy untuk Doughnut Chart
-        const ctxStatus = document.getElementById('statusChart').getContext('2d');
-        new Chart(ctxStatus, {
+            activeUser = JSON.parse(userString);
+
+            document.getElementById('profile-name').textContent = activeUser.name;
+            document.getElementById('profile-role').textContent = activeUser.role;
+            document.getElementById('profile-avatar').src = `https://ui-avatars.com/api/?name=${activeUser.name.replace(' ', '+')}&background=148e9e&color=fff`;
+            
+            const hour = new Date().getHours();
+            let greeting = "Good Evening";
+            if (hour < 12) greeting = "Good Morning";
+            else if (hour < 18) greeting = "Good Afternoon";
+            
+            document.getElementById('welcome-greeting').innerHTML = `${greeting}, ${activeUser.name}! ✨`;
+        }
+
+        // FUNGSI FLAG OFFICER REVO
+        function flagOfficer(targetCellId) {
+            const cell = document.getElementById(targetCellId);
+            
+            cell.innerHTML = `
+                <div class="flex items-center gap-3 animate-fade-in-up">
+                    <div class="relative">
+                        <img src="https://ui-avatars.com/api/?name=${activeUser.name.replace(' ', '+')}&background=148e9e&color=fff" class="w-8 h-8 rounded-full ring-2 ring-white shadow-sm">
+                        <span class="absolute -bottom-1 -right-1 flex h-3 w-3">
+                            <span class="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-75"></span>
+                            <span class="relative inline-flex rounded-full h-3 w-3 bg-emerald-500 border border-white"></span>
+                        </span>
+                    </div>
+                    <span class="font-medium text-slate-700">
+                        ${activeUser.name} 
+                        <span class="text-xs font-semibold text-[#148e9e] block mt-0.5">Assigned to you</span>
+                    </span>
+                </div>
+            `;
+        }
+
+        // FUNGSI LOGOUT
+        function handleLogout() {
+            localStorage.removeItem('currentUser');
+            window.location.href = 'login.html';
+        }
+
+        initDashboard();
+
+        // CHART SETUP
+        Chart.defaults.font.family = "'Inter', sans-serif";
+        Chart.defaults.color = '#64748b'; 
+
+        // 1. Chart SO Fulfillment
+        const ctxFulfill = document.getElementById('soFulfillChart').getContext('2d');
+        new Chart(ctxFulfill, {
             type: 'doughnut',
             data: {
-                labels: ['Selesai', 'Proses', 'Kendala'],
+                labels: ['Ter-Fulfill', 'Belum Fulfill'],
                 datasets: [{
-                    data: [65, 25, 10],
-                    backgroundColor: [
-                        '#148e9e', // Selesai
-                        '#fbbf24', // Proses 
-                        '#f43f5e'  // Kendala 
-                    ],
-                    borderWidth: 0,
-                    hoverOffset: 4
+                    data: [75, 25],
+                    backgroundColor: ['#148e9e', '#f43f5e'],
+                    borderWidth: 0, hoverOffset: 4
                 }]
             },
-            options: {
-                responsive: true,
-                maintainAspectRatio: false,
-                cutout: '75%',
-                plugins: {
-                    legend: { display: false } 
-                }
-            }
+            options: { responsive: true, maintainAspectRatio: false, cutout: '75%', plugins: { legend: { display: false } } }
+        });
+
+        // 2. Chart SO Offering
+        const ctxOffering = document.getElementById('soOfferingChart').getContext('2d');
+        new Chart(ctxOffering, {
+            type: 'doughnut',
+            data: {
+                labels: ['Sudah Offering', 'Belum Offering'],
+                datasets: [{
+                    data: [60, 40],
+                    backgroundColor: ['#10b981', '#fbbf24'],
+                    borderWidth: 0, hoverOffset: 4
+                }]
+            },
+            options: { responsive: true, maintainAspectRatio: false, cutout: '75%', plugins: { legend: { display: false } } }
         });
     </script>
 </body>
 </html>
+
+
+```
