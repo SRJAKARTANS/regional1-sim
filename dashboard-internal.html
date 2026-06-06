@@ -143,8 +143,8 @@
                 <div class="bg-white p-6 rounded-2xl shadow-xl border-none hover:-translate-y-1 transition-transform duration-300 flex flex-col">
                     <div class="flex items-center justify-between mb-2">
                         <h3 class="font-bold text-slate-800">Status SO (Fulfillment)</h3>
-                        <!-- Tombol Upload CSV Baru! -->
-                        <label class="cursor-pointer bg-slate-50 hover:bg-primary hover:text-white text-slate-600 text-xs px-3 py-1.5 rounded-lg border border-slate-200 hover:border-primary transition-all flex items-center gap-2 shadow-sm">
+                        <!-- Tombol Upload CSV Khusus Daffa -->
+                        <label id="syncCsvLabel" style="display: none;" class="cursor-pointer bg-slate-50 hover:bg-primary hover:text-white text-slate-600 text-xs px-3 py-1.5 rounded-lg border border-slate-200 hover:border-primary transition-all items-center gap-2 shadow-sm">
                             <i class="fa-solid fa-cloud-arrow-up"></i> Sync CSV
                             <input type="file" id="csvFileInput" accept=".csv" class="hidden" onchange="handleFileUpload(event)">
                         </label>
@@ -347,6 +347,14 @@
             else if (hour < 18) greeting = "Good Afternoon";
             
             document.getElementById('welcome-greeting').innerHTML = `${greeting}, ${activeUser.name}! ✨`;
+
+            // Logic untuk menampilkan tombol Sync CSV HANYA jika yang login adalah Daffa
+            const syncBtn = document.getElementById('syncCsvLabel');
+            if (activeUser.name.toLowerCase() === 'daffa') {
+                syncBtn.style.display = 'flex'; // Munculkan tombol
+            } else {
+                syncBtn.style.display = 'none'; // Sembunyikan tombol
+            }
         }
 
         // FUNGSI FLAG OFFICER REVO
