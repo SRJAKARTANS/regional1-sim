@@ -348,4 +348,158 @@
             
             document.getElementById('welcome-greeting').innerHTML = `${greeting}, ${activeUser.name}! ✨`;
 
-            // Logic untuk menampilkan tombol Sync CSV H
+            // Logic untuk menampilkan tombol Sync CSV HANYA jika yang login adalah Daffa
+            const syncBtn = document.getElementById('syncCsvLabel');
+            if (activeUser.name.toLowerCase() === 'daffa') {
+                syncBtn.style.display = 'flex'; // Munculkan tombol
+            } else {
+                syncBtn.style.display = 'none'; // Sembunyikan tombol
+            }
+        }
+
+        // FUNGSI FLAG OFFICER REVO
+        function flagOfficer(targetCellId) {
+            const cell = document.getElementById(targetCellId);
+            
+            cell.innerHTML = `
+                <div class="flex items-center gap-3 animate-fade-in-up">
+                    <div class="relative">
+                        <img src="https://ui-avatars.com/api/?name=${activeUser.name.replace(' ', '+')}&background=148e9e&color=fff" class="w-8 h-8 rounded-full ring-2 ring-white shadow-sm">
+                        <span class="absolute -bottom-1 -right-1 flex h-3 w-3">
+                            <span class="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-75"></span>
+                            <span class="relative inline-flex rounded-full h-3 w-3 bg-emerald-500 border border-white"></span>
+                        </span>
+                    </div>
+                    <span class="font-medium text-slate-700">
+                        ${activeUser.name} 
+                        <span class="text-xs font-semibold text-[#148e9e] block mt-0.5">Assigned to you</span>
+                    </span>
+                </div>
+            `;
+        }
+
+        // FUNGSI LOGOUT
+        function handleLogout() {
+            localStorage.removeItem('currentUser');
+            try {
+                window.location.href = 'login.html';
+            } catch (error) {
+                console.warn("Redirect di-skip untuk lingkungan preview.", error);
+                alert("Berhasil Sign Out! (Ini adalah simulasi preview. Di GitHub kamu, layar akan pindah ke halaman login).");
+            }
+        }
+
+        initDashboard();
+
+        // CHART SETUP
+        Chart.defaults.font.family = "'Inter', sans-serif";
+        Chart.defaults.color = '#64748b'; 
+
+        // 1. Chart SO Fulfillment (Inisiasi awal)
+        const ctxFulfill = document.getElementById('soFulfillChart').getContext('2d');
+        const soFulfillChart = new Chart(ctxFulfill, {
+            type: 'doughnut',
+            data: {
+                labels: ['Ter-Fulfill', 'Belum Fulfill'],
+                datasets: [{
+                    data: [1, 1], // Data sementara agar chart tidak kosong
+                    backgroundColor: ['#148e9e', '#f43f5e'],
+                    borderWidth: 0, hoverOffset: 4
+                }]
+            },
+            options: { 
+                responsive: true, 
+                maintainAspectRatio: false, 
+                cutout: '70%', // Diubah dari 75% ke 70% agar lebih tebal & proporsional saat ukurannya kecil
+                plugins: { legend: { display: false } } 
+            }
+        });
+
+        // 2. Chart SO Offering (Inisiasi awal)
+        const ctxOffering = document.getElementById('soOfferingChart').getContext('2d');
+        const soOfferingChart = new Chart(ctxOffering, {
+            type: 'doughnut',
+            data: {
+                labels: ['Sudah Offering', 'Belum Offering'],
+                datasets: [{
+                    data: [1, 1], // Data sementara agar chart tidak kosong
+                    backgroundColor: ['#10b981', '#fbbf24'],
+                    borderWidth: 0, hoverOffset: 4
+                }]
+            },
+            options: { 
+                responsive: true, 
+                maintainAspectRatio: false, 
+                cutout: '70%', // Diubah dari 75% ke 70% agar lebih tebal & proporsional saat ukurannya kecil
+                plugins: { legend: { display: false } } 
+            }
+        });
+
+        // ==========================================
+        // FUNGSI UPLOAD & PARSING CSV LOKAL
+        // ==========================================
+        function handleFileUpload(event) {
+            const file = event.target.files[0];
+            if (!file) return;
+
+            // Menggunakan library PapaParse untuk membaca file CSV
+            Papa.parse(file, {
+                header: true, // Akan menggunakan baris pertama sebagai nama kunci (keys)
+                skipEmptyLines: true,
+                complete: function(results) {
+                    const data = results.data;
+                    updateChartsWithData(data);
+                    
+                    // Notifikasi sukses yang elegan
+                    alert("✨ Data CSV berhasil di-sync! Grafik kamu sudah ter-update otomatis berdasarkan data harian terbaru.");
+                },
+                error: function(err) {
+                    console.error("Gagal membaca file CSV:", err);
+                    alert("Oops, ada masalah saat membaca file CSV. Pastikan formatnya sudah benar ya!");
+                }
+            });
+        }
+
+        function updateChartsWithData(data) {
+            let terFulfill = 0, belumFulfill = 0;
+            let sudahOffering = 0, belumOffering = 0;
+
+            // Membaca setiap baris dari file Excel CSV kamu
+            data.forEach(row => {
+                // Kolom sesuai dengan format data Excel kamu: finish, unfulfill, OFFERING
+                const finish = parseInt(row['finish']) || 0;
+                const unfulfill = parseInt(row['unfulfill']) || 0;
+                const offering = parseInt(row['OFFERING']) || 0;
+
+                // Logika Fulfillment
+                terFulfill += finish;
+                belumFulfill += unfulfill;
+
+                // Logika Offering: Asumsi bahwa hanya baris aktif (finish=1 atau unfulfill=1) yang dihitung offeringnya
+                if (finish === 1 || unfulfill === 1) {
+                    if (offering > 0) {
+                        sudahOffering++;
+                    } else {
+                        belumOffering++;
+                    }
+                }
+            });
+
+            // Update Tampilan Chart Fulfillment
+            const totalFulfill = terFulfill + belumFulfill;
+            soFulfillChart.data.datasets[0].data = [terFulfill, belumFulfill];
+            soFulfillChart.update();
+            document.getElementById('text-ter-fulfill').innerText = `Ter-Fulfill (${totalFulfill > 0 ? Math.round((terFulfill / totalFulfill) * 100) : 0}%)`;
+            document.getElementById('text-belum-fulfill').innerText = `Belum Fulfill (${totalFulfill > 0 ? Math.round((belumFulfill / totalFulfill) * 100) : 0}%)`;
+
+            // Update Tampilan Chart Offering
+            const totalOffering = sudahOffering + belumOffering;
+            soOfferingChart.data.datasets[0].data = [sudahOffering, belumOffering];
+            soOfferingChart.update();
+            document.getElementById('text-sudah-offering').innerText = `Sudah Offering (${totalOffering > 0 ? Math.round((sudahOffering / totalOffering) * 100) : 0}%)`;
+            document.getElementById('text-belum-offering').innerText = `Belum Offering (${totalOffering > 0 ? Math.round((belumOffering / totalOffering) * 100) : 0}%)`;
+        }
+
+    </script>
+</body>
+</html>
