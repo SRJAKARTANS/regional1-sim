@@ -141,7 +141,7 @@
             <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mb-8">
                 
                 <div class="bg-white p-6 rounded-2xl shadow-xl border-none hover:-translate-y-1 transition-transform duration-300 flex flex-col">
-                    <div class="flex items-center justify-between mb-4">
+                    <div class="flex items-center justify-between mb-2">
                         <h3 class="font-bold text-slate-800">Status SO (Fulfillment)</h3>
                         <!-- Tombol Upload CSV Baru! -->
                         <label class="cursor-pointer bg-slate-50 hover:bg-primary hover:text-white text-slate-600 text-xs px-3 py-1.5 rounded-lg border border-slate-200 hover:border-primary transition-all flex items-center gap-2 shadow-sm">
@@ -149,7 +149,8 @@
                             <input type="file" id="csvFileInput" accept=".csv" class="hidden" onchange="handleFileUpload(event)">
                         </label>
                     </div>
-                    <div class="relative h-48 w-full flex justify-center flex-1">
+                    <!-- Diperkecil menjadi h-36 dan justify-center -->
+                    <div class="relative h-36 w-full flex items-center justify-center flex-1 my-2">
                         <canvas id="soFulfillChart"></canvas>
                     </div>
                     <div class="mt-4 flex justify-center gap-6 text-xs font-medium text-slate-600">
@@ -159,11 +160,12 @@
                 </div>
 
                 <div class="bg-white p-6 rounded-2xl shadow-xl border-none hover:-translate-y-1 transition-transform duration-300 flex flex-col">
-                    <div class="flex items-center justify-between mb-4">
+                    <div class="flex items-center justify-between mb-2">
                         <h3 class="font-bold text-slate-800">Status SO (Offering)</h3>
                         <div class="p-2 bg-slate-50 rounded-lg text-slate-400"><i class="fa-solid fa-handshake"></i></div>
                     </div>
-                    <div class="relative h-48 w-full flex justify-center flex-1">
+                    <!-- Diperkecil menjadi h-36 dan justify-center -->
+                    <div class="relative h-36 w-full flex items-center justify-center flex-1 my-2">
                         <canvas id="soOfferingChart"></canvas>
                     </div>
                     <div class="mt-4 flex justify-center gap-6 text-xs font-medium text-slate-600">
@@ -397,7 +399,12 @@
                     borderWidth: 0, hoverOffset: 4
                 }]
             },
-            options: { responsive: true, maintainAspectRatio: false, cutout: '75%', plugins: { legend: { display: false } } }
+            options: { 
+                responsive: true, 
+                maintainAspectRatio: false, 
+                cutout: '70%', // Diubah dari 75% ke 70% agar lebih tebal & proporsional saat ukurannya kecil
+                plugins: { legend: { display: false } } 
+            }
         });
 
         // 2. Chart SO Offering (Inisiasi awal)
@@ -412,7 +419,12 @@
                     borderWidth: 0, hoverOffset: 4
                 }]
             },
-            options: { responsive: true, maintainAspectRatio: false, cutout: '75%', plugins: { legend: { display: false } } }
+            options: { 
+                responsive: true, 
+                maintainAspectRatio: false, 
+                cutout: '70%', // Diubah dari 75% ke 70% agar lebih tebal & proporsional saat ukurannya kecil
+                plugins: { legend: { display: false } } 
+            }
         });
 
         // ==========================================
