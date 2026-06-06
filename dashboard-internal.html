@@ -10,6 +10,8 @@
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <!-- Chart.js -->
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <!-- PapaParse for CSV Parsing -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/PapaParse/5.4.1/papaparse.min.js"></script>
     
     <script>
         tailwind.config = {
@@ -64,13 +66,13 @@
                     Calendar of Event
                 </a>
                 
-                <!-- Menu 4: Activity Report -->
+                <!-- Menu 4: Status SO Berjalan -->
                 <a href="#" class="flex items-center gap-3 px-4 py-3 text-white/70 hover:bg-white/10 hover:text-white rounded-lg font-medium transition-all">
                     <i class="fa-solid fa-clipboard-list w-5 text-center"></i>
-                    Activity Report
+                    Status SO Berjalan
                 </a>
 
-                <!-- Menu 5: Bank Buffer Management (New) -->
+                <!-- Menu 5: Bank Buffer Management -->
                 <a href="#" class="flex items-center gap-3 px-4 py-3 text-white/70 hover:bg-white/10 hover:text-white rounded-lg font-medium transition-all">
                     <i class="fa-solid fa-database w-5 text-center"></i>
                     Bank Buffer Management
@@ -131,38 +133,42 @@
             <div class="mb-8 text-white flex items-center justify-between">
                 <div class="animate-fade-in-up">
                     <h2 class="text-2xl lg:text-3xl font-bold mb-1 tracking-tight" id="welcome-greeting">Welcome! ✨</h2>
-                    <p class="text-white/80 max-w-2xl text-sm md:text-base font-light">Berikut adalah monitoring system operasional terkini: Status Service Order(SO), Status Ratio Offering *Ratio*, dan daftar *Sourcing Partner*.</p>
+                    <p class="text-white/80 max-w-2xl text-sm md:text-base font-light">Berikut adalah ringkasan operasional terkini: Status pemenuhan *Service Order* (SO), antrean *Buffer* Kandidat dari form registrasi, dan daftar *Sourcing Partner*.</p>
                 </div>
             </div>
 
             <!-- Charts Section (SO Status) -->
             <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mb-8">
                 
-                <div class="bg-white p-6 rounded-2xl shadow-xl border-none hover:-translate-y-1 transition-transform duration-300">
+                <div class="bg-white p-6 rounded-2xl shadow-xl border-none hover:-translate-y-1 transition-transform duration-300 flex flex-col">
                     <div class="flex items-center justify-between mb-4">
                         <h3 class="font-bold text-slate-800">Status SO (Fulfillment)</h3>
-                        <div class="p-2 bg-slate-50 rounded-lg text-slate-400"><i class="fa-solid fa-chart-pie"></i></div>
+                        <!-- Tombol Upload CSV Baru! -->
+                        <label class="cursor-pointer bg-slate-50 hover:bg-primary hover:text-white text-slate-600 text-xs px-3 py-1.5 rounded-lg border border-slate-200 hover:border-primary transition-all flex items-center gap-2 shadow-sm">
+                            <i class="fa-solid fa-cloud-arrow-up"></i> Sync CSV
+                            <input type="file" id="csvFileInput" accept=".csv" class="hidden" onchange="handleFileUpload(event)">
+                        </label>
                     </div>
-                    <div class="relative h-48 w-full flex justify-center">
+                    <div class="relative h-48 w-full flex justify-center flex-1">
                         <canvas id="soFulfillChart"></canvas>
                     </div>
                     <div class="mt-4 flex justify-center gap-6 text-xs font-medium text-slate-600">
-                        <div class="flex items-center gap-2"><span class="w-3 h-3 rounded-full bg-[#148e9e] block shadow-sm"></span> Ter-Fulfill (75%)</div>
-                        <div class="flex items-center gap-2"><span class="w-3 h-3 rounded-full bg-[#f43f5e] block shadow-sm"></span> Belum Fulfill (25%)</div>
+                        <div class="flex items-center gap-2"><span class="w-3 h-3 rounded-full bg-[#148e9e] block shadow-sm"></span> <span id="text-ter-fulfill">Ter-Fulfill (0%)</span></div>
+                        <div class="flex items-center gap-2"><span class="w-3 h-3 rounded-full bg-[#f43f5e] block shadow-sm"></span> <span id="text-belum-fulfill">Belum Fulfill (0%)</span></div>
                     </div>
                 </div>
 
-                <div class="bg-white p-6 rounded-2xl shadow-xl border-none hover:-translate-y-1 transition-transform duration-300">
+                <div class="bg-white p-6 rounded-2xl shadow-xl border-none hover:-translate-y-1 transition-transform duration-300 flex flex-col">
                     <div class="flex items-center justify-between mb-4">
                         <h3 class="font-bold text-slate-800">Status SO (Offering)</h3>
                         <div class="p-2 bg-slate-50 rounded-lg text-slate-400"><i class="fa-solid fa-handshake"></i></div>
                     </div>
-                    <div class="relative h-48 w-full flex justify-center">
+                    <div class="relative h-48 w-full flex justify-center flex-1">
                         <canvas id="soOfferingChart"></canvas>
                     </div>
                     <div class="mt-4 flex justify-center gap-6 text-xs font-medium text-slate-600">
-                        <div class="flex items-center gap-2"><span class="w-3 h-3 rounded-full bg-[#10b981] block shadow-sm"></span> Sudah Offering (60%)</div>
-                        <div class="flex items-center gap-2"><span class="w-3 h-3 rounded-full bg-[#fbbf24] block shadow-sm"></span> Belum Offering (40%)</div>
+                        <div class="flex items-center gap-2"><span class="w-3 h-3 rounded-full bg-[#10b981] block shadow-sm"></span> <span id="text-sudah-offering">Sudah Offering (0%)</span></div>
+                        <div class="flex items-center gap-2"><span class="w-3 h-3 rounded-full bg-[#fbbf24] block shadow-sm"></span> <span id="text-belum-offering">Belum Offering (0%)</span></div>
                     </div>
                 </div>
 
@@ -323,8 +329,6 @@
         function initDashboard() {
             const userString = localStorage.getItem('currentUser');
             if (!userString) {
-                // Memberikan data user default sementara (Fallback)
-                // karena di lingkungan *preview* ini, redirect 'window.location' terkadang tidak valid
                 console.log("Tidak ada sesi login ditemukan. Menggunakan akun default.");
                 activeUser = { name: 'Anya', role: 'Regional Manager' };
             } else {
@@ -381,14 +385,14 @@
         Chart.defaults.font.family = "'Inter', sans-serif";
         Chart.defaults.color = '#64748b'; 
 
-        // 1. Chart SO Fulfillment
+        // 1. Chart SO Fulfillment (Inisiasi awal)
         const ctxFulfill = document.getElementById('soFulfillChart').getContext('2d');
-        new Chart(ctxFulfill, {
+        const soFulfillChart = new Chart(ctxFulfill, {
             type: 'doughnut',
             data: {
                 labels: ['Ter-Fulfill', 'Belum Fulfill'],
                 datasets: [{
-                    data: [75, 25],
+                    data: [1, 1], // Data sementara agar chart tidak kosong
                     backgroundColor: ['#148e9e', '#f43f5e'],
                     borderWidth: 0, hoverOffset: 4
                 }]
@@ -396,21 +400,86 @@
             options: { responsive: true, maintainAspectRatio: false, cutout: '75%', plugins: { legend: { display: false } } }
         });
 
-        // 2. Chart SO Offering
+        // 2. Chart SO Offering (Inisiasi awal)
         const ctxOffering = document.getElementById('soOfferingChart').getContext('2d');
-        new Chart(ctxOffering, {
+        const soOfferingChart = new Chart(ctxOffering, {
             type: 'doughnut',
             data: {
                 labels: ['Sudah Offering', 'Belum Offering'],
                 datasets: [{
-                    data: [60, 40],
+                    data: [1, 1], // Data sementara agar chart tidak kosong
                     backgroundColor: ['#10b981', '#fbbf24'],
                     borderWidth: 0, hoverOffset: 4
                 }]
             },
             options: { responsive: true, maintainAspectRatio: false, cutout: '75%', plugins: { legend: { display: false } } }
         });
+
+        // ==========================================
+        // FUNGSI UPLOAD & PARSING CSV LOKAL
+        // ==========================================
+        function handleFileUpload(event) {
+            const file = event.target.files[0];
+            if (!file) return;
+
+            // Menggunakan library PapaParse untuk membaca file CSV
+            Papa.parse(file, {
+                header: true, // Akan menggunakan baris pertama sebagai nama kunci (keys)
+                skipEmptyLines: true,
+                complete: function(results) {
+                    const data = results.data;
+                    updateChartsWithData(data);
+                    
+                    // Notifikasi sukses yang elegan
+                    alert("✨ Data CSV berhasil di-sync! Grafik kamu sudah ter-update otomatis berdasarkan data harian terbaru.");
+                },
+                error: function(err) {
+                    console.error("Gagal membaca file CSV:", err);
+                    alert("Oops, ada masalah saat membaca file CSV. Pastikan formatnya sudah benar ya!");
+                }
+            });
+        }
+
+        function updateChartsWithData(data) {
+            let terFulfill = 0, belumFulfill = 0;
+            let sudahOffering = 0, belumOffering = 0;
+
+            // Membaca setiap baris dari file Excel CSV kamu
+            data.forEach(row => {
+                // Kolom sesuai dengan format data Excel kamu: finish, unfulfill, OFFERING
+                const finish = parseInt(row['finish']) || 0;
+                const unfulfill = parseInt(row['unfulfill']) || 0;
+                const offering = parseInt(row['OFFERING']) || 0;
+
+                // Logika Fulfillment
+                terFulfill += finish;
+                belumFulfill += unfulfill;
+
+                // Logika Offering: Asumsi bahwa hanya baris aktif (finish=1 atau unfulfill=1) yang dihitung offeringnya
+                if (finish === 1 || unfulfill === 1) {
+                    if (offering > 0) {
+                        sudahOffering++;
+                    } else {
+                        belumOffering++;
+                    }
+                }
+            });
+
+            // Update Tampilan Chart Fulfillment
+            const totalFulfill = terFulfill + belumFulfill;
+            soFulfillChart.data.datasets[0].data = [terFulfill, belumFulfill];
+            soFulfillChart.update();
+            document.getElementById('text-ter-fulfill').innerText = `Ter-Fulfill (${totalFulfill > 0 ? Math.round((terFulfill / totalFulfill) * 100) : 0}%)`;
+            document.getElementById('text-belum-fulfill').innerText = `Belum Fulfill (${totalFulfill > 0 ? Math.round((belumFulfill / totalFulfill) * 100) : 0}%)`;
+
+            // Update Tampilan Chart Offering
+            const totalOffering = sudahOffering + belumOffering;
+            soOfferingChart.data.datasets[0].data = [sudahOffering, belumOffering];
+            soOfferingChart.update();
+            document.getElementById('text-sudah-offering').innerText = `Sudah Offering (${totalOffering > 0 ? Math.round((sudahOffering / totalOffering) * 100) : 0}%)`;
+            document.getElementById('text-belum-offering').innerText = `Belum Offering (${totalOffering > 0 ? Math.round((belumOffering / totalOffering) * 100) : 0}%)`;
+        }
+
     </script>
 </body>
 </html>
-```
