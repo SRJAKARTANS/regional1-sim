@@ -148,7 +148,7 @@
                 <div class="bg-white p-6 rounded-2xl shadow-xl border-none hover:-translate-y-1 transition-transform duration-300 flex flex-col relative overflow-hidden">
                     <div class="flex items-center justify-between mb-2">
                         <h3 class="font-bold text-slate-800">Status SO (Fulfillment)</h3>
-                        <!-- Upload Button Daffa -->
+                        <!-- Upload Button (Daffa & Anya) -->
                         <label id="syncCsvLabel1" style="display: none;" class="cursor-pointer bg-slate-50 hover:bg-primary hover:text-white text-slate-600 text-xs px-3 py-1.5 rounded-lg border border-slate-200 hover:border-primary transition-all items-center gap-2 shadow-sm z-10 whitespace-nowrap">
                             <i class="fa-solid fa-cloud-arrow-up"></i> Sync
                             <input type="file" accept=".csv" class="hidden csvUploadInput">
@@ -396,9 +396,12 @@
             else if (hour < 18) greeting = "Good Afternoon";
             document.getElementById('welcome-greeting').innerHTML = `${greeting}, ${window.activeUser.name}! ✨`;
 
-            const isDaffa = window.activeUser.name.toLowerCase().includes('daffa');
-            document.getElementById('syncCsvLabel1').style.display = isDaffa ? 'flex' : 'none';
-            document.getElementById('syncCsvLabel2').style.display = isDaffa ? 'flex' : 'none';
+            // MEMBUKA AKSES UPLOAD UNTUK DAFFA DAN ANYA
+            const userNameLower = window.activeUser.name.toLowerCase();
+            const isAuthorizedToUpload = userNameLower.includes('daffa') || userNameLower.includes('anya');
+            
+            document.getElementById('syncCsvLabel1').style.display = isAuthorizedToUpload ? 'flex' : 'none';
+            document.getElementById('syncCsvLabel2').style.display = isAuthorizedToUpload ? 'flex' : 'none';
         }
 
         // TOGGLE SIDEBAR (Mobile)
