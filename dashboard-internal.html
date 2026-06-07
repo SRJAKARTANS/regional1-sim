@@ -535,9 +535,16 @@
             let sudahOffering = 0, belumOffering = 0;
 
             data.forEach(row => {
-                const finish = parseInt(row['finish']) || 0;
-                const unfulfill = parseInt(row['unfulfill']) || 0;
-                const offering = parseInt(row['OFFERING']) || 0;
+                const rowKeys = Object.keys(row);
+                
+                // Cari key dengan mengabaikan kapitalisasi dan spasi
+                const finishKey = rowKeys.find(k => k.trim().toLowerCase() === 'finish');
+                const unfulfillKey = rowKeys.find(k => k.trim().toLowerCase() === 'unfulfill');
+                const offeringKey = rowKeys.find(k => k.trim().toLowerCase() === 'offering');
+
+                const finish = finishKey ? (parseInt(row[finishKey]) || 0) : 0;
+                const unfulfill = unfulfillKey ? (parseInt(row[unfulfillKey]) || 0) : 0;
+                const offering = offeringKey ? (parseInt(row[offeringKey]) || 0) : 0;
 
                 terFulfill += finish;
                 belumFulfill += unfulfill;
@@ -608,8 +615,11 @@
                 // --- Buat Isi Tabel (tbody) ---
                 let bodyHTML = '';
                 data.forEach((row, index) => {
-                    // Ambil nilai ASSIGN RO untuk dimasukkan ke dropdown filter
-                    const roValue = (row["ASSIGN RO"] || '').trim();
+                    const rowKeys = Object.keys(row);
+
+                    // Cari key ASSIGN RO dengan mengabaikan spasi/huruf besar-kecil
+                    const assignRoKey = rowKeys.find(k => k.trim().toUpperCase() === "ASSIGN RO");
+                    const roValue = (assignRoKey && row[assignRoKey]) ? String(row[assignRoKey]).trim() : '';
                     if (roValue) assignRoSet.add(roValue);
 
                     // Sisipkan nilai ASSIGN RO ke dalam dataset untuk memudahkan filter via javascript
@@ -617,7 +627,10 @@
                     bodyHTML += `<td class="p-4 text-slate-500 font-medium">${index + 1}</td>`;
                     
                     allowedColumns.forEach(key => {
-                        const cellData = (row[key] !== undefined && row[key] !== null && row[key] !== '') ? row[key] : '-';
+                        // Cari kecocokan nama kolom (kebal spasi tersembunyi dan huruf besar/kecil)
+                        const matchedKey = rowKeys.find(k => k.trim().toUpperCase() === key.toUpperCase());
+                        
+                        const cellData = (matchedKey && row[matchedKey] !== undefined && row[matchedKey] !== null && row[matchedKey] !== '') ? row[matchedKey] : '-';
                         bodyHTML += `<td class="p-4 text-slate-700 whitespace-nowrap group-hover:text-slate-900">${cellData}</td>`;
                     });
                     
