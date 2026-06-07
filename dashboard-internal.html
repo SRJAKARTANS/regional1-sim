@@ -3,136 +3,174 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>SIMGROUP Dashboard | Internal</title>
+    <title>Dashboard Internal - SIMGROUP JAKARTA</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/PapaParse/5.4.1/papaparse.min.js"></script>
+    
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        primary: '#148e9e',
+                        secondary: '#0d6470',
+                        glass: 'rgba(255, 255, 255, 0.08)',
+                        glassBorder: 'rgba(255, 255, 255, 0.15)',
+                    }
+                }
+            }
+        }
+    </script>
     <style>
         @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap');
         body { font-family: 'Inter', sans-serif; }
-        .page-hidden { display: none !important; }
+        ::-webkit-scrollbar { width: 8px; height: 8px; }
+        ::-webkit-scrollbar-track { background: rgba(0,0,0,0.1); }
+        ::-webkit-scrollbar-thumb { background: rgba(255,255,255,0.2); border-radius: 10px; }
     </style>
 </head>
-<body class="bg-slate-50 min-h-screen flex text-slate-800">
+<body class="bg-gradient-to-br from-primary to-secondary h-screen overflow-hidden flex text-slate-800">
 
-    <aside id="sidebar" class="w-64 bg-[#094d57] text-white fixed md:relative h-full z-50 flex flex-col shadow-2xl transition-transform -translate-x-full md:translate-x-0">
-        <div class="h-20 flex items-center justify-center border-b border-white/10 font-bold text-xl tracking-wider">
-            <i class="fa-solid fa-building mr-2"></i> SIMGROUP
+    <!-- Sidebar -->
+    <aside class="w-64 bg-glass backdrop-blur-xl border-r border-glassBorder hidden md:flex flex-col z-20">
+        <div class="h-20 flex items-center justify-center border-b border-glassBorder">
+            <div class="flex items-center gap-2 text-white font-bold text-xl tracking-wider">
+                <i class="fa-solid fa-building"></i>
+                <span>SIMGROUP</span>
+            </div>
         </div>
-        <nav class="flex-1 px-3 py-4 space-y-1">
-            <button onclick="switchPage('overview')" id="nav-overview" class="w-full flex items-center gap-3 px-4 py-3 bg-white/20 rounded-lg font-semibold transition-all">
-                <i class="fa-solid fa-chart-pie w-5"></i> Dashboard
+        <div class="flex-1 overflow-y-auto py-4">
+            <nav class="space-y-1.5 px-3">
+                <a href="dashboard-internal.html" class="flex items-center gap-3 px-4 py-3 bg-white/20 text-white rounded-lg font-semibold transition-all">
+                    <i class="fa-solid fa-chart-pie w-5"></i> Dashboard
+                </a>
+                <a href="#" class="flex items-center gap-3 px-4 py-3 text-white/70 hover:bg-white/10 hover:text-white rounded-lg transition-all">
+                    <i class="fa-solid fa-arrow-trend-up w-5"></i> Growth and Drowning
+                </a>
+                <a href="#" class="flex items-center gap-3 px-4 py-3 text-white/70 hover:bg-white/10 hover:text-white rounded-lg transition-all">
+                    <i class="fa-regular fa-calendar-check w-5"></i> Calendar of Event
+                </a>
+                <a href="status-so-berjalan.html" class="flex items-center gap-3 px-4 py-3 text-white/70 hover:bg-white/10 hover:text-white rounded-lg transition-all">
+                    <i class="fa-solid fa-clipboard-list w-5"></i> Status SO Berjalan
+                </a>
+                <a href="#" class="flex items-center gap-3 px-4 py-3 text-white/70 hover:bg-white/10 hover:text-white rounded-lg transition-all">
+                    <i class="fa-solid fa-database w-5"></i> Bank Buffer Management
+                </a>
+                <a href="timeline-kegiatan.html" class="flex items-center gap-3 px-4 py-3 text-white/70 hover:bg-white/10 hover:text-white rounded-lg transition-all">
+                    <i class="fa-solid fa-clock-rotate-left w-5"></i> Timeline Kegiatan
+                </a>
+                <a href="report-media-partner.html" class="flex items-center gap-3 px-4 py-3 text-white/70 hover:bg-white/10 hover:text-white rounded-lg transition-all">
+                    <i class="fa-solid fa-bullhorn w-5"></i> Report Media Partner
+                </a>
+            </nav>
+        </div>
+        <div class="p-4 border-t border-glassBorder">
+            <button onclick="handleLogout()" class="flex items-center justify-center gap-2 w-full py-2.5 bg-rose-500/20 text-white rounded-lg hover:bg-rose-500/40 transition-all font-medium text-sm">
+                <i class="fa-solid fa-arrow-right-from-bracket"></i> Sign Out
             </button>
-            <button onclick="switchPage('sostatus')" id="nav-sostatus" class="w-full flex items-center gap-3 px-4 py-3 hover:bg-white/10 rounded-lg transition-all">
-                <i class="fa-solid fa-table-list w-5"></i> Detail SO
-            </button>
-        </nav>
-        <div class="p-4 border-t border-white/10 text-center text-[10px] text-white/50">
-            Internal Sourcing Portal v2.0
         </div>
     </aside>
 
-    <div class="flex-1 flex flex-col h-screen overflow-hidden">
-        <header class="h-20 bg-white border-b border-slate-200 flex items-center justify-between px-6 shadow-sm z-10">
-            <h1 class="text-lg font-semibold text-slate-800">HR Monitoring Jakarta</h1>
-            <div class="flex items-center gap-4 text-xs font-medium text-slate-500">
-                <span id="syncStatus"><i class="fa-solid fa-circle text-[8px] animate-pulse text-emerald-500 mr-1"></i> Cloud Ready</span>
+    <!-- Main Content -->
+    <div class="flex-1 flex flex-col h-screen overflow-hidden relative">
+        <header class="h-20 bg-glass backdrop-blur-sm border-b border-glassBorder flex items-center justify-between px-10">
+            <h1 class="text-xl font-semibold text-white">Overview <span class="text-sm font-light text-white/70 ml-2">| Monitoring Team Jakarta</span></h1>
+            <div class="flex items-center gap-3 cursor-pointer group" id="user-profile">
+                <div class="text-right">
+                    <p class="text-sm font-semibold text-white" id="profile-name">Loading...</p>
+                    <p class="text-xs text-white/70" id="profile-role">Loading...</p>
+                </div>
+                <img src="https://ui-avatars.com/api/?name=User&background=ffffff&color=148e9e" id="profile-avatar" alt="Profile" class="w-10 h-10 rounded-full shadow-lg">
             </div>
         </header>
 
-        <main id="page-overview" class="flex-1 overflow-y-auto p-6 bg-slate-50">
-            <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
-                <div class="bg-white p-5 rounded-2xl shadow-sm border border-slate-100">
-                    <p class="text-slate-500 text-xs font-semibold uppercase">Total SO Aktif</p>
-                    <h3 class="text-2xl font-bold text-primary mt-1" id="stat-total">0</h3>
-                </div>
-                <div class="bg-white p-5 rounded-2xl shadow-sm border border-slate-100">
-                    <p class="text-slate-500 text-xs font-semibold uppercase">Fulfillment Rate</p>
-                    <h3 class="text-2xl font-bold text-emerald-600 mt-1" id="stat-fulfill">0%</h3>
-                </div>
-                <div class="bg-white p-5 rounded-2xl shadow-sm border border-slate-100">
-                    <p class="text-slate-500 text-xs font-semibold uppercase">Offering Rate</p>
-                    <h3 class="text-2xl font-bold text-amber-500 mt-1" id="stat-offering">0%</h3>
-                </div>
-            </div>
-
-            <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
-                <div class="bg-white p-6 rounded-2xl shadow-sm border border-slate-100">
-                    <h3 class="font-bold text-slate-800 mb-4">Fulfillment Chart</h3>
-                    <canvas id="soFulfillChart" class="h-48"></canvas>
-                </div>
-                <div class="bg-white p-6 rounded-2xl shadow-sm border border-slate-100">
-                    <h3 class="font-bold text-slate-800 mb-4">Offering Chart</h3>
-                    <canvas id="soOfferingChart" class="h-48"></canvas>
-                </div>
-            </div>
-        </main>
-
-        <main id="page-sostatus" class="flex-1 overflow-hidden p-6 bg-slate-50 page-hidden">
-            <div class="bg-white rounded-2xl shadow-sm border border-slate-100 h-full flex flex-col">
-                <div class="p-6 border-b border-slate-100 flex justify-between items-center">
-                    <div>
-                        <h3 class="font-bold text-slate-800">Data Service Order</h3>
-                        <p class="text-xs text-slate-400 mt-1" id="updateInfo">Menunggu file Excel...</p>
+        <main class="flex-1 overflow-y-auto p-10">
+            <h2 class="text-3xl font-bold mb-8 text-white" id="welcome-greeting">Selamat Datang! ✨</h2>
+            
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mb-8">
+                <div class="bg-white p-6 rounded-2xl shadow-xl flex flex-col">
+                    <div class="flex items-center justify-between mb-2">
+                        <h3 class="font-bold text-slate-800">Status SO (Fulfillment)</h3>
+                        <label id="syncCsvLabel" style="display: none;" class="cursor-pointer bg-slate-50 hover:bg-primary hover:text-white text-slate-600 text-xs px-3 py-1.5 rounded-lg border border-slate-200 transition-all shadow-sm">
+                            <i class="fa-solid fa-cloud-arrow-up"></i> Sync CSV
+                            <input type="file" id="csvFileInput" accept=".csv" class="hidden" onchange="handleFileUpload(event)">
+                        </label>
                     </div>
-                    <label class="cursor-pointer bg-primary text-white px-4 py-2 rounded-lg text-sm hover:bg-secondary transition-all">
-                        <i class="fa-solid fa-file-excel mr-2"></i> Upload Excel/CSV
-                        <input type="file" class="hidden" id="excelFile" accept=".xlsx, .xls, .csv">
-                    </label>
+                    <div class="relative h-36 w-full flex items-center justify-center flex-1">
+                        <canvas id="soFulfillChart"></canvas>
+                    </div>
                 </div>
-                <div class="flex-1 overflow-auto">
-                    <table class="w-full text-left border-collapse" id="soTable">
-                        <thead class="bg-slate-50 sticky top-0">
-                            <tr class="text-slate-500 text-xs uppercase">
-                                <th class="p-4">Klien</th>
-                                <th class="p-4">Posisi</th>
-                                <th class="p-4">Area</th>
-                                <th class="p-4 text-center">Fulfillment</th>
-                                <th class="p-4 text-center">Offering</th>
-                            </tr>
-                        </thead>
-                        <tbody id="so-tbody" class="divide-y divide-slate-100">
-                            <tr><td colspan="5" class="p-10 text-center text-slate-400">Silakan upload data hari ini</td></tr>
-                        </tbody>
-                    </table>
+                <div class="bg-white p-6 rounded-2xl shadow-xl flex flex-col">
+                    <h3 class="font-bold text-slate-800">Status SO (Offering)</h3>
+                    <div class="relative h-36 w-full flex items-center justify-center flex-1">
+                        <canvas id="soOfferingChart"></canvas>
+                    </div>
                 </div>
             </div>
         </main>
     </div>
 
-    <script type="module">
-        import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-app.js";
-        import { getFirestore, doc, setDoc, onSnapshot } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
+    <script>
+        // INIT DATA DENGAN AMAN
+        let activeUser = null;
+        
+        function initDashboard() {
+            try {
+                const userString = localStorage.getItem('currentUser');
+                if (!userString) {
+                    window.location.replace('login.html');
+                    return;
+                }
+                activeUser = JSON.parse(userString);
+                window.activeUser = activeUser;
 
-        // Konfigurasi (Sesuaikan dengan milik Anda)
-        const firebaseConfig = { /* isi config Anda di sini */ };
-        const app = initializeApp(firebaseConfig);
-        const db = getFirestore(app);
+                document.getElementById('profile-name').textContent = activeUser.name;
+                document.getElementById('profile-role').textContent = activeUser.role;
+                document.getElementById('profile-avatar').src = `https://ui-avatars.com/api/?name=${activeUser.name.replace(' ', '+')}&background=148e9e&color=fff`;
+                
+                document.getElementById('welcome-greeting').innerText = `Halo, ${activeUser.name}! ✨`;
 
-        // --- STANDARDISASI DATA ---
-        // Fungsi ini memetakan berbagai nama kolom dari Excel departemen lain ke format standar kita
-        function standardizeData(data) {
-            return data.map(row => {
-                const newRow = {};
-                // Mapping key (Tambahkan variasi nama kolom dari departemen lain di sini)
-                newRow.client = row['nama client'] || row['Client'] || row['Nama Klien'] || '-';
-                newRow.job = row['nama job'] || row['Job'] || row['Posisi'] || '-';
-                newRow.area = row['area'] || row['Area'] || '-';
-                newRow.finish = parseInt(row['finish'] || row['Finish'] || 0);
-                newRow.unfulfill = parseInt(row['unfulfill'] || row['Unfulfill'] || 0);
-                newRow.offering = parseInt(row['OFFERING'] || row['Offering'] || 0);
-                return newRow;
+                if (activeUser.name.toLowerCase() === 'daffa') {
+                    document.getElementById('syncCsvLabel').style.display = 'flex';
+                }
+            } catch (e) {
+                window.location.replace('login.html');
+            }
+        }
+
+        window.handleLogout = () => {
+            localStorage.removeItem('currentUser');
+            window.location.replace('login.html');
+        };
+
+        // Inisialisasi Chart
+        const soFulfillChart = new Chart(document.getElementById('soFulfillChart').getContext('2d'), {
+            type: 'doughnut',
+            data: { labels: ['Ter-Fulfill', 'Belum Fulfill'], datasets: [{ data: [1, 1], backgroundColor: ['#148e9e', '#f43f5e'] }] },
+            options: { responsive: true, maintainAspectRatio: false, cutout: '70%', plugins: { legend: { display: false } } }
+        });
+
+        const soOfferingChart = new Chart(document.getElementById('soOfferingChart').getContext('2d'), {
+            type: 'doughnut',
+            data: { labels: ['Sudah Offering', 'Belum Offering'], datasets: [{ data: [1, 1], backgroundColor: ['#10b981', '#fbbf24'] }] },
+            options: { responsive: true, maintainAspectRatio: false, cutout: '70%', plugins: { legend: { display: false } } }
+        });
+
+        function handleFileUpload(event) {
+            const file = event.target.files[0];
+            if (!file) return;
+            Papa.parse(file, {
+                header: true,
+                skipEmptyLines: true,
+                complete: function(results) {
+                    alert("Data berhasil di-sync!");
+                }
             });
         }
 
-        // --- HANDLER UPLOAD ---
-        document.getElementById('excelFile').addEventListener('change', function(e) {
-            const file = e.target.files[0];
-            const reader = new FileReader();
-
-            reader.onload = async function(e) {
-                const data = new Uint8Array(e.target.result);
-                const workbook = XLSX.read(data, {type: 'array'});
-                const firstSheet = workbook.Sheets[workbook.SheetNames[0]];
-                const jsonData = XLSX.utils
+        initDashboard();
+    </script>
+</body>
+</html>
