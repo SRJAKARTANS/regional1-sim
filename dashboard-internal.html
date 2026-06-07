@@ -377,13 +377,40 @@
 
       // PENGGANTI FUNGSI initSession() DI dashboard-internal.html
         function initSession() {
-            // 1. Ambil data dari localStorage (yang diset oleh login.html)
+            // Mengambil data dari localStorage dengan key 'currentUser'
             const userString = localStorage.getItem('currentUser');
             
+            // Debugging: lihat di console browser apa yang terbaca
+            console.log("Data user yang terbaca:", userString);
+
             if (!userString) {
-                // Jika tidak ada data login, tendang balik ke login.html
+                // Jika kosong, paksa kembali ke login
                 window.location.href = 'login.html';
                 return;
+            }
+
+            try {
+                window.activeUser = JSON.parse(userString);
+                
+                // Update Nama & Role di Header
+                document.getElementById('profile-name').textContent = window.activeUser.name;
+                document.getElementById('profile-role').textContent = window.activeUser.role;
+                
+                // Update Avatar
+                document.getElementById('profile-avatar').src = `https://ui-avatars.com/api/?name=${window.activeUser.name.replace(' ', '+')}&background=148e9e&color=fff`;
+
+                // Logika Tombol Upload
+                const name = window.activeUser.name.toLowerCase();
+                if (name.includes('daffa') || name.includes('anya')) {
+                    document.querySelectorAll('.csvUploadInput').forEach(el => {
+                        el.parentElement.style.display = 'flex';
+                    });
+                }
+            } catch (e) {
+                console.error("Gagal membaca data user:", e);
+                window.location.href = 'login.html'; // Jika data korup, balik ke login
+            }
+        }
             }
 
             // 2. Parse data user
