@@ -340,6 +340,14 @@
                             <p class="text-xs text-slate-500 mt-1">Kolom akan otomatis menyesuaikan dengan data Excel/CSV yang diupload.</p>
                         </div>
                         <div class="flex items-center gap-3">
+                             <!-- Tambahan Filter ASSIGN RO -->
+                             <div class="relative hidden md:block">
+                                <i class="fa-solid fa-filter absolute left-3 top-1/2 transform -translate-y-1/2 text-slate-400 text-sm"></i>
+                                <select id="filter-assign-ro" class="pl-9 pr-8 py-2 bg-slate-50 border border-slate-200 rounded-lg text-sm text-slate-700 focus:ring-2 focus:ring-primary focus:outline-none w-full transition-all appearance-none cursor-pointer">
+                                    <option value="">Semua ASSIGN RO</option>
+                                </select>
+                                <i class="fa-solid fa-chevron-down absolute right-3 top-1/2 transform -translate-y-1/2 text-slate-400 text-xs pointer-events-none"></i>
+                            </div>
                              <div class="relative">
                                 <i class="fa-solid fa-search absolute left-3 top-1/2 transform -translate-y-1/2 text-slate-400 text-sm"></i>
                                 <input type="text" id="search-csv" placeholder="Cari data..." class="pl-9 pr-4 py-2 bg-slate-50 border border-slate-200 rounded-lg text-sm text-slate-700 focus:ring-2 focus:ring-primary focus:outline-none w-full md:w-64 transition-all">
@@ -561,11 +569,13 @@
             const tbody = document.getElementById('so-table-body');
             const thead = document.getElementById('so-table-head');
             const rowCount = document.getElementById('total-row-count');
+            const filterAssignRo = document.getElementById('filter-assign-ro');
             
             if (!savedString) {
                 tbody.innerHTML = '<tr><td colspan="100%" class="p-8 text-center text-slate-400 italic bg-slate-50/50">Belum ada data CSV yang di-sync. Silakan upload CSV di halaman Overview.</td></tr>';
                 thead.innerHTML = '';
                 if(rowCount) rowCount.innerText = '0 Baris';
+                if(filterAssignRo) filterAssignRo.innerHTML = '<option value="">Semua ASSIGN RO</option>';
                 return;
             }
 
@@ -575,13 +585,21 @@
 
                 if(rowCount) rowCount.innerText = `${data.length} Baris`;
 
-                // Ambil daftar header secara dinamis dari kunci (keys) baris pertama
-                const headers = Object.keys(data[0]);
+                // Tentukan kolom mana saja yang ingin ditampilkan berdasarkan permintaan
+                const allowedColumns = [
+                    "SO INDUK", "SO PENAMBAH", "NAMA CLIENT", "NAMA AREA", "NAMA JOB", 
+                    "TGL APPROVE", "ASSIGN RO", "AGING-SS", "SLA LT OFFERING", 
+                    "GROUP SLA BELUM OFFERING", "DUE DATE FULFILLMENT", "AGING NON PENDING", 
+                    "TANGGAL INVALID - PENDING", "TASK ID", "RO LINE", "AGING UNFULFILL", 
+                    "PARTICIPATE", "KATEGORI FULFILLMENT"
+                ];
+                
+                const assignRoSet = new Set();
                 
                 // --- Buat Header Tabel (thead) ---
                 let headHTML = '<tr class="text-slate-500 text-xs uppercase tracking-wider">';
                 headHTML += '<th class="p-4 font-semibold whitespace-nowrap border-b border-slate-200">No</th>';
-                headers.forEach(key => {
+                allowedColumns.forEach(key => {
                     headHTML += `<th class="p-4 font-semibold whitespace-nowrap border-b border-slate-200">${key}</th>`;
                 });
                 headHTML += '</tr>';
@@ -590,10 +608,15 @@
                 // --- Buat Isi Tabel (tbody) ---
                 let bodyHTML = '';
                 data.forEach((row, index) => {
-                    bodyHTML += '<tr class="hover:bg-slate-50/80 transition-colors border-b border-slate-100 group">';
+                    // Ambil nilai ASSIGN RO untuk dimasukkan ke dropdown filter
+                    const roValue = (row["ASSIGN RO"] || '').trim();
+                    if (roValue) assignRoSet.add(roValue);
+
+                    // Sisipkan nilai ASSIGN RO ke dalam dataset untuk memudahkan filter via javascript
+                    bodyHTML += `<tr class="hover:bg-slate-50/80 transition-colors border-b border-slate-100 group" data-assign-ro="${roValue}">`;
                     bodyHTML += `<td class="p-4 text-slate-500 font-medium">${index + 1}</td>`;
                     
-                    headers.forEach(key => {
+                    allowedColumns.forEach(key => {
                         const cellData = (row[key] !== undefined && row[key] !== null && row[key] !== '') ? row[key] : '-';
                         bodyHTML += `<td class="p-4 text-slate-700 whitespace-nowrap group-hover:text-slate-900">${cellData}</td>`;
                     });
@@ -601,6 +624,14 @@
                     bodyHTML += '</tr>';
                 });
                 tbody.innerHTML = bodyHTML;
+
+                // --- Isi Dropdown Filter ASSIGN RO ---
+                if (filterAssignRo) {
+                    filterAssignRo.innerHTML = '<option value="">Semua ASSIGN RO</option>';
+                    Array.from(assignRoSet).sort().forEach(ro => {
+                        filterAssignRo.innerHTML += `<option value="${ro}">${ro}</option>`;
+                    });
+                }
 
             } catch (error) {
                 console.error("Gagal merender tabel:", error);
@@ -626,20 +657,42 @@
         // Eksekusi load saat aplikasi dimuat
         loadSavedData();
 
-        // Fitur Search/Filter untuk Tabel CSV
-        document.getElementById('search-csv').addEventListener('input', function(e) {
-            const searchTerm = e.target.value.toLowerCase();
+        // ==========================================
+        // FUNGSI PENCARIAN & FILTER MULTIGANDA
+        // ==========================================
+        function applyFilters() {
+            const searchTerm = document.getElementById('search-csv').value.toLowerCase();
+            const filterRo = document.getElementById('filter-assign-ro').value;
             const rows = document.getElementById('so-table-body').getElementsByTagName('tr');
             
+            let visibleCount = 0;
+            
             Array.from(rows).forEach(row => {
+                // Lewati placeholder peringatan jika tabel kosong
+                if (row.children.length === 1) return; 
+
                 const text = row.innerText.toLowerCase();
-                if(text.includes(searchTerm)) {
+                const rowRo = row.getAttribute('data-assign-ro');
+                
+                const matchSearch = text.includes(searchTerm);
+                const matchRo = filterRo === "" || rowRo === filterRo;
+                
+                if (matchSearch && matchRo) {
                     row.style.display = '';
+                    visibleCount++;
                 } else {
                     row.style.display = 'none';
                 }
             });
-        });
+
+            // Update hitungan total baris yang tampil
+            const rowCount = document.getElementById('total-row-count');
+            if (rowCount) rowCount.innerText = `${visibleCount} Baris`;
+        }
+
+        // Jalankan applyFilters() jika ada ketikan di kolom pencarian atau perubahan di dropdown
+        document.getElementById('search-csv').addEventListener('input', applyFilters);
+        document.getElementById('filter-assign-ro').addEventListener('change', applyFilters);
 
     </script>
 </body>
