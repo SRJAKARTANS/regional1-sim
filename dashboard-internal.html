@@ -375,67 +375,33 @@
         // RULE 1: Protocol Path
         const getDocRef = () => doc(db, 'artifacts', appId, 'public', 'data', 'soreport', 'latest_csv');
 
-      // PENGGANTI FUNGSI initSession() DI dashboard-internal.html
+        // INIT UI & LOGIN SESSION
         function initSession() {
-            // Mengambil data dari localStorage dengan key 'currentUser'
             const userString = localStorage.getItem('currentUser');
-            
-            // Debugging: lihat di console browser apa yang terbaca
-            console.log("Data user yang terbaca:", userString);
-
             if (!userString) {
-                // Jika kosong, paksa kembali ke login
-                window.location.href = 'login.html';
-                return;
-            }
-
-            try {
+                console.log("Tidak ada sesi login ditemukan. Menggunakan akun default.");
+                window.activeUser = { name: 'Daffa', role: 'Area Operational Manager' };
+                localStorage.setItem('currentUser', JSON.stringify(window.activeUser));
+            } else {
                 window.activeUser = JSON.parse(userString);
-                
-                // Update Nama & Role di Header
-                document.getElementById('profile-name').textContent = window.activeUser.name;
-                document.getElementById('profile-role').textContent = window.activeUser.role;
-                
-                // Update Avatar
-                document.getElementById('profile-avatar').src = `https://ui-avatars.com/api/?name=${window.activeUser.name.replace(' ', '+')}&background=148e9e&color=fff`;
-
-                // Logika Tombol Upload
-                const name = window.activeUser.name.toLowerCase();
-                if (name.includes('daffa') || name.includes('anya')) {
-                    document.querySelectorAll('.csvUploadInput').forEach(el => {
-                        el.parentElement.style.display = 'flex';
-                    });
-                }
-            } catch (e) {
-                console.error("Gagal membaca data user:", e);
-                window.location.href = 'login.html'; // Jika data korup, balik ke login
-            }
-        }
             }
 
-            // 2. Parse data user
-            window.activeUser = JSON.parse(userString);
-
-            // 3. Update UI dengan nama yang sesuai dari hasil login
             document.getElementById('profile-name').textContent = window.activeUser.name;
             document.getElementById('profile-role').textContent = window.activeUser.role;
-            
-            // Generate avatar dinamis berdasarkan nama yang login
             document.getElementById('profile-avatar').src = `https://ui-avatars.com/api/?name=${window.activeUser.name.replace(' ', '+')}&background=148e9e&color=fff`;
             
-            // Sapaan personal
             const hour = new Date().getHours();
             let greeting = "Good Evening";
             if (hour < 12) greeting = "Good Morning";
             else if (hour < 18) greeting = "Good Afternoon";
             document.getElementById('welcome-greeting').innerHTML = `${greeting}, ${window.activeUser.name}! ✨`;
 
-            // 4. Logika tombol Sync (Hanya muncul jika Daffa yang login)
-            const isDaffa = window.activeUser.name.toLowerCase().includes('daffa');
-            document.querySelectorAll('.csvUploadInput').forEach(input => {
-                const parentLabel = input.parentElement;
-                parentLabel.style.display = isDaffa ? 'flex' : 'none';
-            });
+            // MEMBUKA AKSES UPLOAD UNTUK DAFFA DAN ANYA
+            const userNameLower = window.activeUser.name.toLowerCase();
+            const isAuthorizedToUpload = userNameLower.includes('daffa') || userNameLower.includes('anya');
+            
+            document.getElementById('syncCsvLabel1').style.display = isAuthorizedToUpload ? 'flex' : 'none';
+            document.getElementById('syncCsvLabel2').style.display = isAuthorizedToUpload ? 'flex' : 'none';
         }
 
         // TOGGLE SIDEBAR (Mobile)
