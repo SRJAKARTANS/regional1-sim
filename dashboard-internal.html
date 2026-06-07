@@ -48,43 +48,30 @@
         </div>
         <div class="flex-1 overflow-y-auto py-4">
             <nav class="space-y-1.5 px-3">
-                <!-- Menu 1: Dashboard -->
                 <a href="dashboard-internal.html" class="flex items-center gap-3 px-4 py-3 bg-white/20 text-white rounded-lg font-semibold transition-all shadow-sm">
                     <i class="fa-solid fa-chart-pie w-5 text-center"></i>
                     Dashboard
                 </a>
-                
-                <!-- Menu 2: Growth and Drowning -->
                 <a href="#" class="flex items-center gap-3 px-4 py-3 text-white/70 hover:bg-white/10 hover:text-white rounded-lg font-medium transition-all">
                     <i class="fa-solid fa-arrow-trend-up w-5 text-center"></i>
                     Growth and Drowning
                 </a>
-                
-                <!-- Menu 3: Calendar of Event -->
                 <a href="#" class="flex items-center gap-3 px-4 py-3 text-white/70 hover:bg-white/10 hover:text-white rounded-lg font-medium transition-all">
                     <i class="fa-regular fa-calendar-check w-5 text-center"></i>
                     Calendar of Event
                 </a>
-                
-                <!-- Menu 4: Status SO Berjalan -->
                 <a href="status-so-berjalan.html" class="flex items-center gap-3 px-4 py-3 text-white/70 hover:bg-white/10 hover:text-white rounded-lg font-medium transition-all">
                     <i class="fa-solid fa-clipboard-list w-5 text-center"></i>
                     Status SO Berjalan
                 </a>
-
-                <!-- Menu 5: Bank Buffer Management -->
                 <a href="#" class="flex items-center gap-3 px-4 py-3 text-white/70 hover:bg-white/10 hover:text-white rounded-lg font-medium transition-all">
                     <i class="fa-solid fa-database w-5 text-center"></i>
                     Bank Buffer Management
                 </a>
-                
-                <!-- Menu 6: Timeline Kegiatan -->
                 <a href="timeline-kegiatan.html" class="flex items-center gap-3 px-4 py-3 text-white/70 hover:bg-white/10 hover:text-white rounded-lg font-medium transition-all">
                     <i class="fa-solid fa-clock-rotate-left w-5 text-center"></i>
                     Timeline Kegiatan
                 </a>
-
-                <!-- Menu 7: Report Media Partner -->
                 <a href="report-media-partner.html" class="flex items-center gap-3 px-4 py-3 text-white/70 hover:bg-white/10 hover:text-white rounded-lg font-medium transition-all">
                     <i class="fa-solid fa-bullhorn w-5 text-center"></i>
                     Report Media Partner
@@ -410,7 +397,7 @@
             options: { 
                 responsive: true, 
                 maintainAspectRatio: false, 
-                cutout: '70%', // Diubah dari 75% ke 70% agar lebih tebal & proporsional saat ukurannya kecil
+                cutout: '70%', 
                 plugins: { legend: { display: false } } 
             }
         });
@@ -430,13 +417,13 @@
             options: { 
                 responsive: true, 
                 maintainAspectRatio: false, 
-                cutout: '70%', // Diubah dari 75% ke 70% agar lebih tebal & proporsional saat ukurannya kecil
+                cutout: '70%', 
                 plugins: { legend: { display: false } } 
             }
         });
 
         // ==========================================
-        // FUNGSI UPLOAD & PARSING CSV LOKAL
+        // FUNGSI UPLOAD, PARSING CSV LOKAL & PENYIMPANAN
         // ==========================================
         function handleFileUpload(event) {
             const file = event.target.files[0];
@@ -448,10 +435,20 @@
                 skipEmptyLines: true,
                 complete: function(results) {
                     const data = results.data;
+                    
+                    // SIMPAN KE LOCAL STORAGE
+                    // Data akan disimpan di browser dengan kunci 'savedDashboardData'
+                    // Menyimpan ini juga akan otomatis mereplace (menggantikan) data sebelumnya.
+                    localStorage.setItem('savedDashboardData', JSON.stringify(data));
+                    
+                    // Update Chart langsung saat itu juga
                     updateChartsWithData(data);
                     
-                    // Notifikasi sukses yang elegan
-                    alert("✨ Data CSV berhasil di-sync! Grafik kamu sudah ter-update otomatis berdasarkan data harian terbaru.");
+                    // Notifikasi sukses
+                    alert("✨ Data CSV berhasil di-sync dan telah disimpan! Grafik sudah diperbarui. Data tidak akan hilang saat di-refresh.");
+                    
+                    // Reset input file agar dapat membaca file yang sama berturut-turut jika perlu
+                    event.target.value = ''; 
                 },
                 error: function(err) {
                     console.error("Gagal membaca file CSV:", err);
@@ -464,9 +461,8 @@
             let terFulfill = 0, belumFulfill = 0;
             let sudahOffering = 0, belumOffering = 0;
 
-            // Membaca setiap baris dari file Excel CSV kamu
+            // Membaca setiap baris dari file Excel CSV
             data.forEach(row => {
-                // Kolom sesuai dengan format data Excel kamu: finish, unfulfill, OFFERING
                 const finish = parseInt(row['finish']) || 0;
                 const unfulfill = parseInt(row['unfulfill']) || 0;
                 const offering = parseInt(row['OFFERING']) || 0;
@@ -475,7 +471,7 @@
                 terFulfill += finish;
                 belumFulfill += unfulfill;
 
-                // Logika Offering: Asumsi bahwa hanya baris aktif (finish=1 atau unfulfill=1) yang dihitung offeringnya
+                // Logika Offering
                 if (finish === 1 || unfulfill === 1) {
                     if (offering > 0) {
                         sudahOffering++;
@@ -499,6 +495,25 @@
             document.getElementById('text-sudah-offering').innerText = `Sudah Offering (${totalOffering > 0 ? Math.round((sudahOffering / totalOffering) * 100) : 0}%)`;
             document.getElementById('text-belum-offering').innerText = `Belum Offering (${totalOffering > 0 ? Math.round((belumOffering / totalOffering) * 100) : 0}%)`;
         }
+
+        // ==========================================
+        // FUNGSI LOAD DATA TERSIMPAN SAAT HALAMAN DIBUKA
+        // ==========================================
+        function loadSavedData() {
+            const savedString = localStorage.getItem('savedDashboardData');
+            if (savedString) {
+                try {
+                    const parsedData = JSON.parse(savedString);
+                    // Panggil fungsi pembaruan grafik menggunakan data yang tersimpan di Local Storage
+                    updateChartsWithData(parsedData);
+                } catch (error) {
+                    console.error("Gagal memuat data tersimpan:", error);
+                }
+            }
+        }
+
+        // Eksekusi load data tersimpan saat aplikasi pertama kali dimuat
+        loadSavedData();
 
     </script>
 </body>
