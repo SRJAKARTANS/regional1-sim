@@ -202,9 +202,9 @@
                         <p class="text-xs text-slate-500 mt-1">Data pelamar baru yang siap di-follow up.</p>
                     </div>
                 </div>
-                <!-- Tambahan min-w-[800px] agar tabel tidak menyusut dan berantakan -->
+                <!-- Diperbaiki dengan min-w-max agar tabel menyesuaikan lebarnya dengan rapi -->
                 <div class="overflow-x-auto w-full">
-                    <table class="w-full min-w-[800px] text-left border-collapse">
+                    <table class="w-full min-w-max text-left border-collapse">
                         <thead>
                             <tr class="bg-slate-50/80 text-slate-500 text-xs uppercase tracking-wider">
                                 <th class="p-4 font-semibold whitespace-nowrap">Nama Kandidat</th>
@@ -217,11 +217,11 @@
                         <tbody class="text-sm divide-y divide-slate-100">
                             <tr class="hover:bg-slate-50 transition-colors">
                                 <td class="p-4 font-medium text-slate-800 whitespace-nowrap">Raditya Dika</td>
-                                <td class="p-4"><p class="text-slate-700 font-medium whitespace-nowrap">PT. FIF Group</p></td>
-                                <td class="p-4"><span class="bg-blue-50 text-blue-600 border border-blue-200 text-xs px-2.5 py-1 rounded-md font-medium whitespace-nowrap">Review CV</span></td>
-                                <td class="p-4" id="revo-flag-1"><span class="text-slate-400 italic text-xs whitespace-nowrap">Belum ada PIC</span></td>
-                                <td class="p-4 text-center">
-                                    <button onclick="flagOfficer('revo-flag-1')" class="text-xs bg-white hover:bg-primary hover:text-white text-primary px-4 py-2 rounded-lg transition-colors font-semibold border border-primary/30 hover:border-primary shadow-sm whitespace-nowrap">Ambil</button>
+                                <td class="p-4 whitespace-nowrap"><p class="text-slate-700 font-medium">PT. FIF Group</p></td>
+                                <td class="p-4 whitespace-nowrap"><span class="bg-blue-50 text-blue-600 border border-blue-200 text-xs px-2.5 py-1 rounded-md font-medium">Review CV</span></td>
+                                <td class="p-4 whitespace-nowrap" id="revo-flag-1"><span class="text-slate-400 italic text-xs">Belum ada PIC</span></td>
+                                <td class="p-4 text-center whitespace-nowrap">
+                                    <button onclick="flagOfficer('revo-flag-1')" class="text-xs bg-white hover:bg-primary hover:text-white text-primary px-4 py-2 rounded-lg transition-colors font-semibold border border-primary/30 hover:border-primary shadow-sm">Ambil</button>
                                 </td>
                             </tr>
                         </tbody>
@@ -265,9 +265,9 @@
                 </div>
 
                 <!-- Table Content -->
-                <!-- Tambahan min-w-[1000px] agar tabel detail tidak menyusut dan berantakan -->
+                <!-- Diperbaiki dengan min-w-max agar tabel menyesuaikan lebarnya dengan rapi -->
                 <div class="overflow-x-auto flex-1 relative w-full">
-                    <table class="w-full min-w-[1000px] text-left border-collapse" id="soTable">
+                    <table class="w-full min-w-max text-left border-collapse" id="soTable">
                         <thead class="sticky top-0 bg-white shadow-sm z-10">
                             <tr class="bg-slate-50/90 backdrop-blur-sm text-slate-500 text-xs uppercase tracking-wider">
                                 <th class="p-4 font-semibold w-16 text-center whitespace-nowrap">No</th>
@@ -428,13 +428,14 @@
 
                     const tr = document.createElement('tr');
                     tr.className = 'hover:bg-slate-50 transition-colors';
+                    // Menambahkan class whitespace-nowrap secara merata ke dalam sel JavaScript
                     tr.innerHTML = `
                         <td class="p-4 text-center text-slate-400 font-medium whitespace-nowrap">${validCount}</td>
-                        <td class="p-4 min-w-[200px]"><p class="font-bold text-slate-800">${client}</p><p class="text-slate-500 text-xs mt-0.5">${job}</p></td>
+                        <td class="p-4 whitespace-nowrap"><p class="font-bold text-slate-800">${client}</p><p class="text-slate-500 text-xs mt-0.5">${job}</p></td>
                         <td class="p-4 whitespace-nowrap"><p class="text-slate-700 font-medium">${area}</p><p class="text-slate-400 text-xs mt-0.5"><i class="fa-regular fa-user mr-1"></i>${assignRo}</p></td>
                         <td class="p-4 text-slate-600 text-sm whitespace-nowrap">${tglApprove}</td>
-                        <td class="p-4 text-center">${fulfillBadge}</td>
-                        <td class="p-4 text-center">${offeringBadge}</td>
+                        <td class="p-4 text-center whitespace-nowrap">${fulfillBadge}</td>
+                        <td class="p-4 text-center whitespace-nowrap">${offeringBadge}</td>
                     `;
                     tbody.appendChild(tr);
                 }
