@@ -34,89 +34,95 @@
         ::-webkit-scrollbar-track { background: rgba(0,0,0,0.1); }
         ::-webkit-scrollbar-thumb { background: rgba(255,255,255,0.2); border-radius: 10px; }
         ::-webkit-scrollbar-thumb:hover { background: rgba(255,255,255,0.4); }
+        .page-hidden { display: none !important; }
     </style>
 </head>
-<body class="bg-gradient-to-br from-primary to-secondary h-screen overflow-hidden flex text-slate-800">
+<body class="bg-gradient-to-br from-primary to-secondary h-screen overflow-hidden flex text-slate-800 relative">
 
-    <!-- Sidebar (Glassmorphism) -->
-    <aside class="w-64 bg-glass backdrop-blur-xl border-r border-glassBorder hidden md:flex flex-col z-20">
+    <!-- Sidebar (Glassmorphism & Responsive) -->
+    <aside id="sidebar" class="w-64 bg-[#094d57] md:bg-glass backdrop-blur-xl border-r border-glassBorder absolute md:relative inset-y-0 left-0 transform -translate-x-full md:translate-x-0 transition-transform duration-300 z-50 flex flex-col shadow-2xl md:shadow-none">
+        
+        <button onclick="toggleSidebar()" class="md:hidden absolute top-7 right-4 text-white/70 hover:text-white">
+            <i class="fa-solid fa-xmark text-xl"></i>
+        </button>
+
         <div class="h-20 flex items-center justify-center border-b border-glassBorder">
             <div class="flex items-center gap-2 text-white font-bold text-xl tracking-wider">
                 <i class="fa-solid fa-building"></i>
                 <span>SIMGROUP</span>
             </div>
         </div>
+        
         <div class="flex-1 overflow-y-auto py-4">
             <nav class="space-y-1.5 px-3">
                 <!-- Menu 1: Dashboard -->
-                <a href="dashboard-internal.html" class="flex items-center gap-3 px-4 py-3 bg-white/20 text-white rounded-lg font-semibold transition-all shadow-sm">
-                    <i class="fa-solid fa-chart-pie w-5 text-center"></i>
-                    Dashboard
-                </a>
+                <button onclick="switchPage('overview')" id="nav-overview" class="w-full flex items-center gap-3 px-4 py-3 bg-white/20 text-white rounded-lg font-semibold transition-all shadow-sm">
+                    <i class="fa-solid fa-chart-pie w-5 text-center"></i> Dashboard
+                </button>
                 
                 <!-- Menu 2: Growth and Drowning -->
-                <a href="#" class="flex items-center gap-3 px-4 py-3 text-white/70 hover:bg-white/10 hover:text-white rounded-lg font-medium transition-all">
-                    <i class="fa-solid fa-arrow-trend-up w-5 text-center"></i>
-                    Growth and Drowning
-                </a>
+                <button class="w-full flex items-center gap-3 px-4 py-3 text-white/70 hover:bg-white/10 hover:text-white rounded-lg font-medium transition-all cursor-not-allowed opacity-60">
+                    <i class="fa-solid fa-arrow-trend-up w-5 text-center"></i> Growth and Drowning
+                </button>
                 
                 <!-- Menu 3: Calendar of Event -->
-                <a href="#" class="flex items-center gap-3 px-4 py-3 text-white/70 hover:bg-white/10 hover:text-white rounded-lg font-medium transition-all">
-                    <i class="fa-regular fa-calendar-check w-5 text-center"></i>
-                    Calendar of Event
-                </a>
+                <button class="w-full flex items-center gap-3 px-4 py-3 text-white/70 hover:bg-white/10 hover:text-white rounded-lg font-medium transition-all cursor-not-allowed opacity-60">
+                    <i class="fa-regular fa-calendar-check w-5 text-center"></i> Calendar of Event
+                </button>
                 
                 <!-- Menu 4: Status SO Berjalan -->
-                <a href="#" class="flex items-center gap-3 px-4 py-3 text-white/70 hover:bg-white/10 hover:text-white rounded-lg font-medium transition-all">
-                    <i class="fa-solid fa-clipboard-list w-5 text-center"></i>
-                    Status SO Berjalan
-                </a>
+                <button onclick="switchPage('sostatus')" id="nav-sostatus" class="w-full flex items-center gap-3 px-4 py-3 text-white/70 hover:bg-white/10 hover:text-white rounded-lg font-medium transition-all">
+                    <i class="fa-solid fa-clipboard-list w-5 text-center"></i> Status SO Berjalan
+                </button>
 
                 <!-- Menu 5: Bank Buffer Management -->
-                <a href="#" class="flex items-center gap-3 px-4 py-3 text-white/70 hover:bg-white/10 hover:text-white rounded-lg font-medium transition-all">
-                    <i class="fa-solid fa-database w-5 text-center"></i>
-                    Bank Buffer Management
-                </a>
+                <button class="w-full flex items-center gap-3 px-4 py-3 text-white/70 hover:bg-white/10 hover:text-white rounded-lg font-medium transition-all cursor-not-allowed opacity-60">
+                    <i class="fa-solid fa-database w-5 text-center"></i> Bank Buffer Management
+                </button>
                 
                 <!-- Menu 6: Timeline Kegiatan -->
-                <a href="timeline-kegiatan.html" class="flex items-center gap-3 px-4 py-3 text-white/70 hover:bg-white/10 hover:text-white rounded-lg font-medium transition-all">
-                    <i class="fa-solid fa-clock-rotate-left w-5 text-center"></i>
-                    Timeline Kegiatan
-                </a>
+                <button class="w-full flex items-center gap-3 px-4 py-3 text-white/70 hover:bg-white/10 hover:text-white rounded-lg font-medium transition-all cursor-not-allowed opacity-60">
+                    <i class="fa-solid fa-clock-rotate-left w-5 text-center"></i> Timeline Kegiatan
+                </button>
 
                 <!-- Menu 7: Report Media Partner -->
-                <a href="report-media-partner.html" class="flex items-center gap-3 px-4 py-3 text-white/70 hover:bg-white/10 hover:text-white rounded-lg font-medium transition-all">
-                    <i class="fa-solid fa-bullhorn w-5 text-center"></i>
-                    Report Media Partner
-                </a>
+                <button class="w-full flex items-center gap-3 px-4 py-3 text-white/70 hover:bg-white/10 hover:text-white rounded-lg font-medium transition-all cursor-not-allowed opacity-60">
+                    <i class="fa-solid fa-bullhorn w-5 text-center"></i> Report Media Partner
+                </button>
             </nav>
         </div>
+        
         <div class="p-4 border-t border-glassBorder">
             <button onclick="handleLogout()" class="flex items-center justify-center gap-2 w-full py-2.5 bg-rose-500/20 border border-rose-500/30 text-white rounded-lg hover:bg-rose-500/40 transition-all font-medium text-sm">
-                <i class="fa-solid fa-arrow-right-from-bracket"></i>
-                Sign Out
+                <i class="fa-solid fa-arrow-right-from-bracket"></i> Sign Out
             </button>
         </div>
     </aside>
 
-    <!-- Main Content -->
-    <div class="flex-1 flex flex-col h-screen overflow-hidden relative">
+    <!-- Main Wrapper -->
+    <div class="flex-1 flex flex-col h-screen overflow-hidden relative w-full">
         
-        <!-- Top Header -->
-        <header class="h-20 bg-glass backdrop-blur-sm border-b border-glassBorder flex items-center justify-between px-6 lg:px-10 z-10">
+        <!-- Header -->
+        <header class="h-20 bg-glass backdrop-blur-sm border-b border-glassBorder flex items-center justify-between px-6 lg:px-10 z-10 shrink-0">
             <div class="flex items-center gap-4 text-white">
-                <button class="md:hidden text-white/80 hover:text-white transition">
+                <button onclick="toggleSidebar()" class="md:hidden text-white/80 hover:text-white transition">
                     <i class="fa-solid fa-bars text-xl"></i>
                 </button>
                 <h1 class="text-xl font-semibold hidden sm:block">Overview <span class="text-sm font-light text-white/70 ml-2">| Monitoring Team Jakarta</span></h1>
             </div>
             
             <div class="flex items-center gap-6">
-                <button class="relative text-white/80 hover:text-white transition">
+                <!-- Sync Status Indicator -->
+                <div id="cloudStatus" class="hidden md:flex items-center gap-2 px-3 py-1 bg-white/10 rounded-full text-xs font-medium text-white/80">
+                    <i class="fa-solid fa-cloud-arrow-down animate-pulse text-emerald-400"></i> Auto-Synced
+                </div>
+                
+                <button class="relative text-white/80 hover:text-white transition hidden sm:block">
                     <i class="fa-regular fa-bell text-xl"></i>
                     <span class="absolute -top-1 -right-1 bg-red-500 text-white text-[10px] font-bold w-4 h-4 rounded-full flex items-center justify-center border-2 border-[#148e9e]">5</span>
                 </button>
-                <div class="flex items-center gap-3 border-l border-white/20 pl-6 cursor-pointer group" id="user-profile">
+                
+                <div class="flex items-center gap-3 border-l border-white/20 pl-4 sm:pl-6 cursor-pointer group" id="user-profile">
                     <div class="text-right hidden sm:block">
                         <p class="text-sm font-semibold text-white group-hover:text-white/90 transition" id="profile-name">Loading...</p>
                         <p class="text-xs text-white/70 group-hover:text-white/80 transition" id="profile-role">Loading...</p>
@@ -126,10 +132,9 @@
             </div>
         </header>
 
-        <!-- Scrollable Main Content -->
-        <main class="flex-1 overflow-x-hidden overflow-y-auto p-6 lg:p-10 z-0">
+        <!-- PAGE 1: OVERVIEW DASHBOARD -->
+        <main id="page-overview" class="flex-1 overflow-x-hidden overflow-y-auto p-4 sm:p-6 lg:p-10 z-0 w-full">
             
-            <!-- Welcome Text -->
             <div class="mb-8 text-white flex items-center justify-between">
                 <div class="animate-fade-in-up">
                     <h2 class="text-2xl lg:text-3xl font-bold mb-1 tracking-tight" id="welcome-greeting">Welcome! ✨</h2>
@@ -137,47 +142,49 @@
                 </div>
             </div>
 
-            <!-- Charts Section (SO Status) -->
+            <!-- Charts Section -->
             <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mb-8">
-                
-                <div class="bg-white p-6 rounded-2xl shadow-xl border-none hover:-translate-y-1 transition-transform duration-300 flex flex-col">
+                <!-- Fulfillment Chart -->
+                <div class="bg-white p-6 rounded-2xl shadow-xl border-none hover:-translate-y-1 transition-transform duration-300 flex flex-col relative overflow-hidden">
                     <div class="flex items-center justify-between mb-2">
                         <h3 class="font-bold text-slate-800">Status SO (Fulfillment)</h3>
-                        <!-- Tombol Upload CSV Khusus Daffa -->
-                        <label id="syncCsvLabel" style="display: none;" class="cursor-pointer bg-slate-50 hover:bg-primary hover:text-white text-slate-600 text-xs px-3 py-1.5 rounded-lg border border-slate-200 hover:border-primary transition-all items-center gap-2 shadow-sm">
-                            <i class="fa-solid fa-cloud-arrow-up"></i> Sync CSV
-                            <input type="file" id="csvFileInput" accept=".csv" class="hidden" onchange="handleFileUpload(event)">
+                        <!-- Upload Button Daffa -->
+                        <label id="syncCsvLabel1" style="display: none;" class="cursor-pointer bg-slate-50 hover:bg-primary hover:text-white text-slate-600 text-xs px-3 py-1.5 rounded-lg border border-slate-200 hover:border-primary transition-all items-center gap-2 shadow-sm z-10 whitespace-nowrap">
+                            <i class="fa-solid fa-cloud-arrow-up"></i> Sync
+                            <input type="file" accept=".csv" class="hidden csvUploadInput">
                         </label>
                     </div>
-                    <!-- Diperkecil menjadi h-36 dan justify-center -->
+                    <p class="text-[10px] text-slate-400 mb-2 lastUpdatedText">Menunggu data cloud...</p>
+                    
                     <div class="relative h-36 w-full flex items-center justify-center flex-1 my-2">
                         <canvas id="soFulfillChart"></canvas>
                     </div>
-                    <div class="mt-4 flex justify-center gap-6 text-xs font-medium text-slate-600">
-                        <div class="flex items-center gap-2"><span class="w-3 h-3 rounded-full bg-[#148e9e] block shadow-sm"></span> <span id="text-ter-fulfill">Ter-Fulfill (0%)</span></div>
-                        <div class="flex items-center gap-2"><span class="w-3 h-3 rounded-full bg-[#f43f5e] block shadow-sm"></span> <span id="text-belum-fulfill">Belum Fulfill (0%)</span></div>
+                    <div class="mt-4 flex justify-center gap-4 sm:gap-6 text-xs font-medium text-slate-600">
+                        <div class="flex items-center gap-2"><span class="w-3 h-3 rounded-full bg-[#148e9e] block shadow-sm shrink-0"></span> <span id="text-ter-fulfill">Ter-Fulfill (0%)</span></div>
+                        <div class="flex items-center gap-2"><span class="w-3 h-3 rounded-full bg-[#f43f5e] block shadow-sm shrink-0"></span> <span id="text-belum-fulfill">Belum (0%)</span></div>
                     </div>
                 </div>
 
-                <div class="bg-white p-6 rounded-2xl shadow-xl border-none hover:-translate-y-1 transition-transform duration-300 flex flex-col">
+                <!-- Offering Chart -->
+                <div class="bg-white p-6 rounded-2xl shadow-xl border-none hover:-translate-y-1 transition-transform duration-300 flex flex-col relative overflow-hidden">
                     <div class="flex items-center justify-between mb-2">
                         <h3 class="font-bold text-slate-800">Status SO (Offering)</h3>
                         <div class="p-2 bg-slate-50 rounded-lg text-slate-400"><i class="fa-solid fa-handshake"></i></div>
                     </div>
-                    <!-- Diperkecil menjadi h-36 dan justify-center -->
+                    <p class="text-[10px] text-slate-400 mb-2 lastUpdatedText">Menunggu data cloud...</p>
+
                     <div class="relative h-36 w-full flex items-center justify-center flex-1 my-2">
                         <canvas id="soOfferingChart"></canvas>
                     </div>
-                    <div class="mt-4 flex justify-center gap-6 text-xs font-medium text-slate-600">
-                        <div class="flex items-center gap-2"><span class="w-3 h-3 rounded-full bg-[#10b981] block shadow-sm"></span> <span id="text-sudah-offering">Sudah Offering (0%)</span></div>
-                        <div class="flex items-center gap-2"><span class="w-3 h-3 rounded-full bg-[#fbbf24] block shadow-sm"></span> <span id="text-belum-offering">Belum Offering (0%)</span></div>
+                    <div class="mt-4 flex justify-center gap-4 sm:gap-6 text-xs font-medium text-slate-600">
+                        <div class="flex items-center gap-2"><span class="w-3 h-3 rounded-full bg-[#10b981] block shadow-sm shrink-0"></span> <span id="text-sudah-offering">Sudah Offering (0%)</span></div>
+                        <div class="flex items-center gap-2"><span class="w-3 h-3 rounded-full bg-[#fbbf24] block shadow-sm shrink-0"></span> <span id="text-belum-offering">Belum (0%)</span></div>
                     </div>
                 </div>
-
             </div>
 
             <!-- Buffer Kandidat (GForm) Table -->
-            <div class="bg-white rounded-2xl shadow-xl border-none overflow-hidden mb-8">
+            <div class="bg-white rounded-2xl shadow-xl border-none overflow-hidden mb-8 w-full max-w-full">
                 <div class="p-6 border-b border-slate-100 flex flex-col md:flex-row md:items-center justify-between gap-4">
                     <div>
                         <h3 class="font-bold text-slate-800 text-lg">Buffer Kandidat (GForm All REVO)</h3>
@@ -188,77 +195,48 @@
                         <input type="text" placeholder="Cari kandidat/klien..." class="pl-9 pr-4 py-2 bg-slate-50 border border-slate-200 rounded-lg text-sm text-slate-700 focus:ring-2 focus:ring-primary focus:outline-none w-full md:w-64 transition-all">
                     </div>
                 </div>
-                <div class="overflow-x-auto">
-                    <table class="w-full text-left border-collapse">
+                <div class="overflow-x-auto w-full">
+                    <table class="w-full min-w-max text-left border-collapse">
                         <thead>
                             <tr class="bg-slate-50/80 text-slate-500 text-xs uppercase tracking-wider">
-                                <th class="p-4 font-semibold">Nama Kandidat</th>
-                                <th class="p-4 font-semibold">Penempatan (Klien - Cabang)</th>
-                                <th class="p-4 font-semibold">Status Kandidat</th>
-                                <th class="p-4 font-semibold">REVO Flagging (PIC)</th>
-                                <th class="p-4 font-semibold text-center">Action</th>
+                                <th class="p-4 font-semibold whitespace-nowrap">Nama Kandidat</th>
+                                <th class="p-4 font-semibold whitespace-nowrap">Penempatan</th>
+                                <th class="p-4 font-semibold whitespace-nowrap">Status Kandidat</th>
+                                <th class="p-4 font-semibold whitespace-nowrap">REVO Flagging (PIC)</th>
+                                <th class="p-4 font-semibold text-center whitespace-nowrap">Action</th>
                             </tr>
                         </thead>
                         <tbody class="text-sm divide-y divide-slate-100">
                             <tr class="hover:bg-slate-50 transition-colors">
-                                <td class="p-4 font-medium text-slate-800">Raditya Dika</td>
-                                <td class="p-4">
-                                    <p class="text-slate-700 font-medium">PT. FIF Group</p>
-                                    <p class="text-slate-500 text-xs">Cabang: Jakarta Pusat</p>
-                                </td>
-                                <td class="p-4">
-                                    <span class="bg-blue-50 text-blue-600 border border-blue-200 text-xs px-2.5 py-1 rounded-md font-medium">Review CV</span>
-                                </td>
-                                <td class="p-4" id="revo-flag-1">
-                                    <span class="text-slate-400 italic text-xs">Belum ada PIC</span>
-                                </td>
-                                <td class="p-4 text-center">
-                                    <button onclick="flagOfficer('revo-flag-1')" class="text-xs bg-white hover:bg-primary hover:text-white text-primary px-4 py-2 rounded-lg transition-colors font-semibold border border-primary/30 hover:border-primary shadow-sm flex items-center justify-center mx-auto gap-2">
-                                        <i class="fa-solid fa-flag"></i> Ambil
-                                    </button>
+                                <td class="p-4 font-medium text-slate-800 whitespace-nowrap">Raditya Dika</td>
+                                <td class="p-4 whitespace-nowrap"><p class="text-slate-700 font-medium">PT. FIF Group</p><p class="text-slate-500 text-xs">Cabang: Jakarta Pusat</p></td>
+                                <td class="p-4 whitespace-nowrap"><span class="bg-blue-50 text-blue-600 border border-blue-200 text-xs px-2.5 py-1 rounded-md font-medium">Review CV</span></td>
+                                <td class="p-4 whitespace-nowrap" id="revo-flag-1"><span class="text-slate-400 italic text-xs">Belum ada PIC</span></td>
+                                <td class="p-4 text-center whitespace-nowrap">
+                                    <button onclick="flagOfficer('revo-flag-1')" class="text-xs bg-white hover:bg-primary hover:text-white text-primary px-4 py-2 rounded-lg transition-colors font-semibold border border-primary/30 hover:border-primary shadow-sm flex items-center justify-center mx-auto gap-2"><i class="fa-solid fa-flag"></i> Ambil</button>
                                 </td>
                             </tr>
-                            
                             <tr class="hover:bg-slate-50 transition-colors">
-                                <td class="p-4 font-medium text-slate-800">Chelsea Islan</td>
-                                <td class="p-4">
-                                    <p class="text-slate-700 font-medium">Adira Finance</p>
-                                    <p class="text-slate-500 text-xs">Cabang: Kelapa Gading</p>
-                                </td>
-                                <td class="p-4">
-                                    <span class="bg-purple-50 text-purple-600 border border-purple-200 text-xs px-2.5 py-1 rounded-md font-medium">Interview User</span>
-                                </td>
-                                <td class="p-4" id="revo-flag-2">
+                                <td class="p-4 font-medium text-slate-800 whitespace-nowrap">Chelsea Islan</td>
+                                <td class="p-4 whitespace-nowrap"><p class="text-slate-700 font-medium">Adira Finance</p><p class="text-slate-500 text-xs">Cabang: Kelapa Gading</p></td>
+                                <td class="p-4 whitespace-nowrap"><span class="bg-purple-50 text-purple-600 border border-purple-200 text-xs px-2.5 py-1 rounded-md font-medium">Interview User</span></td>
+                                <td class="p-4 whitespace-nowrap" id="revo-flag-2">
                                     <div class="flex items-center gap-3">
-                                        <div class="relative">
-                                            <img src="https://ui-avatars.com/api/?name=Ali&background=148e9e&color=fff" class="w-8 h-8 rounded-full shadow-sm">
-                                        </div>
+                                        <div class="relative"><img src="https://ui-avatars.com/api/?name=Ali&background=148e9e&color=fff" class="w-8 h-8 rounded-full shadow-sm"></div>
                                         <span class="font-medium text-slate-700">Ali <span class="text-xs font-normal text-slate-400 block">REVO FIF JKT</span></span>
                                     </div>
                                 </td>
-                                <td class="p-4 text-center">
-                                    <button onclick="flagOfficer('revo-flag-2')" class="text-xs bg-slate-100 hover:bg-slate-200 text-slate-600 px-4 py-2 rounded-lg transition-colors font-medium border border-slate-200 flex items-center justify-center mx-auto gap-2">
-                                        <i class="fa-solid fa-rotate"></i> Override
-                                    </button>
+                                <td class="p-4 text-center whitespace-nowrap">
+                                    <button onclick="flagOfficer('revo-flag-2')" class="text-xs bg-slate-100 hover:bg-slate-200 text-slate-600 px-4 py-2 rounded-lg transition-colors font-medium border border-slate-200 flex items-center justify-center mx-auto gap-2"><i class="fa-solid fa-rotate"></i> Override</button>
                                 </td>
                             </tr>
-
                             <tr class="hover:bg-slate-50 transition-colors">
-                                <td class="p-4 font-medium text-slate-800">Nicholas Saputra</td>
-                                <td class="p-4">
-                                    <p class="text-slate-700 font-medium">Multifinance Mandiri</p>
-                                    <p class="text-slate-500 text-xs">Cabang: Taman Palem</p>
-                                </td>
-                                <td class="p-4">
-                                    <span class="bg-amber-50 text-amber-600 border border-amber-200 text-xs px-2.5 py-1 rounded-md font-medium">Psikotes</span>
-                                </td>
-                                <td class="p-4" id="revo-flag-3">
-                                    <span class="text-slate-400 italic text-xs">Belum ada PIC</span>
-                                </td>
-                                <td class="p-4 text-center">
-                                    <button onclick="flagOfficer('revo-flag-3')" class="text-xs bg-white hover:bg-primary hover:text-white text-primary px-4 py-2 rounded-lg transition-colors font-semibold border border-primary/30 hover:border-primary shadow-sm flex items-center justify-center mx-auto gap-2">
-                                        <i class="fa-solid fa-flag"></i> Ambil
-                                    </button>
+                                <td class="p-4 font-medium text-slate-800 whitespace-nowrap">Nicholas Saputra</td>
+                                <td class="p-4 whitespace-nowrap"><p class="text-slate-700 font-medium">Multifinance Mandiri</p><p class="text-slate-500 text-xs">Cabang: Taman Palem</p></td>
+                                <td class="p-4 whitespace-nowrap"><span class="bg-amber-50 text-amber-600 border border-amber-200 text-xs px-2.5 py-1 rounded-md font-medium">Psikotes</span></td>
+                                <td class="p-4 whitespace-nowrap" id="revo-flag-3"><span class="text-slate-400 italic text-xs">Belum ada PIC</span></td>
+                                <td class="p-4 text-center whitespace-nowrap">
+                                    <button onclick="flagOfficer('revo-flag-3')" class="text-xs bg-white hover:bg-primary hover:text-white text-primary px-4 py-2 rounded-lg transition-colors font-semibold border border-primary/30 hover:border-primary shadow-sm flex items-center justify-center mx-auto gap-2"><i class="fa-solid fa-flag"></i> Ambil</button>
                                 </td>
                             </tr>
                         </tbody>
@@ -273,48 +251,42 @@
                     <p class="text-xs text-slate-500 mt-1">Database instansi/sekolah yang bekerjasama untuk suplai kandidat.</p>
                 </div>
                 <div class="overflow-x-auto">
-                    <table class="w-full text-left border-collapse">
+                    <table class="w-full text-left border-collapse min-w-max">
                         <thead>
                             <tr class="bg-slate-50/80 text-slate-500 text-xs uppercase tracking-wider">
-                                <th class="p-4 font-semibold">Nama Mitra / Instansi</th>
-                                <th class="p-4 font-semibold">PIC Sourcing</th>
-                                <th class="p-4 font-semibold">Kontak (WhatsApp)</th>
-                                <th class="p-4 font-semibold">Kategori</th>
+                                <th class="p-4 font-semibold whitespace-nowrap">Nama Mitra / Instansi</th>
+                                <th class="p-4 font-semibold whitespace-nowrap">PIC Sourcing</th>
+                                <th class="p-4 font-semibold whitespace-nowrap">Kontak (WhatsApp)</th>
+                                <th class="p-4 font-semibold whitespace-nowrap">Kategori</th>
                             </tr>
                         </thead>
                         <tbody class="text-sm divide-y divide-slate-100">
                             <tr class="hover:bg-slate-50 transition-colors">
-                                <td class="p-4 font-medium text-slate-800 flex items-center gap-3">
+                                <td class="p-4 font-medium text-slate-800 flex items-center gap-3 whitespace-nowrap">
                                     <div class="w-8 h-8 rounded bg-teal-50 text-teal-600 flex items-center justify-center"><i class="fa-solid fa-school"></i></div>
                                     BKK SMKN 1 Jakarta
                                 </td>
-                                <td class="p-4 text-slate-600">Bpk. Haryanto</td>
-                                <td class="p-4">
-                                    <a href="#" class="text-primary hover:underline font-medium flex items-center gap-1.5"><i class="fa-brands fa-whatsapp text-emerald-500"></i> 0812-3456-7890</a>
-                                </td>
-                                <td class="p-4"><span class="bg-slate-100 text-slate-600 text-xs px-2.5 py-1 rounded font-medium">Sekolah/Kampus</span></td>
+                                <td class="p-4 text-slate-600 whitespace-nowrap">Bpk. Haryanto</td>
+                                <td class="p-4 whitespace-nowrap"><a href="#" class="text-primary hover:underline font-medium flex items-center gap-1.5"><i class="fa-brands fa-whatsapp text-emerald-500"></i> 0812-3456-7890</a></td>
+                                <td class="p-4 whitespace-nowrap"><span class="bg-slate-100 text-slate-600 text-xs px-2.5 py-1 rounded font-medium">Sekolah/Kampus</span></td>
                             </tr>
                             <tr class="hover:bg-slate-50 transition-colors">
-                                <td class="p-4 font-medium text-slate-800 flex items-center gap-3">
+                                <td class="p-4 font-medium text-slate-800 flex items-center gap-3 whitespace-nowrap">
                                     <div class="w-8 h-8 rounded bg-blue-50 text-blue-600 flex items-center justify-center"><i class="fa-solid fa-users-viewfinder"></i></div>
                                     Komunitas Sales JABODETABEK
                                 </td>
-                                <td class="p-4 text-slate-600">Ibu Dian Sastro</td>
-                                <td class="p-4">
-                                    <a href="#" class="text-primary hover:underline font-medium flex items-center gap-1.5"><i class="fa-brands fa-whatsapp text-emerald-500"></i> 0857-9988-7766</a>
-                                </td>
-                                <td class="p-4"><span class="bg-slate-100 text-slate-600 text-xs px-2.5 py-1 rounded font-medium">Komunitas</span></td>
+                                <td class="p-4 text-slate-600 whitespace-nowrap">Ibu Dian Sastro</td>
+                                <td class="p-4 whitespace-nowrap"><a href="#" class="text-primary hover:underline font-medium flex items-center gap-1.5"><i class="fa-brands fa-whatsapp text-emerald-500"></i> 0857-9988-7766</a></td>
+                                <td class="p-4 whitespace-nowrap"><span class="bg-slate-100 text-slate-600 text-xs px-2.5 py-1 rounded font-medium">Komunitas</span></td>
                             </tr>
                             <tr class="hover:bg-slate-50 transition-colors">
-                                <td class="p-4 font-medium text-slate-800 flex items-center gap-3">
+                                <td class="p-4 font-medium text-slate-800 flex items-center gap-3 whitespace-nowrap">
                                     <div class="w-8 h-8 rounded bg-orange-50 text-orange-600 flex items-center justify-center"><i class="fa-solid fa-building-ngo"></i></div>
                                     Disnaker Jakarta Selatan
                                 </td>
-                                <td class="p-4 text-slate-600">Ibu Sri Wahyuni</td>
-                                <td class="p-4">
-                                    <a href="#" class="text-primary hover:underline font-medium flex items-center gap-1.5"><i class="fa-solid fa-phone text-slate-400"></i> (021) 7654321</a>
-                                </td>
-                                <td class="p-4"><span class="bg-slate-100 text-slate-600 text-xs px-2.5 py-1 rounded font-medium">Pemerintah</span></td>
+                                <td class="p-4 text-slate-600 whitespace-nowrap">Ibu Sri Wahyuni</td>
+                                <td class="p-4 whitespace-nowrap"><a href="#" class="text-primary hover:underline font-medium flex items-center gap-1.5"><i class="fa-solid fa-phone text-slate-400"></i> (021) 7654321</a></td>
+                                <td class="p-4 whitespace-nowrap"><span class="bg-slate-100 text-slate-600 text-xs px-2.5 py-1 rounded font-medium">Pemerintah</span></td>
                             </tr>
                         </tbody>
                     </table>
@@ -322,184 +294,328 @@
             </div>
 
         </main>
+
+        <!-- PAGE 2: STATUS SO BERJALAN -->
+        <main id="page-sostatus" class="flex-1 overflow-x-hidden overflow-y-auto p-4 sm:p-6 lg:p-10 z-0 page-hidden w-full">
+            <div class="mb-8 text-white flex flex-col md:flex-row md:items-end justify-between gap-4">
+                <div class="animate-fade-in-up">
+                    <h2 class="text-2xl lg:text-3xl font-bold mb-1 tracking-tight">Detail Rekapitulasi SO</h2>
+                    <p class="text-white/80 max-w-2xl text-sm md:text-base font-light">Tabel rincian status pemenuhan (*Fulfillment*) dan tahap *Offering* berdasarkan Cloud Data.</p>
+                </div>
+                
+                <div class="flex items-center gap-3">
+                    <label id="syncCsvLabel2" style="display: none;" class="cursor-pointer bg-white text-primary hover:bg-slate-50 font-semibold px-4 py-2.5 rounded-xl shadow-lg transition-all flex items-center gap-2 text-sm whitespace-nowrap">
+                        <i class="fa-solid fa-cloud-arrow-up"></i> Upload Data Baru
+                        <input type="file" accept=".csv" class="hidden csvUploadInput">
+                    </label>
+                </div>
+            </div>
+
+            <!-- Table Container -->
+            <div class="bg-white rounded-2xl shadow-xl border-none overflow-hidden mb-8 flex flex-col h-[70vh] min-h-[500px] w-full max-w-full">
+                <div class="p-6 border-b border-slate-100 flex flex-col md:flex-row md:items-center justify-between gap-4 bg-slate-50/50 shrink-0">
+                    <div>
+                        <h3 class="font-bold text-slate-800 text-lg flex items-center gap-2">
+                            <i class="fa-solid fa-table-list text-primary"></i> Data Service Order
+                        </h3>
+                        <p class="text-xs text-slate-500 mt-1 lastUpdatedText">Menunggu otentikasi data cloud...</p>
+                        <p class="text-xs font-semibold text-primary mt-1" id="totalDataRecord"></p>
+                    </div>
+                    <div class="relative w-full md:w-72">
+                        <i class="fa-solid fa-search absolute left-3 top-1/2 transform -translate-y-1/2 text-slate-400 text-sm"></i>
+                        <input type="text" id="searchInput" onkeyup="filterTable()" placeholder="Cari nama klien, job, atau area..." class="pl-9 pr-4 py-2 bg-white border border-slate-200 rounded-lg text-sm text-slate-700 focus:ring-2 focus:ring-primary focus:outline-none w-full transition-all shadow-sm">
+                    </div>
+                </div>
+
+                <div class="overflow-x-auto flex-1 relative w-full">
+                    <table class="w-full min-w-max text-left border-collapse" id="soTable">
+                        <thead class="sticky top-0 bg-white shadow-sm z-10">
+                            <tr class="bg-slate-50/90 backdrop-blur-sm text-slate-500 text-xs uppercase tracking-wider">
+                                <th class="p-4 font-semibold w-16 text-center whitespace-nowrap">No</th>
+                                <th class="p-4 font-semibold whitespace-nowrap">Klien & Posisi</th>
+                                <th class="p-4 font-semibold whitespace-nowrap">Area & Assign RO</th>
+                                <th class="p-4 font-semibold whitespace-nowrap">Tgl Approve</th>
+                                <th class="p-4 font-semibold text-center whitespace-nowrap">Status Fulfillment</th>
+                                <th class="p-4 font-semibold text-center whitespace-nowrap">Status Offering</th>
+                            </tr>
+                        </thead>
+                        <tbody class="text-sm divide-y divide-slate-100" id="so-tbody">
+                            <tr>
+                                <td colspan="6" class="p-12 text-center text-slate-400">
+                                    <div class="flex flex-col items-center justify-center">
+                                        <i class="fa-solid fa-cloud-arrow-down animate-bounce text-4xl mb-3 text-slate-300"></i>
+                                        <p class="font-medium text-slate-500">Menyinkronkan dengan Cloud Database...</p>
+                                    </div>
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </main>
     </div>
 
-    <script>
-        // INIT DASHBOARD LOGIN DATA
-        let activeUser = null;
-        
-        function initDashboard() {
+    <!-- Firebase SDKs & Logika Cloud -->
+    <script type="module">
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-app.js";
+        import { getAuth, signInAnonymously, signInWithCustomToken, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
+        import { getFirestore, doc, setDoc, onSnapshot } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
+
+        // Global Variables
+        window.activeUser = null;
+        let soFulfillChart, soOfferingChart;
+
+        // Firebase Configuration injected by Canvas
+        const firebaseConfig = typeof __firebase_config !== 'undefined' ? JSON.parse(__firebase_config) : {};
+        const app = initializeApp(firebaseConfig);
+        const auth = getAuth(app);
+        const db = getFirestore(app);
+        const appId = typeof __app_id !== 'undefined' ? __app_id : 'simgroup-jkt';
+
+        // RULE 1: Protocol Path
+        const getDocRef = () => doc(db, 'artifacts', appId, 'public', 'data', 'soreport', 'latest_csv');
+
+        // INIT UI & LOGIN SESSION
+        function initSession() {
             const userString = localStorage.getItem('currentUser');
             if (!userString) {
                 console.log("Tidak ada sesi login ditemukan. Menggunakan akun default.");
-                activeUser = { name: 'Anya', role: 'Regional Manager' };
+                window.activeUser = { name: 'Daffa', role: 'Area Operational Manager' };
+                localStorage.setItem('currentUser', JSON.stringify(window.activeUser));
             } else {
-                activeUser = JSON.parse(userString);
+                window.activeUser = JSON.parse(userString);
             }
 
-            document.getElementById('profile-name').textContent = activeUser.name;
-            document.getElementById('profile-role').textContent = activeUser.role;
-            document.getElementById('profile-avatar').src = `https://ui-avatars.com/api/?name=${activeUser.name.replace(' ', '+')}&background=148e9e&color=fff`;
+            document.getElementById('profile-name').textContent = window.activeUser.name;
+            document.getElementById('profile-role').textContent = window.activeUser.role;
+            document.getElementById('profile-avatar').src = `https://ui-avatars.com/api/?name=${window.activeUser.name.replace(' ', '+')}&background=148e9e&color=fff`;
             
             const hour = new Date().getHours();
             let greeting = "Good Evening";
             if (hour < 12) greeting = "Good Morning";
             else if (hour < 18) greeting = "Good Afternoon";
+            document.getElementById('welcome-greeting').innerHTML = `${greeting}, ${window.activeUser.name}! ✨`;
+
+            const isDaffa = window.activeUser.name.toLowerCase().includes('daffa');
+            document.getElementById('syncCsvLabel1').style.display = isDaffa ? 'flex' : 'none';
+            document.getElementById('syncCsvLabel2').style.display = isDaffa ? 'flex' : 'none';
+        }
+
+        // TOGGLE SIDEBAR (Mobile)
+        window.toggleSidebar = function() {
+            const sidebar = document.getElementById('sidebar');
+            sidebar.classList.toggle('-translate-x-full');
+        };
+
+        // NAVIGATION LOGIC (SPA)
+        window.switchPage = function(pageId) {
+            document.getElementById('page-overview').classList.add('page-hidden');
+            document.getElementById('page-sostatus').classList.add('page-hidden');
             
-            document.getElementById('welcome-greeting').innerHTML = `${greeting}, ${activeUser.name}! ✨`;
-
-            // Logic untuk menampilkan tombol Sync CSV HANYA jika yang login adalah Daffa
-            const syncBtn = document.getElementById('syncCsvLabel');
-            if (activeUser.name.toLowerCase() === 'daffa') {
-                syncBtn.style.display = 'flex'; // Munculkan tombol
-            } else {
-                syncBtn.style.display = 'none'; // Sembunyikan tombol
-            }
-        }
-
-        // FUNGSI FLAG OFFICER REVO
-        function flagOfficer(targetCellId) {
-            const cell = document.getElementById(targetCellId);
+            const navOverview = document.getElementById('nav-overview');
+            const navSostatus = document.getElementById('nav-sostatus');
             
-            cell.innerHTML = `
-                <div class="flex items-center gap-3 animate-fade-in-up">
-                    <div class="relative">
-                        <img src="https://ui-avatars.com/api/?name=${activeUser.name.replace(' ', '+')}&background=148e9e&color=fff" class="w-8 h-8 rounded-full ring-2 ring-white shadow-sm">
-                        <span class="absolute -bottom-1 -right-1 flex h-3 w-3">
-                            <span class="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-75"></span>
-                            <span class="relative inline-flex rounded-full h-3 w-3 bg-emerald-500 border border-white"></span>
-                        </span>
-                    </div>
-                    <span class="font-medium text-slate-700">
-                        ${activeUser.name} 
-                        <span class="text-xs font-semibold text-[#148e9e] block mt-0.5">Assigned to you</span>
-                    </span>
-                </div>
-            `;
-        }
+            navOverview.className = "w-full flex items-center gap-3 px-4 py-3 text-white/70 hover:bg-white/10 hover:text-white rounded-lg font-medium transition-all";
+            navSostatus.className = "w-full flex items-center gap-3 px-4 py-3 text-white/70 hover:bg-white/10 hover:text-white rounded-lg font-medium transition-all";
 
-        // FUNGSI LOGOUT
-        function handleLogout() {
-            localStorage.removeItem('currentUser');
-            try {
-                window.location.href = 'login.html';
-            } catch (error) {
-                console.warn("Redirect di-skip untuk lingkungan preview.", error);
-                alert("Berhasil Sign Out! (Ini adalah simulasi preview. Di GitHub kamu, layar akan pindah ke halaman login).");
+            if (pageId === 'overview') {
+                document.getElementById('page-overview').classList.remove('page-hidden');
+                navOverview.className = "w-full flex items-center gap-3 px-4 py-3 bg-white/20 text-white rounded-lg font-semibold transition-all shadow-sm";
+            } else if (pageId === 'sostatus') {
+                document.getElementById('page-sostatus').classList.remove('page-hidden');
+                navSostatus.className = "w-full flex items-center gap-3 px-4 py-3 bg-white/20 text-white rounded-lg font-semibold transition-all shadow-sm";
             }
-        }
 
-        initDashboard();
-
-        // CHART SETUP
-        Chart.defaults.font.family = "'Inter', sans-serif";
-        Chart.defaults.color = '#64748b'; 
-
-        // 1. Chart SO Fulfillment (Inisiasi awal)
-        const ctxFulfill = document.getElementById('soFulfillChart').getContext('2d');
-        const soFulfillChart = new Chart(ctxFulfill, {
-            type: 'doughnut',
-            data: {
-                labels: ['Ter-Fulfill', 'Belum Fulfill'],
-                datasets: [{
-                    data: [1, 1], // Data sementara agar chart tidak kosong
-                    backgroundColor: ['#148e9e', '#f43f5e'],
-                    borderWidth: 0, hoverOffset: 4
-                }]
-            },
-            options: { 
-                responsive: true, 
-                maintainAspectRatio: false, 
-                cutout: '70%', // Diubah dari 75% ke 70% agar lebih tebal & proporsional saat ukurannya kecil
-                plugins: { legend: { display: false } } 
+            if (window.innerWidth < 768) {
+                document.getElementById('sidebar').classList.add('-translate-x-full');
             }
-        });
+        };
 
-        // 2. Chart SO Offering (Inisiasi awal)
-        const ctxOffering = document.getElementById('soOfferingChart').getContext('2d');
-        const soOfferingChart = new Chart(ctxOffering, {
-            type: 'doughnut',
-            data: {
-                labels: ['Sudah Offering', 'Belum Offering'],
-                datasets: [{
-                    data: [1, 1], // Data sementara agar chart tidak kosong
-                    backgroundColor: ['#10b981', '#fbbf24'],
-                    borderWidth: 0, hoverOffset: 4
-                }]
-            },
-            options: { 
-                responsive: true, 
-                maintainAspectRatio: false, 
-                cutout: '70%', // Diubah dari 75% ke 70% agar lebih tebal & proporsional saat ukurannya kecil
-                plugins: { legend: { display: false } } 
-            }
-        });
+        // SETUP CHARTS
+        function initCharts() {
+            Chart.defaults.font.family = "'Inter', sans-serif";
+            Chart.defaults.color = '#64748b'; 
+            
+            const ctxFulfill = document.getElementById('soFulfillChart').getContext('2d');
+            soFulfillChart = new Chart(ctxFulfill, {
+                type: 'doughnut',
+                data: { labels: ['Ter-Fulfill', 'Belum Fulfill'], datasets: [{ data: [1, 1], backgroundColor: ['#148e9e', '#f43f5e'], borderWidth: 0 }] },
+                options: { responsive: true, maintainAspectRatio: false, cutout: '70%', plugins: { legend: { display: false } } }
+            });
 
-        // ==========================================
-        // FUNGSI UPLOAD & PARSING CSV LOKAL
-        // ==========================================
-        function handleFileUpload(event) {
-            const file = event.target.files[0];
-            if (!file) return;
-
-            // Menggunakan library PapaParse untuk membaca file CSV
-            Papa.parse(file, {
-                header: true, // Akan menggunakan baris pertama sebagai nama kunci (keys)
-                skipEmptyLines: true,
-                complete: function(results) {
-                    const data = results.data;
-                    updateChartsWithData(data);
-                    
-                    // Notifikasi sukses yang elegan
-                    alert("✨ Data CSV berhasil di-sync! Grafik kamu sudah ter-update otomatis berdasarkan data harian terbaru.");
-                },
-                error: function(err) {
-                    console.error("Gagal membaca file CSV:", err);
-                    alert("Oops, ada masalah saat membaca file CSV. Pastikan formatnya sudah benar ya!");
-                }
+            const ctxOffering = document.getElementById('soOfferingChart').getContext('2d');
+            soOfferingChart = new Chart(ctxOffering, {
+                type: 'doughnut',
+                data: { labels: ['Sudah Offering', 'Belum Offering'], datasets: [{ data: [1, 1], backgroundColor: ['#10b981', '#fbbf24'], borderWidth: 0 }] },
+                options: { responsive: true, maintainAspectRatio: false, cutout: '70%', plugins: { legend: { display: false } } }
             });
         }
 
-        function updateChartsWithData(data) {
-            let terFulfill = 0, belumFulfill = 0;
-            let sudahOffering = 0, belumOffering = 0;
+        // Fungsi Membangun UI Tabel dari Data Cloud
+        window.renderDashboard = (data, timestamp, uploader) => {
+            const tbody = document.getElementById('so-tbody');
+            const lastUpdatedTexts = document.querySelectorAll('.lastUpdatedText');
+            tbody.innerHTML = '';
 
-            // Membaca setiap baris dari file Excel CSV kamu
+            if (timestamp) {
+                const date = new Date(timestamp);
+                const timeStr = date.toLocaleString('id-ID');
+                lastUpdatedTexts.forEach(el => el.innerText = `Terakhir diupdate oleh: ${uploader || 'System'} (${timeStr})`);
+            }
+
+            if (!data || data.length === 0) {
+                tbody.innerHTML = '<tr><td colspan="6" class="p-8 text-center text-slate-500">Belum ada data CSV yang diunggah hari ini.</td></tr>';
+                return;
+            }
+
+            let terFulfill = 0, belumFulfill = 0, sudahOffering = 0, belumOffering = 0;
+            let validCount = 0;
+
             data.forEach(row => {
-                // Kolom sesuai dengan format data Excel kamu: finish, unfulfill, OFFERING
                 const finish = parseInt(row['finish']) || 0;
                 const unfulfill = parseInt(row['unfulfill']) || 0;
                 const offering = parseInt(row['OFFERING']) || 0;
 
-                // Logika Fulfillment
                 terFulfill += finish;
                 belumFulfill += unfulfill;
 
-                // Logika Offering: Asumsi bahwa hanya baris aktif (finish=1 atau unfulfill=1) yang dihitung offeringnya
                 if (finish === 1 || unfulfill === 1) {
-                    if (offering > 0) {
-                        sudahOffering++;
-                    } else {
-                        belumOffering++;
-                    }
+                    if (offering > 0) sudahOffering++; else belumOffering++;
+                    validCount++;
+                    
+                    const client = row['nama client'] || '-';
+                    const job = row['nama job'] || '-';
+                    const area = row['area'] || '-';
+                    const assignRo = row['ASSIGN RO'] || row['Assign RO'] || row['assign ro'] || '-';
+                    const tglApprove = row['tgl approve'] || '-';
+
+                    const fulfillBadge = finish === 1 
+                        ? `<span class="bg-emerald-50 text-emerald-600 border border-emerald-200 text-xs px-2.5 py-1 rounded-full font-semibold whitespace-nowrap"><i class="fa-solid fa-check mr-1"></i> Ter-Fulfill</span>`
+                        : `<span class="bg-rose-50 text-rose-600 border border-rose-200 text-xs px-2.5 py-1 rounded-full font-semibold whitespace-nowrap"><i class="fa-solid fa-hourglass-half mr-1"></i> Belum Fulfill</span>`;
+
+                    const offeringBadge = offering > 0 
+                        ? `<span class="bg-[#148e9e]/10 text-[#148e9e] border border-[#148e9e]/20 text-xs px-2.5 py-1 rounded-full font-semibold whitespace-nowrap"><i class="fa-solid fa-file-signature mr-1"></i> Sudah Offering</span>`
+                        : `<span class="bg-amber-50 text-amber-600 border border-amber-200 text-xs px-2.5 py-1 rounded-full font-semibold whitespace-nowrap"><i class="fa-regular fa-clock mr-1"></i> Belum Offering</span>`;
+
+                    const tr = document.createElement('tr');
+                    tr.className = 'hover:bg-slate-50 transition-colors';
+                    tr.innerHTML = `
+                        <td class="p-4 text-center text-slate-400 font-medium whitespace-nowrap">${validCount}</td>
+                        <td class="p-4 whitespace-nowrap"><p class="font-bold text-slate-800">${client}</p><p class="text-slate-500 text-xs mt-0.5">${job}</p></td>
+                        <td class="p-4 whitespace-nowrap"><p class="text-slate-700 font-medium">${area}</p><p class="text-slate-400 text-xs mt-0.5"><i class="fa-regular fa-user mr-1"></i>${assignRo}</p></td>
+                        <td class="p-4 text-slate-600 text-sm whitespace-nowrap">${tglApprove}</td>
+                        <td class="p-4 text-center whitespace-nowrap">${fulfillBadge}</td>
+                        <td class="p-4 text-center whitespace-nowrap">${offeringBadge}</td>
+                    `;
+                    tbody.appendChild(tr);
                 }
             });
 
-            // Update Tampilan Chart Fulfillment
+            // Update Charts
             const totalFulfill = terFulfill + belumFulfill;
             soFulfillChart.data.datasets[0].data = [terFulfill, belumFulfill];
             soFulfillChart.update();
             document.getElementById('text-ter-fulfill').innerText = `Ter-Fulfill (${totalFulfill > 0 ? Math.round((terFulfill / totalFulfill) * 100) : 0}%)`;
-            document.getElementById('text-belum-fulfill').innerText = `Belum Fulfill (${totalFulfill > 0 ? Math.round((belumFulfill / totalFulfill) * 100) : 0}%)`;
+            document.getElementById('text-belum-fulfill').innerText = `Belum (${totalFulfill > 0 ? Math.round((belumFulfill / totalFulfill) * 100) : 0}%)`;
 
-            // Update Tampilan Chart Offering
             const totalOffering = sudahOffering + belumOffering;
             soOfferingChart.data.datasets[0].data = [sudahOffering, belumOffering];
             soOfferingChart.update();
             document.getElementById('text-sudah-offering').innerText = `Sudah Offering (${totalOffering > 0 ? Math.round((sudahOffering / totalOffering) * 100) : 0}%)`;
-            document.getElementById('text-belum-offering').innerText = `Belum Offering (${totalOffering > 0 ? Math.round((belumOffering / totalOffering) * 100) : 0}%)`;
+            document.getElementById('text-belum-offering').innerText = `Belum (${totalOffering > 0 ? Math.round((belumOffering / totalOffering) * 100) : 0}%)`;
+
+            document.getElementById('totalDataRecord').innerText = `Total Service Order Aktif: ${validCount} Data`;
+        };
+
+        // RULE 3: Selesaikan Autentikasi terlebih dahulu
+        async function initApp() {
+            try {
+                if (typeof __initial_auth_token !== 'undefined' && __initial_auth_token) {
+                    await signInWithCustomToken(auth, __initial_auth_token);
+                } else {
+                    await signInAnonymously(auth);
+                }
+
+                onAuthStateChanged(auth, (user) => {
+                    if (!user) return;
+                    
+                    onSnapshot(getDocRef(), (docSnap) => {
+                        if (docSnap.exists()) {
+                            const parsedData = JSON.parse(docSnap.data().csvData);
+                            window.renderDashboard(parsedData, docSnap.data().timestamp, docSnap.data().uploadedBy);
+                        } else {
+                            document.getElementById('so-tbody').innerHTML = '<tr><td colspan="6" class="p-8 text-center text-slate-500">Belum ada data CSV. Silakan klik Upload CSV.</td></tr>';
+                            document.querySelectorAll('.lastUpdatedText').forEach(el => el.innerText = "Belum ada file ditarik ke Cloud");
+                        }
+                    }, (err) => {
+                        console.error("Firestore Listener Error:", err);
+                    });
+                });
+            } catch (e) {
+                console.error("Firebase Init Error:", e);
+            }
         }
 
+        // CSV Uploader
+        function handleFile(event) {
+            if (!auth.currentUser) return alert("Sistem masih melakukan otentikasi. Tunggu sebentar.");
+            const file = event.target.files[0];
+            if (!file) return;
+
+            Papa.parse(file, {
+                header: true, 
+                skipEmptyLines: true,
+                complete: async function(results) {
+                    try {
+                        const dataStr = JSON.stringify(results.data);
+                        await setDoc(getDocRef(), { 
+                            csvData: dataStr, 
+                            timestamp: Date.now(),
+                            uploadedBy: window.activeUser.name
+                        });
+                        alert("✅ Data berhasil ditarik ke Cloud Database!");
+                    } catch (e) {
+                        alert("❌ Error saat Upload ke Cloud: " + e.message);
+                    }
+                }
+            });
+        }
+
+        // Bind event listeners ke semua input file upload
+        document.querySelectorAll('.csvUploadInput').forEach(input => {
+            input.addEventListener('change', handleFile);
+        });
+
+        // Utilities
+        window.handleLogout = function() {
+            localStorage.removeItem('currentUser');
+            try { window.location.href = 'login.html'; } catch (e) { alert("Berhasil Sign Out!"); }
+        };
+
+        window.flagOfficer = function(targetCellId) {
+            document.getElementById(targetCellId).innerHTML = `
+                <div class="flex items-center gap-3 animate-fade-in-up whitespace-nowrap">
+                    <div class="relative">
+                        <img src="https://ui-avatars.com/api/?name=${window.activeUser.name.replace(' ', '+')}&background=148e9e&color=fff" class="w-8 h-8 rounded-full ring-2 ring-white shadow-sm">
+                        <span class="absolute -bottom-1 -right-1 flex h-3 w-3"><span class="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-75"></span><span class="relative inline-flex rounded-full h-3 w-3 bg-emerald-500 border border-white"></span></span>
+                    </div>
+                    <span class="font-medium text-slate-700">${window.activeUser.name} <span class="text-xs font-semibold text-[#148e9e] block mt-0.5">Assigned to you</span></span>
+                </div>`;
+        };
+
+        window.filterTable = function() {
+            const filter = document.getElementById("searchInput").value.toLowerCase();
+            const trs = document.getElementById("so-tbody").getElementsByTagName("tr");
+            for (let i = 0; i < trs.length; i++) {
+                const text = trs[i].innerText.toLowerCase();
+                trs[i].style.display = text.includes(filter) ? "" : "none";
+            }
+        };
+
+        // Bootstrap App
+        initSession();
+        initCharts();
+        initApp();
     </script>
 </body>
 </html>
