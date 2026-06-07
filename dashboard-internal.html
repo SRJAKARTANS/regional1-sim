@@ -325,6 +325,25 @@
     </div>
 
     <script>
+
+        // Tambahkan fungsi ini di dalam tag <script> pada dashboard-internal.html
+function checkUserPermission() {
+    const user = JSON.parse(localStorage.getItem('currentUser'));
+    const uploadSection = document.getElementById('upload-section'); // Pastikan elemen upload Anda memiliki id ini
+    
+    // Hanya Daffa dan Simon yang bisa melihat/mengakses tombol upload
+    if (user && (user.username === 'daffa' || user.username === 'simon')) {
+        uploadSection.style.display = 'block';
+    } else {
+        uploadSection.style.display = 'none';
+    }
+}
+
+// Panggil fungsi saat halaman dimuat
+window.onload = function() {
+    checkUserPermission();
+    loadStoredCSV(); // Fungsi untuk meload data yang tersimpan
+};
         // INIT DASHBOARD LOGIN DATA
         let activeUser = null;
         
@@ -443,16 +462,22 @@
             if (!file) return;
 
             // Menggunakan library PapaParse untuk membaca file CSV
-            Papa.parse(file, {
-                header: true, // Akan menggunakan baris pertama sebagai nama kunci (keys)
-                skipEmptyLines: true,
-                complete: function(results) {
-                    const data = results.data;
-                    updateChartsWithData(data);
-                    
-                    // Notifikasi sukses yang elegan
-                    alert("✨ Data CSV berhasil di-sync! Grafik kamu sudah ter-update otomatis berdasarkan data harian terbaru.");
-                },
+            // Saat file diupload dan di-parse oleh PapaParse:
+Papa.parse(file, {
+    complete: function(results) {
+        // Simpan data ke localStorage agar persist
+        localStorage.setItem('cachedCSVData', JSON.stringify(results.data));
+        processData(results.data);
+    }
+});
+
+// Fungsi untuk meload data saat dashboard dibuka
+function loadStoredCSV() {
+    const cachedData = localStorage.getItem('cachedCSVData');
+    if (cachedData) {
+        processData(JSON.parse(cachedData));
+    }
+}
                 error: function(err) {
                     console.error("Gagal membaca file CSV:", err);
                     alert("Oops, ada masalah saat membaca file CSV. Pastikan formatnya sudah benar ya!");
