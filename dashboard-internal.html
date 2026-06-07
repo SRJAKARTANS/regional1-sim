@@ -39,10 +39,16 @@
         .page-hidden { display: none !important; }
     </style>
 </head>
-<body class="bg-gradient-to-br from-primary to-secondary h-screen overflow-hidden flex text-slate-800">
+<body class="bg-gradient-to-br from-primary to-secondary h-screen overflow-hidden flex text-slate-800 relative">
 
-    <!-- Sidebar (Glassmorphism) -->
-    <aside class="w-64 bg-glass backdrop-blur-xl border-r border-glassBorder hidden md:flex flex-col z-20">
+    <!-- Sidebar (Glassmorphism & Responsive) -->
+    <aside id="sidebar" class="w-64 bg-[#094d57] md:bg-glass backdrop-blur-xl border-r border-glassBorder absolute md:relative inset-y-0 left-0 transform -translate-x-full md:translate-x-0 transition-transform duration-300 z-50 flex flex-col shadow-2xl md:shadow-none">
+        
+        <!-- Close Button (Mobile Only) -->
+        <button onclick="toggleSidebar()" class="md:hidden absolute top-7 right-4 text-white/70 hover:text-white">
+            <i class="fa-solid fa-xmark text-xl"></i>
+        </button>
+
         <div class="h-20 flex items-center justify-center border-b border-glassBorder">
             <div class="flex items-center gap-2 text-white font-bold text-xl tracking-wider">
                 <i class="fa-solid fa-building"></i>
@@ -103,12 +109,13 @@
     </aside>
 
     <!-- Main Content wrapper -->
-    <div class="flex-1 flex flex-col h-screen overflow-hidden relative">
+    <div class="flex-1 flex flex-col h-screen overflow-hidden relative w-full">
         
         <!-- Top Header -->
         <header class="h-20 bg-glass backdrop-blur-sm border-b border-glassBorder flex items-center justify-between px-6 lg:px-10 z-10 shrink-0">
             <div class="flex items-center gap-4 text-white">
-                <button class="md:hidden text-white/80 hover:text-white transition">
+                <!-- Hamburger Button (Mobile) -->
+                <button onclick="toggleSidebar()" class="md:hidden text-white/80 hover:text-white transition">
                     <i class="fa-solid fa-bars text-xl"></i>
                 </button>
                 <h1 class="text-xl font-semibold hidden sm:block">Overview <span class="text-sm font-light text-white/70 ml-2">| Monitoring Team Jakarta</span></h1>
@@ -120,11 +127,11 @@
                     <i class="fa-solid fa-cloud-arrow-down animate-pulse text-emerald-400"></i> Auto-Synced
                 </div>
                 
-                <button class="relative text-white/80 hover:text-white transition">
+                <button class="relative text-white/80 hover:text-white transition hidden sm:block">
                     <i class="fa-regular fa-bell text-xl"></i>
                     <span class="absolute -top-1 -right-1 bg-red-500 text-white text-[10px] font-bold w-4 h-4 rounded-full flex items-center justify-center border-2 border-[#148e9e]">5</span>
                 </button>
-                <div class="flex items-center gap-3 border-l border-white/20 pl-6 cursor-pointer group" id="user-profile">
+                <div class="flex items-center gap-3 border-l border-white/20 pl-4 sm:pl-6 cursor-pointer group" id="user-profile">
                     <div class="text-right hidden sm:block">
                         <p class="text-sm font-semibold text-white group-hover:text-white/90 transition" id="profile-name">Loading...</p>
                         <p class="text-xs text-white/70 group-hover:text-white/80 transition" id="profile-role">Loading...</p>
@@ -135,7 +142,7 @@
         </header>
 
         <!-- PAGE 1: OVERVIEW DASHBOARD -->
-        <main id="page-overview" class="flex-1 overflow-x-hidden overflow-y-auto p-6 lg:p-10 z-0">
+        <main id="page-overview" class="flex-1 overflow-x-hidden overflow-y-auto p-4 sm:p-6 lg:p-10 z-0 w-full">
             <!-- Welcome Text -->
             <div class="mb-8 text-white flex items-center justify-between">
                 <div class="animate-fade-in-up">
@@ -150,8 +157,8 @@
                     <div class="flex items-center justify-between mb-2">
                         <h3 class="font-bold text-slate-800">Status SO (Fulfillment)</h3>
                         <!-- Tombol Upload CSV Khusus Daffa -->
-                        <label id="syncCsvLabel1" style="display: none;" class="cursor-pointer bg-slate-50 hover:bg-primary hover:text-white text-slate-600 text-xs px-3 py-1.5 rounded-lg border border-slate-200 hover:border-primary transition-all items-center gap-2 shadow-sm z-10">
-                            <i class="fa-solid fa-cloud-arrow-up"></i> Upload & Sync
+                        <label id="syncCsvLabel1" style="display: none;" class="cursor-pointer bg-slate-50 hover:bg-primary hover:text-white text-slate-600 text-xs px-3 py-1.5 rounded-lg border border-slate-200 hover:border-primary transition-all items-center gap-2 shadow-sm z-10 whitespace-nowrap">
+                            <i class="fa-solid fa-cloud-arrow-up"></i> Sync
                             <input type="file" accept=".csv" class="hidden" onchange="handleFileUpload(event)">
                         </label>
                     </div>
@@ -160,9 +167,9 @@
                     <div class="relative h-36 w-full flex items-center justify-center flex-1 my-2">
                         <canvas id="soFulfillChart"></canvas>
                     </div>
-                    <div class="mt-4 flex justify-center gap-6 text-xs font-medium text-slate-600">
-                        <div class="flex items-center gap-2"><span class="w-3 h-3 rounded-full bg-[#148e9e] block shadow-sm"></span> <span id="text-ter-fulfill">Ter-Fulfill (0%)</span></div>
-                        <div class="flex items-center gap-2"><span class="w-3 h-3 rounded-full bg-[#f43f5e] block shadow-sm"></span> <span id="text-belum-fulfill">Belum Fulfill (0%)</span></div>
+                    <div class="mt-4 flex justify-center gap-4 sm:gap-6 text-xs font-medium text-slate-600">
+                        <div class="flex items-center gap-2"><span class="w-3 h-3 rounded-full bg-[#148e9e] block shadow-sm shrink-0"></span> <span id="text-ter-fulfill">Ter-Fulfill (0%)</span></div>
+                        <div class="flex items-center gap-2"><span class="w-3 h-3 rounded-full bg-[#f43f5e] block shadow-sm shrink-0"></span> <span id="text-belum-fulfill">Belum (0%)</span></div>
                     </div>
                 </div>
 
@@ -170,8 +177,8 @@
                     <div class="flex items-center justify-between mb-2">
                         <h3 class="font-bold text-slate-800">Status SO (Offering)</h3>
                         <!-- Tombol Upload CSV Khusus Daffa -->
-                        <label id="syncCsvLabel2" style="display: none;" class="cursor-pointer bg-slate-50 hover:bg-primary hover:text-white text-slate-600 text-xs px-3 py-1.5 rounded-lg border border-slate-200 hover:border-primary transition-all items-center gap-2 shadow-sm z-10">
-                            <i class="fa-solid fa-cloud-arrow-up"></i> Upload & Sync
+                        <label id="syncCsvLabel2" style="display: none;" class="cursor-pointer bg-slate-50 hover:bg-primary hover:text-white text-slate-600 text-xs px-3 py-1.5 rounded-lg border border-slate-200 hover:border-primary transition-all items-center gap-2 shadow-sm z-10 whitespace-nowrap">
+                            <i class="fa-solid fa-cloud-arrow-up"></i> Sync
                             <input type="file" accept=".csv" class="hidden" onchange="handleFileUpload(event)">
                         </label>
                     </div>
@@ -180,40 +187,41 @@
                     <div class="relative h-36 w-full flex items-center justify-center flex-1 my-2">
                         <canvas id="soOfferingChart"></canvas>
                     </div>
-                    <div class="mt-4 flex justify-center gap-6 text-xs font-medium text-slate-600">
-                        <div class="flex items-center gap-2"><span class="w-3 h-3 rounded-full bg-[#10b981] block shadow-sm"></span> <span id="text-sudah-offering">Sudah Offering (0%)</span></div>
-                        <div class="flex items-center gap-2"><span class="w-3 h-3 rounded-full bg-[#fbbf24] block shadow-sm"></span> <span id="text-belum-offering">Belum Offering (0%)</span></div>
+                    <div class="mt-4 flex justify-center gap-4 sm:gap-6 text-xs font-medium text-slate-600">
+                        <div class="flex items-center gap-2"><span class="w-3 h-3 rounded-full bg-[#10b981] block shadow-sm shrink-0"></span> <span id="text-sudah-offering">Sudah Offering (0%)</span></div>
+                        <div class="flex items-center gap-2"><span class="w-3 h-3 rounded-full bg-[#fbbf24] block shadow-sm shrink-0"></span> <span id="text-belum-offering">Belum (0%)</span></div>
                     </div>
                 </div>
             </div>
 
             <!-- Buffer Kandidat (GForm) Table -->
-            <div class="bg-white rounded-2xl shadow-xl border-none overflow-hidden mb-8">
+            <div class="bg-white rounded-2xl shadow-xl border-none overflow-hidden mb-8 w-full max-w-full">
                 <div class="p-6 border-b border-slate-100 flex flex-col md:flex-row md:items-center justify-between gap-4">
                     <div>
                         <h3 class="font-bold text-slate-800 text-lg">Buffer Kandidat (GForm All REVO)</h3>
-                        <p class="text-xs text-slate-500 mt-1">Data pelamar baru yang siap di-follow up. Silakan klik "Ambil Alih" untuk memproses.</p>
+                        <p class="text-xs text-slate-500 mt-1">Data pelamar baru yang siap di-follow up.</p>
                     </div>
                 </div>
-                <div class="overflow-x-auto">
-                    <table class="w-full text-left border-collapse">
+                <!-- Tambahan min-w-[800px] agar tabel tidak menyusut dan berantakan -->
+                <div class="overflow-x-auto w-full">
+                    <table class="w-full min-w-[800px] text-left border-collapse">
                         <thead>
                             <tr class="bg-slate-50/80 text-slate-500 text-xs uppercase tracking-wider">
-                                <th class="p-4 font-semibold">Nama Kandidat</th>
-                                <th class="p-4 font-semibold">Penempatan</th>
-                                <th class="p-4 font-semibold">Status Kandidat</th>
-                                <th class="p-4 font-semibold">REVO Flagging (PIC)</th>
-                                <th class="p-4 font-semibold text-center">Action</th>
+                                <th class="p-4 font-semibold whitespace-nowrap">Nama Kandidat</th>
+                                <th class="p-4 font-semibold whitespace-nowrap">Penempatan</th>
+                                <th class="p-4 font-semibold whitespace-nowrap">Status Kandidat</th>
+                                <th class="p-4 font-semibold whitespace-nowrap">REVO Flagging (PIC)</th>
+                                <th class="p-4 font-semibold text-center whitespace-nowrap">Action</th>
                             </tr>
                         </thead>
                         <tbody class="text-sm divide-y divide-slate-100">
                             <tr class="hover:bg-slate-50 transition-colors">
-                                <td class="p-4 font-medium text-slate-800">Raditya Dika</td>
-                                <td class="p-4"><p class="text-slate-700 font-medium">PT. FIF Group</p></td>
-                                <td class="p-4"><span class="bg-blue-50 text-blue-600 border border-blue-200 text-xs px-2.5 py-1 rounded-md font-medium">Review CV</span></td>
-                                <td class="p-4" id="revo-flag-1"><span class="text-slate-400 italic text-xs">Belum ada PIC</span></td>
+                                <td class="p-4 font-medium text-slate-800 whitespace-nowrap">Raditya Dika</td>
+                                <td class="p-4"><p class="text-slate-700 font-medium whitespace-nowrap">PT. FIF Group</p></td>
+                                <td class="p-4"><span class="bg-blue-50 text-blue-600 border border-blue-200 text-xs px-2.5 py-1 rounded-md font-medium whitespace-nowrap">Review CV</span></td>
+                                <td class="p-4" id="revo-flag-1"><span class="text-slate-400 italic text-xs whitespace-nowrap">Belum ada PIC</span></td>
                                 <td class="p-4 text-center">
-                                    <button onclick="flagOfficer('revo-flag-1')" class="text-xs bg-white hover:bg-primary hover:text-white text-primary px-4 py-2 rounded-lg transition-colors font-semibold border border-primary/30 hover:border-primary shadow-sm">Ambil</button>
+                                    <button onclick="flagOfficer('revo-flag-1')" class="text-xs bg-white hover:bg-primary hover:text-white text-primary px-4 py-2 rounded-lg transition-colors font-semibold border border-primary/30 hover:border-primary shadow-sm whitespace-nowrap">Ambil</button>
                                 </td>
                             </tr>
                         </tbody>
@@ -223,7 +231,7 @@
         </main>
 
         <!-- PAGE 2: STATUS SO BERJALAN -->
-        <main id="page-sostatus" class="flex-1 overflow-x-hidden overflow-y-auto p-6 lg:p-10 z-0 page-hidden">
+        <main id="page-sostatus" class="flex-1 overflow-x-hidden overflow-y-auto p-4 sm:p-6 lg:p-10 z-0 page-hidden w-full">
             <!-- Header Section -->
             <div class="mb-8 text-white flex flex-col md:flex-row md:items-end justify-between gap-4">
                 <div class="animate-fade-in-up">
@@ -232,7 +240,7 @@
                 </div>
                 
                 <div class="flex items-center gap-3">
-                    <label id="syncCsvLabel3" style="display: none;" class="cursor-pointer bg-white text-primary hover:bg-slate-50 font-semibold px-4 py-2.5 rounded-xl shadow-lg transition-all flex items-center gap-2 text-sm">
+                    <label id="syncCsvLabel3" style="display: none;" class="cursor-pointer bg-white text-primary hover:bg-slate-50 font-semibold px-4 py-2.5 rounded-xl shadow-lg transition-all flex items-center gap-2 text-sm whitespace-nowrap">
                         <i class="fa-solid fa-cloud-arrow-up"></i> Upload Data Baru
                         <input type="file" accept=".csv" class="hidden" onchange="handleFileUpload(event)">
                     </label>
@@ -240,7 +248,7 @@
             </div>
 
             <!-- Table Container -->
-            <div class="bg-white rounded-2xl shadow-xl border-none overflow-hidden mb-8 flex flex-col h-[65vh]">
+            <div class="bg-white rounded-2xl shadow-xl border-none overflow-hidden mb-8 flex flex-col h-[70vh] min-h-[500px] w-full max-w-full">
                 <!-- Table Toolbar -->
                 <div class="p-6 border-b border-slate-100 flex flex-col md:flex-row md:items-center justify-between gap-4 bg-slate-50/50 shrink-0">
                     <div>
@@ -257,16 +265,17 @@
                 </div>
 
                 <!-- Table Content -->
-                <div class="overflow-x-auto flex-1 relative">
-                    <table class="w-full text-left border-collapse" id="soTable">
+                <!-- Tambahan min-w-[1000px] agar tabel detail tidak menyusut dan berantakan -->
+                <div class="overflow-x-auto flex-1 relative w-full">
+                    <table class="w-full min-w-[1000px] text-left border-collapse" id="soTable">
                         <thead class="sticky top-0 bg-white shadow-sm z-10">
                             <tr class="bg-slate-50/90 backdrop-blur-sm text-slate-500 text-xs uppercase tracking-wider">
-                                <th class="p-4 font-semibold w-16 text-center">No</th>
-                                <th class="p-4 font-semibold">Klien & Posisi</th>
-                                <th class="p-4 font-semibold">Area & Assign RO</th>
-                                <th class="p-4 font-semibold">Tgl Approve</th>
-                                <th class="p-4 font-semibold text-center">Status Fulfillment</th>
-                                <th class="p-4 font-semibold text-center">Status Offering</th>
+                                <th class="p-4 font-semibold w-16 text-center whitespace-nowrap">No</th>
+                                <th class="p-4 font-semibold whitespace-nowrap">Klien & Posisi</th>
+                                <th class="p-4 font-semibold whitespace-nowrap">Area & Assign RO</th>
+                                <th class="p-4 font-semibold whitespace-nowrap">Tgl Approve</th>
+                                <th class="p-4 font-semibold text-center whitespace-nowrap">Status Fulfillment</th>
+                                <th class="p-4 font-semibold text-center whitespace-nowrap">Status Offering</th>
                             </tr>
                         </thead>
                         <tbody class="text-sm divide-y divide-slate-100" id="tableBody">
@@ -291,13 +300,13 @@
         import { getAuth, signInAnonymously, signInWithCustomToken, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
         import { getFirestore, doc, setDoc, onSnapshot } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
 
-        // Firebase Init (Injecting Global Canvas Env Variables safely)
+        // Firebase Init
         let firebaseConfig = {};
         let appId = 'simgroup-dashboard-app';
         try {
             if (typeof __firebase_config !== 'undefined') firebaseConfig = JSON.parse(__firebase_config);
             if (typeof __app_id !== 'undefined') appId = __app_id;
-        } catch (e) { console.warn("Firebase config not found. Running in local/offline mode."); }
+        } catch (e) { console.warn("Firebase config not found."); }
 
         const app = initializeApp(firebaseConfig);
         const auth = getAuth(app);
@@ -327,32 +336,40 @@
             else if (hour < 18) greeting = "Good Afternoon";
             document.getElementById('welcome-greeting').innerHTML = `${greeting}, ${window.activeUser.name}! ✨`;
 
-            // Tombol Upload khusus Daffa
             const isDaffa = window.activeUser.name.toLowerCase() === 'daffa';
             document.getElementById('syncCsvLabel1').style.display = isDaffa ? 'flex' : 'none';
             document.getElementById('syncCsvLabel2').style.display = isDaffa ? 'flex' : 'none';
             document.getElementById('syncCsvLabel3').style.display = isDaffa ? 'flex' : 'none';
         }
 
+        // TOGGLE SIDEBAR (Mobile)
+        window.toggleSidebar = function() {
+            const sidebar = document.getElementById('sidebar');
+            sidebar.classList.toggle('-translate-x-full');
+        };
+
         // NAVIGATION LOGIC (SPA)
         window.switchPage = function(pageId) {
             document.getElementById('page-overview').classList.add('page-hidden');
             document.getElementById('page-sostatus').classList.add('page-hidden');
             
-            // Reset Sidebar Styling
             const navOverview = document.getElementById('nav-overview');
             const navSostatus = document.getElementById('nav-sostatus');
             
             navOverview.className = "w-full flex items-center gap-3 px-4 py-3 text-white/70 hover:bg-white/10 hover:text-white rounded-lg font-medium transition-all";
             navSostatus.className = "w-full flex items-center gap-3 px-4 py-3 text-white/70 hover:bg-white/10 hover:text-white rounded-lg font-medium transition-all";
 
-            // Show selected page
             if (pageId === 'overview') {
                 document.getElementById('page-overview').classList.remove('page-hidden');
                 navOverview.className = "w-full flex items-center gap-3 px-4 py-3 bg-white/20 text-white rounded-lg font-semibold transition-all shadow-sm";
             } else if (pageId === 'sostatus') {
                 document.getElementById('page-sostatus').classList.remove('page-hidden');
                 navSostatus.className = "w-full flex items-center gap-3 px-4 py-3 bg-white/20 text-white rounded-lg font-semibold transition-all shadow-sm";
+            }
+
+            // Tutup sidebar di versi mobile setelah menu diklik
+            if (window.innerWidth < 768) {
+                document.getElementById('sidebar').classList.add('-translate-x-full');
             }
         };
 
@@ -395,7 +412,6 @@
                     if (offering > 0) sudahOffering++; else belumOffering++;
                     validCount++;
                     
-                    // Render Table Row
                     const client = row['nama client'] || '-';
                     const job = row['nama job'] || '-';
                     const area = row['area'] || '-';
@@ -403,20 +419,20 @@
                     const tglApprove = row['tgl approve'] || '-';
 
                     const fulfillBadge = finish === 1 
-                        ? `<span class="bg-emerald-50 text-emerald-600 border border-emerald-200 text-xs px-2.5 py-1 rounded-full font-semibold"><i class="fa-solid fa-check mr-1"></i> Ter-Fulfill</span>`
-                        : `<span class="bg-rose-50 text-rose-600 border border-rose-200 text-xs px-2.5 py-1 rounded-full font-semibold"><i class="fa-solid fa-hourglass-half mr-1"></i> Belum Fulfill</span>`;
+                        ? `<span class="bg-emerald-50 text-emerald-600 border border-emerald-200 text-xs px-2.5 py-1 rounded-full font-semibold whitespace-nowrap"><i class="fa-solid fa-check mr-1"></i> Ter-Fulfill</span>`
+                        : `<span class="bg-rose-50 text-rose-600 border border-rose-200 text-xs px-2.5 py-1 rounded-full font-semibold whitespace-nowrap"><i class="fa-solid fa-hourglass-half mr-1"></i> Belum Fulfill</span>`;
 
                     const offeringBadge = offering > 0 
-                        ? `<span class="bg-[#148e9e]/10 text-[#148e9e] border border-[#148e9e]/20 text-xs px-2.5 py-1 rounded-full font-semibold"><i class="fa-solid fa-file-signature mr-1"></i> Sudah Offering</span>`
-                        : `<span class="bg-amber-50 text-amber-600 border border-amber-200 text-xs px-2.5 py-1 rounded-full font-semibold"><i class="fa-regular fa-clock mr-1"></i> Belum Offering</span>`;
+                        ? `<span class="bg-[#148e9e]/10 text-[#148e9e] border border-[#148e9e]/20 text-xs px-2.5 py-1 rounded-full font-semibold whitespace-nowrap"><i class="fa-solid fa-file-signature mr-1"></i> Sudah Offering</span>`
+                        : `<span class="bg-amber-50 text-amber-600 border border-amber-200 text-xs px-2.5 py-1 rounded-full font-semibold whitespace-nowrap"><i class="fa-regular fa-clock mr-1"></i> Belum Offering</span>`;
 
                     const tr = document.createElement('tr');
                     tr.className = 'hover:bg-slate-50 transition-colors';
                     tr.innerHTML = `
-                        <td class="p-4 text-center text-slate-400 font-medium">${validCount}</td>
-                        <td class="p-4"><p class="font-bold text-slate-800">${client}</p><p class="text-slate-500 text-xs mt-0.5">${job}</p></td>
-                        <td class="p-4"><p class="text-slate-700 font-medium">${area}</p><p class="text-slate-400 text-xs mt-0.5"><i class="fa-regular fa-user mr-1"></i>${assignRo}</p></td>
-                        <td class="p-4 text-slate-600 text-sm">${tglApprove}</td>
+                        <td class="p-4 text-center text-slate-400 font-medium whitespace-nowrap">${validCount}</td>
+                        <td class="p-4 min-w-[200px]"><p class="font-bold text-slate-800">${client}</p><p class="text-slate-500 text-xs mt-0.5">${job}</p></td>
+                        <td class="p-4 whitespace-nowrap"><p class="text-slate-700 font-medium">${area}</p><p class="text-slate-400 text-xs mt-0.5"><i class="fa-regular fa-user mr-1"></i>${assignRo}</p></td>
+                        <td class="p-4 text-slate-600 text-sm whitespace-nowrap">${tglApprove}</td>
                         <td class="p-4 text-center">${fulfillBadge}</td>
                         <td class="p-4 text-center">${offeringBadge}</td>
                     `;
@@ -446,20 +462,17 @@
         // FIREBASE CONNECTIVITY DENGAN AUTHENTICATION PROPER
         async function connectCloud() {
             try {
-                // 1. Lakukan Otentikasi Terlebih Dahulu
                 if (typeof __initial_auth_token !== 'undefined' && __initial_auth_token) {
                     await signInWithCustomToken(auth, __initial_auth_token);
                 } else {
                     await signInAnonymously(auth);
                 }
                 
-                // 2. Dengarkan Status Otentikasi sebelum memanggil database
                 onAuthStateChanged(auth, (user) => {
-                    if (!user) return; // Jika belum terautentikasi, hentikan.
+                    if (!user) return; 
 
                     const docRef = doc(db, 'artifacts', appId, 'public', 'data', 'soreport', 'latest_csv');
                     
-                    // Real-time Listener ke Cloud Database
                     onSnapshot(docRef, (docSnap) => {
                         if (docSnap.exists()) {
                             const cloudData = docSnap.data();
@@ -495,7 +508,6 @@
                         const jsonString = JSON.stringify(results.data);
                         const docRef = doc(db, 'artifacts', appId, 'public', 'data', 'soreport', 'latest_csv');
                         
-                        // Timpa data lama dengan data baru
                         await setDoc(docRef, {
                             csvData: jsonString,
                             timestamp: Date.now(),
@@ -519,7 +531,7 @@
 
         window.flagOfficer = function(targetCellId) {
             document.getElementById(targetCellId).innerHTML = `
-                <div class="flex items-center gap-3 animate-fade-in-up">
+                <div class="flex items-center gap-3 animate-fade-in-up whitespace-nowrap">
                     <div class="relative">
                         <img src="https://ui-avatars.com/api/?name=${window.activeUser.name.replace(' ', '+')}&background=148e9e&color=fff" class="w-8 h-8 rounded-full ring-2 ring-white shadow-sm">
                         <span class="absolute -bottom-1 -right-1 flex h-3 w-3"><span class="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-75"></span><span class="relative inline-flex rounded-full h-3 w-3 bg-emerald-500 border border-white"></span></span>
