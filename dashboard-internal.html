@@ -4,13 +4,9 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Dashboard Internal - SIMGROUP JAKARTA</title>
-    <!-- Tailwind CSS -->
     <script src="https://cdn.tailwindcss.com"></script>
-    <!-- Font Awesome -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-    <!-- Chart.js -->
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-    <!-- PapaParse for CSV Parsing -->
     <script src="https://cdnjs.cloudflare.com/ajax/libs/PapaParse/5.4.1/papaparse.min.js"></script>
     
     <script>
@@ -35,12 +31,10 @@
         ::-webkit-scrollbar-thumb { background: rgba(255,255,255,0.2); border-radius: 10px; }
         ::-webkit-scrollbar-thumb:hover { background: rgba(255,255,255,0.4); }
         
-        /* Tambahan styling agar tabel bisa scroll dengan rapi */
         .table-container::-webkit-scrollbar { width: 6px; height: 6px; }
         .table-container::-webkit-scrollbar-track { background: rgba(0,0,0,0.05); }
         .table-container::-webkit-scrollbar-thumb { background: rgba(0,0,0,0.2); border-radius: 10px; }
 
-        /* Animasi indikator cloud */
         @keyframes pulse-green {
             0% { box-shadow: 0 0 0 0 rgba(16, 185, 129, 0.7); }
             70% { box-shadow: 0 0 0 6px rgba(16, 185, 129, 0); }
@@ -51,7 +45,6 @@
 </head>
 <body class="bg-gradient-to-br from-primary to-secondary h-screen overflow-hidden flex text-slate-800">
 
-    <!-- Sidebar (Glassmorphism) -->
     <aside class="w-64 bg-glass backdrop-blur-xl border-r border-glassBorder hidden md:flex flex-col z-20">
         <div class="h-20 flex items-center justify-center border-b border-glassBorder">
             <div class="flex items-center gap-2 text-white font-bold text-xl tracking-wider">
@@ -99,10 +92,8 @@
         </div>
     </aside>
 
-    <!-- Main Content -->
     <div class="flex-1 flex flex-col h-screen overflow-hidden relative">
         
-        <!-- Top Header -->
         <header class="h-20 bg-glass backdrop-blur-sm border-b border-glassBorder flex items-center justify-between px-6 lg:px-10 z-10">
             <div class="flex items-center gap-4 text-white">
                 <button class="md:hidden text-white/80 hover:text-white transition">
@@ -112,9 +103,8 @@
             </div>
             
             <div class="flex items-center gap-6">
-                <!-- Status Cloud Indicator -->
-                <div id="cloud-status" class="hidden items-center gap-2 text-xs font-medium text-emerald-300 bg-emerald-900/40 px-3 py-1.5 rounded-full border border-emerald-500/30">
-                    <i class="fa-solid fa-cloud-check"></i> Cloud Terhubung
+                <div id="cloud-status" class="flex items-center gap-2 text-xs font-medium text-slate-300 bg-slate-800/40 px-3 py-1.5 rounded-full border border-slate-500/30">
+                    <i class="fa-solid fa-hard-drive"></i> Menghubungkan...
                 </div>
 
                 <button class="relative text-white/80 hover:text-white transition">
@@ -131,28 +121,21 @@
             </div>
         </header>
 
-        <!-- Scrollable Main Content -->
         <main class="flex-1 overflow-x-hidden overflow-y-auto p-6 lg:p-10 z-0">
             
-            <!-- ============================================== -->
-            <!-- VIEW 1: DASHBOARD OVERVIEW -->
-            <!-- ============================================== -->
             <div id="view-dashboard">
-                <!-- Welcome Text -->
                 <div class="mb-8 text-white flex items-center justify-between">
                     <div>
                         <h2 class="text-2xl lg:text-3xl font-bold mb-1 tracking-tight" id="welcome-greeting">Welcome! ✨</h2>
-                        <p class="text-white/80 max-w-2xl text-sm md:text-base font-light">Berikut adalah ringkasan operasional terkini: Status pemenuhan *Service Order* (SO), antrean *Buffer* Kandidat dari form registrasi, dan daftar *Sourcing Partner*.</p>
+                        <p class="text-white/80 max-w-2xl text-sm md:text-base font-light">Berikut adalah ringkasan operasional terkini: Status pemenuhan *Service Order* (SO), antrean *Buffer* Kandidat dari form registrasi.</p>
                     </div>
                 </div>
 
-                <!-- Charts Section (SO Status) -->
                 <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mb-8">
                     
                     <div class="bg-white p-6 rounded-2xl shadow-xl border-none hover:-translate-y-1 transition-transform duration-300 flex flex-col">
                         <div class="flex items-center justify-between mb-2">
                             <h3 class="font-bold text-slate-800">Status SO (Fulfillment)</h3>
-                            <!-- Tombol Upload CSV -->
                             <label id="syncCsvLabel" style="display: none;" class="cursor-pointer bg-slate-50 hover:bg-emerald-50 text-slate-600 hover:text-emerald-600 text-xs px-3 py-1.5 rounded-lg border border-slate-200 hover:border-emerald-300 transition-all items-center gap-2 shadow-sm group">
                                 <i class="fa-solid fa-cloud-arrow-up group-hover:-translate-y-0.5 transition-transform text-emerald-500"></i> <span id="btn-sync-text">Sync CSV</span>
                                 <input type="file" id="csvFileInput" accept=".csv" class="hidden" onchange="handleFileUpload(event)">
@@ -182,42 +165,13 @@
                     </div>
 
                 </div>
-
-                <!-- Sourcing Partner Table (Dipendekkan demi fokus ke fitur baru) -->
-                <div class="bg-white rounded-2xl shadow-xl border-none overflow-hidden mb-8">
-                    <div class="p-6 border-b border-slate-100">
-                        <h3 class="font-bold text-slate-800 text-lg">Daftar Sourcing Partner Aktif</h3>
-                        <p class="text-xs text-slate-500 mt-1">Database instansi/sekolah yang bekerjasama untuk suplai kandidat.</p>
-                    </div>
-                    <div class="overflow-x-auto">
-                        <table class="w-full text-left border-collapse">
-                            <thead>
-                                <tr class="bg-slate-50/80 text-slate-500 text-xs uppercase tracking-wider">
-                                    <th class="p-4 font-semibold">Nama Mitra / Instansi</th>
-                                    <th class="p-4 font-semibold">PIC Sourcing</th>
-                                    <th class="p-4 font-semibold">Kontak (WhatsApp)</th>
-                                </tr>
-                            </thead>
-                            <tbody class="text-sm divide-y divide-slate-100">
-                                <tr class="hover:bg-slate-50 transition-colors">
-                                    <td class="p-4 font-medium text-slate-800">BKK SMKN 1 Jakarta</td>
-                                    <td class="p-4 text-slate-600">Bpk. Haryanto</td>
-                                    <td class="p-4 text-primary font-medium">0812-3456-7890</td>
-                                </tr>
-                            </tbody>
-                        </table>
-                    </div>
-                </div>
             </div>
 
-            <!-- ============================================== -->
-            <!-- VIEW 2: STATUS SO BERJALAN (DETAIL CSV) -->
-            <!-- ============================================== -->
             <div id="view-status-so" class="hidden">
                 <div class="mb-6 text-white flex items-center justify-between">
                     <div>
                         <h2 class="text-2xl lg:text-3xl font-bold mb-1 tracking-tight">Detail Status SO 📄</h2>
-                        <p class="text-white/80 max-w-2xl text-sm md:text-base font-light">Tabel di bawah memuat rincian data tersinkronisasi dari <span class="font-semibold text-emerald-200">Cloud Storage</span>.</p>
+                        <p class="text-white/80 max-w-2xl text-sm md:text-base font-light">Tabel di bawah memuat rincian data tersinkronisasi dari sistem.</p>
                     </div>
                     <button onclick="switchTab('dashboard')" class="bg-white/20 hover:bg-white/30 text-white px-4 py-2 rounded-lg text-sm font-medium transition-all flex items-center gap-2">
                         <i class="fa-solid fa-arrow-left"></i> Kembali
@@ -257,9 +211,6 @@
         </main>
     </div>
 
-     <!-- ======================================================= -->
-    <!-- FIREBASE & JAVASCRIPT LOGIC (ES MODULE) -->
-    <!-- ======================================================= -->
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-app.js";
         import { getAuth, signInAnonymously, signInWithCustomToken, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
@@ -283,7 +234,6 @@
             const userString = localStorage.getItem('currentUser');
             activeUser = userString ? JSON.parse(userString) : { name: 'Daffa', role: 'Monitoring Staff' };
             
-            // Null-checks untuk elemen profil
             const profileName = document.getElementById('profile-name');
             if (profileName) profileName.textContent = activeUser.name;
             
@@ -304,7 +254,7 @@
         initDashboard();
 
         // =========================================================
-        // 🚀 PENGATURAN DATABASE CLOUD (FIREBASE) YANG BENAR
+        // 🚀 PENGATURAN DATABASE CLOUD (FIREBASE)
         // =========================================================
         const firebaseConfig = {
             apiKey: "AIzaSyDGWDjaE9ZKU1oUm57gdgONlpw_aZnLGpo",
@@ -395,6 +345,10 @@
             });
         } catch (error) {
             console.warn("Berjalan dalam mode Offline. Alasan: " + error.message);
+            const statusUI = document.getElementById('cloud-status');
+            if (statusUI) {
+                statusUI.innerHTML = '<i class="fa-solid fa-hard-drive"></i> Mode Lokal (Offline)';
+            }
             const tabelJudul = document.getElementById('tabel-judul');
             if (tabelJudul) {
                 tabelJudul.innerText = "Tabel Data CSV (Mode Lokal)";
