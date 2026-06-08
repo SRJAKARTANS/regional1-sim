@@ -261,13 +261,42 @@
     <!-- FIREBASE & JAVASCRIPT LOGIC (ES MODULE) -->
     <!-- ======================================================= -->
     <script type="module">
-        import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-app.js";
-        import { getAuth, signInAnonymously, signInWithCustomToken, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
-        import { getFirestore, doc, setDoc, onSnapshot } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
+    // HANYA gunakan link CDN ini, jangan ada import lain
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-app.js";
+    import { getAuth, signInAnonymously, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
+    import { getFirestore, doc, setDoc, onSnapshot } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
 
-        window.switchTab = switchTab;
-        window.handleLogout = handleLogout;
-        window.handleFileUpload = handleFileUpload;
+    window.switchTab = switchTab;
+    window.handleLogout = handleLogout;
+    window.handleFileUpload = handleFileUpload;
+
+    // Chart.js tetap seperti sebelumnya...
+    Chart.defaults.font.family = "'Inter', sans-serif";
+    Chart.defaults.color = '#64748b'; 
+    // (Lanjutkan dengan kode Chart.js Anda yang sudah ada di bawah ini...)
+
+    const firebaseConfig = {
+        apiKey: "AIzaSyDGWDjaE9ZKU1oUm57gdgONlpw_aZnLGpo",
+        authDomain: "jakartans-dashboard.firebaseapp.com",
+        projectId: "jakartans-dashboard",
+        storageBucket: "jakartans-dashboard.firebasestorage.app",
+        messagingSenderId: "648533447432",
+        appId: "1:648533447432:web:f11e41a82a62f766c892bd",
+        measurementId: "G-H5M7GNR99G"
+    };
+
+    const app = initializeApp(firebaseConfig);
+    const auth = getAuth(app);
+    const db = getFirestore(app);
+
+    signInAnonymously(auth).catch(console.error);
+
+    onAuthStateChanged(auth, (user) => {
+        if (user) {
+            // Indikator Hijau
+            const statusUI = document.getElementById('cloud-status');
+            statusUI.className = "flex items-center gap-2 text-xs font-medium text-emerald-300 bg-emerald-900/40 px-3 py-1.5 rounded-full border border-emerald-500/30 cloud-syncing";
+            statusUI.innerHTML = '<i class="fa-solid fa-cloud-check"></i> Cloud Terhubung';
 
         // Chart Init
         Chart.defaults.font.family = "'Inter', sans-serif";
