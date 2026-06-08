@@ -1,0 +1,179 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Calendar of Event - SIMGROUP</title>
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- Font Awesome untuk Ikon -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    
+    <!-- Konfigurasi Tema Warna SIMGROUP -->
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        primary: '#148e9e', // Deep Teal
+                        secondary: '#0d6470',
+                    }
+                }
+            }
+        }
+    </script>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap');
+        body { font-family: 'Inter', sans-serif; background-color: #f3f4f6; }
+    </style>
+</head>
+<body class="text-gray-800">
+
+    <!-- Header / Topbar Sederhana -->
+    <header class="bg-white shadow-sm border-b border-gray-200 px-8 py-4 flex justify-between items-center sticky top-0 z-10">
+        <div class="flex items-center">
+            <h1 class="text-2xl font-bold text-primary tracking-wider mr-4">SIMGROUP</h1>
+            <span class="text-gray-400">|</span>
+            <h2 class="text-lg font-semibold text-gray-600 ml-4">Calendar of Event</h2>
+        </div>
+        <a href="https://calendar.google.com/" target="_blank" class="bg-primary text-white px-4 py-2 rounded-lg hover:bg-secondary text-sm flex items-center font-medium transition shadow">
+            <i class="fas fa-external-link-alt mr-2"></i> Buka Google Calendar
+        </a>
+    </header>
+
+    <!-- Konten Utama -->
+    <main class="max-w-7xl mx-auto p-8">
+        
+        <div class="mb-6">
+            <h2 class="text-2xl font-bold text-gray-800">Agenda Terdekat</h2>
+            <p class="text-sm text-gray-500 mt-1">Daftar kegiatan, event sourcing, dan meeting dalam 30 hari ke depan.</p>
+        </div>
+
+        <!-- Wadah Kartu Kalender -->
+        <div id="calendar-container" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+            <!-- Loading State Default -->
+            <div class="col-span-full bg-white p-10 rounded-xl shadow-sm border border-gray-100 text-center">
+                <i class="fas fa-spinner fa-spin text-primary text-4xl mb-4"></i>
+                <p class="text-gray-500 font-medium">Sinkronisasi data dari Google Calendar...</p>
+            </div>
+        </div>
+
+    </main>
+
+    <!-- KUMPULAN SCRIPT -->
+    <script>
+        // ----------------------------------------------------
+        // INTEGRASI GOOGLE CALENDAR
+        // ----------------------------------------------------
+        // GANTI STRING DI BAWAH INI DENGAN URL WEB APP DARI GOOGLE APPS SCRIPT ANDA
+        const GOOGLE_CALENDAR_API_URL = "ISI_DENGAN_URL_WEB_APP_APPS_SCRIPT_ANDA"; 
+
+        async function loadGoogleCalendar() {
+            const container = document.getElementById('calendar-container');
+            
+            try {
+                // --- BAGIAN INI HANYA UNTUK PREVIEW MOCKUP JIKA URL API BELUM DIISI ---
+                if (GOOGLE_CALENDAR_API_URL === "ISI_DENGAN_URL_WEB_APP_APPS_SCRIPT_ANDA" || GOOGLE_CALENDAR_API_URL === "") {
+                    setTimeout(() => {
+                        const mockData = [
+                            {
+                                title: "Sourcing Workshop Regional 1", location: "Ruang Meeting A - Lt.2",
+                                startTime: new Date(Date.now() + 86400000).toISOString(),
+                                endTime: new Date(Date.now() + 93600000).toISOString(),
+                                description: "Workshop strategi sourcing kandidat di lapangan bersama tim rekrutmen."
+                            },
+                            {
+                                title: "Review SLA Bulanan Tim Revo", location: "Online (Google Meet)",
+                                startTime: new Date(Date.now() + (86400000 * 3)).toISOString(),
+                                endTime: new Date(Date.now() + (86400000 * 3) + 7200000).toISOString(),
+                                description: "Evaluasi performa pemenuhan SO bulan ini."
+                            },
+                            {
+                                title: "Job Fair Universitas Indonesia", location: "Balairung UI, Depok",
+                                startTime: new Date(Date.now() + (86400000 * 5)).toISOString(),
+                                endTime: new Date(Date.now() + (86400000 * 5) + 28800000).toISOString(),
+                                description: "Stand SIMGROUP nomor B-12. PIC: Mas Budi."
+                            }
+                        ];
+                        renderEvents(mockData);
+                    }, 1000);
+                    return;
+                }
+                // ------------------------------------------------------------------------
+
+                // Fetch ke URL API ASLI
+                const response = await fetch(GOOGLE_CALENDAR_API_URL);
+                const events = await response.json();
+                renderEvents(events);
+
+            } catch (error) {
+                console.error("Gagal memuat Google Calendar:", error);
+                container.innerHTML = `
+                    <div class="col-span-full bg-red-50 p-6 rounded-xl border border-red-200 text-center text-red-600">
+                        <i class="fas fa-exclamation-triangle text-3xl mb-3"></i>
+                        <p class="font-medium text-lg">Gagal memuat data kalender.</p>
+                        <p class="text-sm mt-2">Pastikan URL Apps Script sudah benar, memiliki izin "Anyone", dan koneksi internet stabil.</p>
+                    </div>`;
+            }
+        }
+
+        // Fungsi bantuan untuk mencetak HTML Kartu Kalender
+        function renderEvents(events) {
+            const container = document.getElementById('calendar-container');
+            container.innerHTML = ''; // Bersihkan loading
+            
+            if (!events || events.length === 0 || events.error) {
+                container.innerHTML = `
+                    <div class="col-span-full bg-white p-12 rounded-xl shadow-sm border border-gray-100 text-center text-gray-500">
+                        <i class="fas fa-calendar-check text-5xl mb-4 text-gray-300"></i>
+                        <h3 class="text-xl font-medium text-gray-700">Jadwal Kosong</h3>
+                        <p class="mt-2">Tidak ada agenda yang terjadwal dalam 30 hari ke depan.</p>
+                    </div>`;
+                return;
+            }
+            
+            events.forEach(event => {
+                const startDate = new Date(event.startTime);
+                const endDate = new Date(event.endTime);
+                
+                // Format Tanggal (Misal: Senin, 15 Juni 2026)
+                const optionsDate = { weekday: 'long', day: 'numeric', month: 'long', year: 'numeric' };
+                const formattedDate = startDate.toLocaleDateString('id-ID', optionsDate);
+                
+                // Format Jam (Misal: 09:00 - 11:00 WIB)
+                const optionsTime = { hour: '2-digit', minute: '2-digit' };
+                const formattedTime = `${startDate.toLocaleTimeString('id-ID', optionsTime)} - ${endDate.toLocaleTimeString('id-ID', optionsTime)} WIB`;
+                
+                const cardHTML = `
+                    <div class="bg-white p-6 rounded-xl shadow-sm border-l-4 border-primary hover:shadow-lg transition-all duration-300 relative group flex flex-col h-full">
+                        <div>
+                            <span class="inline-block text-[11px] font-bold text-primary uppercase bg-teal-50 px-3 py-1 rounded-full mb-3">${formattedDate}</span>
+                            <h3 class="font-bold text-gray-800 text-lg leading-snug">${event.title}</h3>
+                        </div>
+                        
+                        <div class="space-y-3 mt-4 flex-grow">
+                            <p class="text-sm text-gray-600 flex items-start">
+                                <i class="fas fa-map-marker-alt text-gray-400 mt-1 mr-3 w-4 text-center"></i> 
+                                <span class="flex-1">${event.location || 'Tidak ada lokasi spesifik'}</span>
+                            </p>
+                            <div class="flex items-center text-sm text-gray-600">
+                                <i class="fas fa-clock text-gray-400 mr-3 w-4 text-center"></i> ${formattedTime}
+                            </div>
+                        </div>
+                        
+                        ${event.description ? `
+                        <div class="mt-5 pt-4 border-t border-gray-100 text-sm text-gray-500">
+                            <p class="line-clamp-3">${event.description}</p>
+                        </div>` : ''}
+                    </div>
+                `;
+                container.innerHTML += cardHTML;
+            });
+        }
+
+        // Jalankan fungsi loadGoogleCalendar secara otomatis saat halaman pertama kali dibuka
+        document.addEventListener('DOMContentLoaded', loadGoogleCalendar);
+
+    </script>
+</body>
+</html>
