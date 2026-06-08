@@ -154,7 +154,7 @@
                             <h3 class="font-bold text-slate-800">Status SO (Fulfillment)</h3>
                             <!-- Tombol Upload CSV -->
                             <label id="syncCsvLabel" style="display: none;" class="cursor-pointer bg-slate-50 hover:bg-emerald-50 text-slate-600 hover:text-emerald-600 text-xs px-3 py-1.5 rounded-lg border border-slate-200 hover:border-emerald-300 transition-all items-center gap-2 shadow-sm group">
-                                <i class="fa-solid fa-cloud-arrow-up group-hover:-translate-y-0.5 transition-transform text-emerald-500"></i> Sync Cloud CSV
+                                <i class="fa-solid fa-cloud-arrow-up group-hover:-translate-y-0.5 transition-transform text-emerald-500"></i> <span id="btn-sync-text">Sync CSV</span>
                                 <input type="file" id="csvFileInput" accept=".csv" class="hidden" onchange="handleFileUpload(event)">
                             </label>
                         </div>
@@ -227,7 +227,7 @@
                 <div class="bg-white rounded-2xl shadow-xl border-none overflow-hidden flex flex-col mb-8">
                     <div class="p-6 border-b border-slate-100 flex flex-col md:flex-row md:items-center justify-between gap-4">
                         <div>
-                            <h3 class="font-bold text-slate-800 text-lg">Tabel Data CSV (Cloud)</h3>
+                            <h3 class="font-bold text-slate-800 text-lg" id="tabel-judul">Tabel Data CSV</h3>
                             <p class="text-xs text-slate-500 mt-1" id="last-update-text">Menunggu pembaruan data...</p>
                         </div>
                         <div class="flex items-center gap-3">
@@ -237,7 +237,7 @@
                                     <option value="">Semua ASSIGN RO</option>
                                 </select>
                                 <i class="fa-solid fa-chevron-down absolute right-3 top-1/2 transform -translate-y-1/2 text-slate-400 text-xs pointer-events-none"></i>
-                            </div>a
+                            </div>
                              <div class="relative">
                                 <i class="fa-solid fa-search absolute left-3 top-1/2 transform -translate-y-1/2 text-slate-400 text-sm"></i>
                                 <input type="text" id="search-csv" placeholder="Cari data..." class="pl-9 pr-4 py-2 bg-slate-50 border border-slate-200 rounded-lg text-sm text-slate-700 focus:ring-2 focus:ring-primary focus:outline-none w-full md:w-64 transition-all">
@@ -282,16 +282,24 @@
         function initDashboard() {
             const userString = localStorage.getItem('currentUser');
             activeUser = userString ? JSON.parse(userString) : { name: 'Daffa', role: 'Monitoring Staff' };
-            document.getElementById('profile-name').textContent = activeUser.name;
-            document.getElementById('profile-role').textContent = activeUser.role;
-            document.getElementById('profile-avatar').src = `https://ui-avatars.com/api/?name=${activeUser.name.replace(' ', '+')}&background=148e9e&color=fff`;
+            
+            // Null-checks untuk elemen profil
+            const profileName = document.getElementById('profile-name');
+            if (profileName) profileName.textContent = activeUser.name;
+            
+            const profileRole = document.getElementById('profile-role');
+            if (profileRole) profileRole.textContent = activeUser.role;
+            
+            const profileAvatar = document.getElementById('profile-avatar');
+            if (profileAvatar) profileAvatar.src = `https://ui-avatars.com/api/?name=${activeUser.name.replace(' ', '+')}&background=148e9e&color=fff`;
             
             const hour = new Date().getHours();
             let greeting = hour < 12 ? "Good Morning" : hour < 18 ? "Good Afternoon" : "Good Evening";
-            document.getElementById('welcome-greeting').innerHTML = `${greeting}, ${activeUser.name}! ✨`;
+            const welcomeGreeting = document.getElementById('welcome-greeting');
+            if (welcomeGreeting) welcomeGreeting.innerHTML = `${greeting}, ${activeUser.name}! ✨`;
             
             const syncBtn = document.getElementById('syncCsvLabel');
-            syncBtn.style.display = (activeUser.name.toLowerCase() === 'daffa') ? 'flex' : 'none';
+            if (syncBtn) syncBtn.style.display = (activeUser.name.toLowerCase() === 'daffa') ? 'flex' : 'none';
         }
         initDashboard();
 
@@ -332,9 +340,11 @@
                     }
                 } catch (authError) {
                     console.error("Gagal Autentikasi:", authError);
-                    // Menangkap error jika Anonymous Auth belum diaktifkan di Firebase Console
                     if (authError.code === 'auth/operation-not-allowed') {
-                        document.getElementById('last-update-text').innerHTML = `<span class="text-rose-500 font-bold"><i class="fa-solid fa-triangle-exclamation"></i> Error: Aktifkan mode 'Anonymous' Auth di Firebase Console Anda!</span>`;
+                        const lastUpdateText = document.getElementById('last-update-text');
+                        if (lastUpdateText) {
+                            lastUpdateText.innerHTML = `<span class="text-rose-500 font-bold"><i class="fa-solid fa-triangle-exclamation"></i> Error: Aktifkan mode 'Anonymous' Auth di Firebase Console Anda!</span>`;
+                        }
                     }
                 }
             };
@@ -344,10 +354,15 @@
                 firebaseUser = user;
                 if (user) {
                     const statusUI = document.getElementById('cloud-status');
-                    statusUI.className = "flex items-center gap-2 text-xs font-medium text-emerald-300 bg-emerald-900/40 px-3 py-1.5 rounded-full border border-emerald-500/30 cloud-syncing";
-                    statusUI.innerHTML = '<i class="fa-solid fa-cloud-check"></i> Cloud Terhubung';
+                    if (statusUI) {
+                        statusUI.className = "flex items-center gap-2 text-xs font-medium text-emerald-300 bg-emerald-900/40 px-3 py-1.5 rounded-full border border-emerald-500/30 cloud-syncing";
+                        statusUI.innerHTML = '<i class="fa-solid fa-cloud-check"></i> Cloud Terhubung';
+                    }
                     
-                    document.getElementById('tabel-judul').innerHTML = 'Tabel Data CSV <span class="text-emerald-500 text-sm ml-2"><i class="fa-solid fa-cloud"></i> Tersinkronisasi</span>';
+                    const tabelJudul = document.getElementById('tabel-judul');
+                    if (tabelJudul) {
+                        tabelJudul.innerHTML = 'Tabel Data CSV <span class="text-emerald-500 text-sm ml-2"><i class="fa-solid fa-cloud"></i> Tersinkronisasi</span>';
+                    }
 
                     // Tarik Data Realtime
                     const docRef = doc(db, 'artifacts', appId, 'public', 'data', 'csv_uploads', 'latest');
@@ -361,21 +376,29 @@
                                 renderSOTable();
                                 
                                 const date = new Date(cloudData.updatedAt);
-                                document.getElementById('last-update-text').innerHTML = `Terakhir di-sync oleh <b>${cloudData.uploader}</b> pada ${date.toLocaleString('id-ID')}`;
+                                const lastUpdateText = document.getElementById('last-update-text');
+                                if (lastUpdateText) {
+                                    lastUpdateText.innerHTML = `Terakhir di-sync oleh <b>${cloudData.uploader}</b> pada ${date.toLocaleString('id-ID')}`;
+                                }
                             } catch(e) {}
                         }
                     }, (error) => { 
                         console.error("Gagal sinkron:", error); 
-                        // PENANGANAN ERROR PERMISSIONS
                         if (error.message.includes("permissions")) {
-                            document.getElementById('last-update-text').innerHTML = `<span class="text-rose-500 font-bold text-sm"><i class="fa-solid fa-triangle-exclamation"></i> Akses Ditolak: Buka Firebase Console -> Firestore -> Rules, lalu ubah 'allow read, write: if false;' menjadi 'if true;'</span>`;
+                            const lastUpdateText = document.getElementById('last-update-text');
+                            if (lastUpdateText) {
+                                lastUpdateText.innerHTML = `<span class="text-rose-500 font-bold text-sm"><i class="fa-solid fa-triangle-exclamation"></i> Akses Ditolak: Buka Firebase Console -> Firestore -> Rules, lalu ubah 'allow read, write: if false;' menjadi 'if true;'</span>`;
+                            }
                         }
                     });
                 }
             });
         } catch (error) {
             console.warn("Berjalan dalam mode Offline. Alasan: " + error.message);
-            document.getElementById('tabel-judul').innerText = "Tabel Data CSV (Mode Lokal)";
+            const tabelJudul = document.getElementById('tabel-judul');
+            if (tabelJudul) {
+                tabelJudul.innerText = "Tabel Data CSV (Mode Lokal)";
+            }
         }
         
         // --- FUNGSI UPLOAD ---
@@ -384,8 +407,11 @@
             if (!file) return;
 
             const btnLabel = document.getElementById('btn-sync-text');
-            const originalHTML = btnLabel.innerHTML;
-            btnLabel.innerHTML = 'Memproses...';
+            let originalHTML = 'Sync CSV';
+            if (btnLabel) {
+                originalHTML = btnLabel.innerHTML;
+                btnLabel.innerHTML = 'Memproses...';
+            }
 
             Papa.parse(file, {
                 header: true,
@@ -408,7 +434,6 @@
                             });
                             alert("✅ Sukses! Data CSV berhasil diunggah ke Database Cloud.");
                         } catch (error) {
-                            // PENANGANAN ERROR PERMISSIONS SAAT UPLOAD
                             if (error.message.includes("permissions")) {
                                 alert("❌ Gagal upload ke Cloud!\n\nAturan (Rules) Firestore Anda masih terkunci. \n\nSolusi: Buka Firebase Console -> Firestore Database -> tab 'Rules', lalu ubah tulisan 'allow read, write: if false;' menjadi 'allow read, write: if true;'.");
                             } else {
@@ -419,7 +444,7 @@
                         alert("Berhasil! (Tersimpan di Mode Lokal). Cek konfigurasi Rules dan Auth Firebase Anda agar cloud berjalan.");
                     }
 
-                    btnLabel.innerHTML = originalHTML; 
+                    if (btnLabel) btnLabel.innerHTML = originalHTML; 
                     event.target.value = ''; 
                 }
             });
@@ -447,14 +472,22 @@
             const totalFulfill = terFulfill + belumFulfill;
             soFulfillChart.data.datasets[0].data = [terFulfill, belumFulfill];
             soFulfillChart.update();
-            document.getElementById('text-ter-fulfill').innerText = `Ter-Fulfill (${totalFulfill > 0 ? Math.round((terFulfill / totalFulfill) * 100) : 0}%)`;
-            document.getElementById('text-belum-fulfill').innerText = `Belum Fulfill (${totalFulfill > 0 ? Math.round((belumFulfill / totalFulfill) * 100) : 0}%)`;
+            
+            const elTerFulfill = document.getElementById('text-ter-fulfill');
+            if (elTerFulfill) elTerFulfill.innerText = `Ter-Fulfill (${totalFulfill > 0 ? Math.round((terFulfill / totalFulfill) * 100) : 0}%)`;
+            
+            const elBelumFulfill = document.getElementById('text-belum-fulfill');
+            if (elBelumFulfill) elBelumFulfill.innerText = `Belum Fulfill (${totalFulfill > 0 ? Math.round((belumFulfill / totalFulfill) * 100) : 0}%)`;
 
             const totalOffering = sudahOffering + belumOffering;
             soOfferingChart.data.datasets[0].data = [sudahOffering, belumOffering];
             soOfferingChart.update();
-            document.getElementById('text-sudah-offering').innerText = `Sudah Offering (${totalOffering > 0 ? Math.round((sudahOffering / totalOffering) * 100) : 0}%)`;
-            document.getElementById('text-belum-offering').innerText = `Belum Offering (${totalOffering > 0 ? Math.round((belumOffering / totalOffering) * 100) : 0}%)`;
+            
+            const elSudahOffering = document.getElementById('text-sudah-offering');
+            if (elSudahOffering) elSudahOffering.innerText = `Sudah Offering (${totalOffering > 0 ? Math.round((sudahOffering / totalOffering) * 100) : 0}%)`;
+            
+            const elBelumOffering = document.getElementById('text-belum-offering');
+            if (elBelumOffering) elBelumOffering.innerText = `Belum Offering (${totalOffering > 0 ? Math.round((belumOffering / totalOffering) * 100) : 0}%)`;
         }
 
         function renderSOTable() {
@@ -464,13 +497,13 @@
             const rowCount = document.getElementById('total-row-count');
             const filterAssignRo = document.getElementById('filter-assign-ro');
             
-            if (!savedString) return;
+            if (!savedString || !tbody || !thead) return;
 
             try {
                 const data = JSON.parse(savedString);
                 if (!data || data.length === 0) return;
 
-                if(rowCount) rowCount.innerText = `${data.length} Baris`;
+                if (rowCount) rowCount.innerText = `${data.length} Baris`;
 
                 const allowedColumns = [
                     "SO INDUK", "SO PENAMBAH", "NAMA CLIENT", "NAMA AREA", "NAMA JOB", 
@@ -524,20 +557,28 @@
 
         // --- FILTER & UI ---
         function switchTab(tabId) {
-            document.getElementById('view-dashboard').classList.add('hidden');
-            document.getElementById('view-status-so').classList.add('hidden');
+            const viewDashboard = document.getElementById('view-dashboard');
+            const viewStatusSo = document.getElementById('view-status-so');
+            const navDashboard = document.getElementById('nav-dashboard');
+            const navStatusSo = document.getElementById('nav-status-so');
+            const headerTitle = document.getElementById('header-title');
+
+            if(viewDashboard) viewDashboard.classList.add('hidden');
+            if(viewStatusSo) viewStatusSo.classList.add('hidden');
+            
             const inactiveClass = "flex items-center gap-3 px-4 py-3 text-white/70 hover:bg-white/10 hover:text-white rounded-lg font-medium transition-all";
-            document.getElementById('nav-dashboard').className = inactiveClass;
-            document.getElementById('nav-status-so').className = inactiveClass;
+            if(navDashboard) navDashboard.className = inactiveClass;
+            if(navStatusSo) navStatusSo.className = inactiveClass;
+            
             const activeClass = "flex items-center gap-3 px-4 py-3 bg-white/20 text-white rounded-lg font-semibold transition-all shadow-sm";
             if (tabId === 'dashboard') {
-                document.getElementById('view-dashboard').classList.remove('hidden');
-                document.getElementById('nav-dashboard').className = activeClass;
-                document.getElementById('header-title').innerHTML = 'Overview <span class="text-sm font-light text-white/70 ml-2">| Monitoring Team Jakarta</span>';
+                if(viewDashboard) viewDashboard.classList.remove('hidden');
+                if(navDashboard) navDashboard.className = activeClass;
+                if(headerTitle) headerTitle.innerHTML = 'Overview <span class="text-sm font-light text-white/70 ml-2">| Monitoring Team Jakarta</span>';
             } else if (tabId === 'status-so') {
-                document.getElementById('view-status-so').classList.remove('hidden');
-                document.getElementById('nav-status-so').className = activeClass;
-                document.getElementById('header-title').innerHTML = 'Status SO Berjalan <span class="text-sm font-light text-white/70 ml-2">| Detail Data CSV</span>';
+                if(viewStatusSo) viewStatusSo.classList.remove('hidden');
+                if(navStatusSo) navStatusSo.className = activeClass;
+                if(headerTitle) headerTitle.innerHTML = 'Status SO Berjalan <span class="text-sm font-light text-white/70 ml-2">| Detail Data CSV</span>';
                 renderSOTable();
             }
         }
@@ -549,9 +590,17 @@
         }
 
         function applyFilters() {
-            const searchTerm = document.getElementById('search-csv').value.toLowerCase();
-            const filterRo = document.getElementById('filter-assign-ro').value;
-            const rows = document.getElementById('so-table-body').getElementsByTagName('tr');
+            const searchInput = document.getElementById('search-csv');
+            const filterInput = document.getElementById('filter-assign-ro');
+            const tbody = document.getElementById('so-table-body');
+            const rowCount = document.getElementById('total-row-count');
+            
+            if (!searchInput || !filterInput || !tbody) return;
+
+            const searchTerm = searchInput.value.toLowerCase();
+            const filterRo = filterInput.value;
+            const rows = tbody.getElementsByTagName('tr');
+            
             let visibleCount = 0;
             Array.from(rows).forEach(row => {
                 if (row.children.length === 1) return; 
@@ -559,6 +608,7 @@
                 const rowRo = row.getAttribute('data-assign-ro');
                 const matchSearch = text.includes(searchTerm);
                 const matchRo = filterRo === "" || rowRo === filterRo;
+                
                 if (matchSearch && matchRo) {
                     row.style.display = '';
                     visibleCount++;
@@ -566,14 +616,16 @@
                     row.style.display = 'none';
                 }
             });
-            const rowCount = document.getElementById('total-row-count');
+            
             if (rowCount) rowCount.innerText = `${visibleCount} Baris`;
         }
 
-        document.getElementById('search-csv').addEventListener('input', applyFilters);
-        document.getElementById('filter-assign-ro').addEventListener('change', applyFilters);
+        const searchEl = document.getElementById('search-csv');
+        if(searchEl) searchEl.addEventListener('input', applyFilters);
+        
+        const filterEl = document.getElementById('filter-assign-ro');
+        if(filterEl) filterEl.addEventListener('change', applyFilters);
 
     </script>
 </body>
 </html>
-        
