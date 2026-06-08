@@ -39,6 +39,14 @@
         .table-container::-webkit-scrollbar { width: 6px; height: 6px; }
         .table-container::-webkit-scrollbar-track { background: rgba(0,0,0,0.05); }
         .table-container::-webkit-scrollbar-thumb { background: rgba(0,0,0,0.2); border-radius: 10px; }
+
+        /* Animasi indikator cloud */
+        @keyframes pulse-green {
+            0% { box-shadow: 0 0 0 0 rgba(16, 185, 129, 0.7); }
+            70% { box-shadow: 0 0 0 6px rgba(16, 185, 129, 0); }
+            100% { box-shadow: 0 0 0 0 rgba(16, 185, 129, 0); }
+        }
+        .cloud-syncing { animation: pulse-green 2s infinite; }
     </style>
 </head>
 <body class="bg-gradient-to-br from-primary to-secondary h-screen overflow-hidden flex text-slate-800">
@@ -65,7 +73,6 @@
                     <i class="fa-regular fa-calendar-check w-5 text-center"></i>
                     Calendar of Event
                 </a>
-                <!-- Diubah menjadi interaktif untuk membuka tab Status SO -->
                 <a href="#" onclick="switchTab('status-so')" id="nav-status-so" class="flex items-center gap-3 px-4 py-3 text-white/70 hover:bg-white/10 hover:text-white rounded-lg font-medium transition-all">
                     <i class="fa-solid fa-clipboard-list w-5 text-center"></i>
                     Status SO Berjalan
@@ -105,6 +112,11 @@
             </div>
             
             <div class="flex items-center gap-6">
+                <!-- Status Cloud Indicator -->
+                <div id="cloud-status" class="hidden items-center gap-2 text-xs font-medium text-emerald-300 bg-emerald-900/40 px-3 py-1.5 rounded-full border border-emerald-500/30">
+                    <i class="fa-solid fa-cloud-check"></i> Cloud Terhubung
+                </div>
+
                 <button class="relative text-white/80 hover:text-white transition">
                     <i class="fa-regular fa-bell text-xl"></i>
                     <span class="absolute -top-1 -right-1 bg-red-500 text-white text-[10px] font-bold w-4 h-4 rounded-full flex items-center justify-center border-2 border-[#148e9e]">5</span>
@@ -140,13 +152,12 @@
                     <div class="bg-white p-6 rounded-2xl shadow-xl border-none hover:-translate-y-1 transition-transform duration-300 flex flex-col">
                         <div class="flex items-center justify-between mb-2">
                             <h3 class="font-bold text-slate-800">Status SO (Fulfillment)</h3>
-                            <!-- Tombol Upload CSV Khusus Daffa -->
-                            <label id="syncCsvLabel" style="display: none;" class="cursor-pointer bg-slate-50 hover:bg-primary hover:text-white text-slate-600 text-xs px-3 py-1.5 rounded-lg border border-slate-200 hover:border-primary transition-all items-center gap-2 shadow-sm">
-                                <i class="fa-solid fa-cloud-arrow-up"></i> Sync CSV
+                            <!-- Tombol Upload CSV -->
+                            <label id="syncCsvLabel" style="display: none;" class="cursor-pointer bg-slate-50 hover:bg-emerald-50 text-slate-600 hover:text-emerald-600 text-xs px-3 py-1.5 rounded-lg border border-slate-200 hover:border-emerald-300 transition-all items-center gap-2 shadow-sm group">
+                                <i class="fa-solid fa-cloud-arrow-up group-hover:-translate-y-0.5 transition-transform text-emerald-500"></i> Sync Cloud CSV
                                 <input type="file" id="csvFileInput" accept=".csv" class="hidden" onchange="handleFileUpload(event)">
                             </label>
                         </div>
-                        <!-- Diperkecil menjadi h-36 dan justify-center -->
                         <div class="relative h-36 w-full flex items-center justify-center flex-1 my-2">
                             <canvas id="soFulfillChart"></canvas>
                         </div>
@@ -161,7 +172,6 @@
                             <h3 class="font-bold text-slate-800">Status SO (Offering)</h3>
                             <div class="p-2 bg-slate-50 rounded-lg text-slate-400"><i class="fa-solid fa-handshake"></i></div>
                         </div>
-                        <!-- Diperkecil menjadi h-36 dan justify-center -->
                         <div class="relative h-36 w-full flex items-center justify-center flex-1 my-2">
                             <canvas id="soOfferingChart"></canvas>
                         </div>
@@ -173,97 +183,7 @@
 
                 </div>
 
-                <!-- Buffer Kandidat (GForm) Table -->
-                <div class="bg-white rounded-2xl shadow-xl border-none overflow-hidden mb-8">
-                    <div class="p-6 border-b border-slate-100 flex flex-col md:flex-row md:items-center justify-between gap-4">
-                        <div>
-                            <h3 class="font-bold text-slate-800 text-lg">Buffer Kandidat (GForm All REVO)</h3>
-                            <p class="text-xs text-slate-500 mt-1">Data pelamar baru yang siap di-follow up. Silakan klik "Ambil Alih" untuk memproses.</p>
-                        </div>
-                        <div class="relative">
-                            <i class="fa-solid fa-search absolute left-3 top-1/2 transform -translate-y-1/2 text-slate-400 text-sm"></i>
-                            <input type="text" placeholder="Cari kandidat/klien..." class="pl-9 pr-4 py-2 bg-slate-50 border border-slate-200 rounded-lg text-sm text-slate-700 focus:ring-2 focus:ring-primary focus:outline-none w-full md:w-64 transition-all">
-                        </div>
-                    </div>
-                    <div class="overflow-x-auto">
-                        <table class="w-full text-left border-collapse">
-                            <thead>
-                                <tr class="bg-slate-50/80 text-slate-500 text-xs uppercase tracking-wider">
-                                    <th class="p-4 font-semibold">Nama Kandidat</th>
-                                    <th class="p-4 font-semibold">Penempatan (Klien - Cabang)</th>
-                                    <th class="p-4 font-semibold">Status Kandidat</th>
-                                    <th class="p-4 font-semibold">REVO Flagging (PIC)</th>
-                                    <th class="p-4 font-semibold text-center">Action</th>
-                                </tr>
-                            </thead>
-                            <tbody class="text-sm divide-y divide-slate-100">
-                                <tr class="hover:bg-slate-50 transition-colors">
-                                    <td class="p-4 font-medium text-slate-800">Raditya Dika</td>
-                                    <td class="p-4">
-                                        <p class="text-slate-700 font-medium">PT. FIF Group</p>
-                                        <p class="text-slate-500 text-xs">Cabang: Jakarta Pusat</p>
-                                    </td>
-                                    <td class="p-4">
-                                        <span class="bg-blue-50 text-blue-600 border border-blue-200 text-xs px-2.5 py-1 rounded-md font-medium">Review CV</span>
-                                    </td>
-                                    <td class="p-4" id="revo-flag-1">
-                                        <span class="text-slate-400 italic text-xs">Belum ada PIC</span>
-                                    </td>
-                                    <td class="p-4 text-center">
-                                        <button onclick="flagOfficer('revo-flag-1')" class="text-xs bg-white hover:bg-primary hover:text-white text-primary px-4 py-2 rounded-lg transition-colors font-semibold border border-primary/30 hover:border-primary shadow-sm flex items-center justify-center mx-auto gap-2">
-                                            <i class="fa-solid fa-flag"></i> Ambil
-                                        </button>
-                                    </td>
-                                </tr>
-                                
-                                <tr class="hover:bg-slate-50 transition-colors">
-                                    <td class="p-4 font-medium text-slate-800">Chelsea Islan</td>
-                                    <td class="p-4">
-                                        <p class="text-slate-700 font-medium">Adira Finance</p>
-                                        <p class="text-slate-500 text-xs">Cabang: Kelapa Gading</p>
-                                    </td>
-                                    <td class="p-4">
-                                        <span class="bg-purple-50 text-purple-600 border border-purple-200 text-xs px-2.5 py-1 rounded-md font-medium">Interview User</span>
-                                    </td>
-                                    <td class="p-4" id="revo-flag-2">
-                                        <div class="flex items-center gap-3">
-                                            <div class="relative">
-                                                <img src="https://ui-avatars.com/api/?name=Ali&background=148e9e&color=fff" class="w-8 h-8 rounded-full shadow-sm">
-                                            </div>
-                                            <span class="font-medium text-slate-700">Ali <span class="text-xs font-normal text-slate-400 block">REVO FIF JKT</span></span>
-                                        </div>
-                                    </td>
-                                    <td class="p-4 text-center">
-                                        <button onclick="flagOfficer('revo-flag-2')" class="text-xs bg-slate-100 hover:bg-slate-200 text-slate-600 px-4 py-2 rounded-lg transition-colors font-medium border border-slate-200 flex items-center justify-center mx-auto gap-2">
-                                            <i class="fa-solid fa-rotate"></i> Override
-                                        </button>
-                                    </td>
-                                </tr>
-
-                                <tr class="hover:bg-slate-50 transition-colors">
-                                    <td class="p-4 font-medium text-slate-800">Nicholas Saputra</td>
-                                    <td class="p-4">
-                                        <p class="text-slate-700 font-medium">Multifinance Mandiri</p>
-                                        <p class="text-slate-500 text-xs">Cabang: Taman Palem</p>
-                                    </td>
-                                    <td class="p-4">
-                                        <span class="bg-amber-50 text-amber-600 border border-amber-200 text-xs px-2.5 py-1 rounded-md font-medium">Psikotes</span>
-                                    </td>
-                                    <td class="p-4" id="revo-flag-3">
-                                        <span class="text-slate-400 italic text-xs">Belum ada PIC</span>
-                                    </td>
-                                    <td class="p-4 text-center">
-                                        <button onclick="flagOfficer('revo-flag-3')" class="text-xs bg-white hover:bg-primary hover:text-white text-primary px-4 py-2 rounded-lg transition-colors font-semibold border border-primary/30 hover:border-primary shadow-sm flex items-center justify-center mx-auto gap-2">
-                                            <i class="fa-solid fa-flag"></i> Ambil
-                                        </button>
-                                    </td>
-                                </tr>
-                            </tbody>
-                        </table>
-                    </div>
-                </div>
-
-                <!-- Sourcing Partner Table -->
+                <!-- Sourcing Partner Table (Dipendekkan demi fokus ke fitur baru) -->
                 <div class="bg-white rounded-2xl shadow-xl border-none overflow-hidden mb-8">
                     <div class="p-6 border-b border-slate-100">
                         <h3 class="font-bold text-slate-800 text-lg">Daftar Sourcing Partner Aktif</h3>
@@ -276,42 +196,13 @@
                                     <th class="p-4 font-semibold">Nama Mitra / Instansi</th>
                                     <th class="p-4 font-semibold">PIC Sourcing</th>
                                     <th class="p-4 font-semibold">Kontak (WhatsApp)</th>
-                                    <th class="p-4 font-semibold">Kategori</th>
                                 </tr>
                             </thead>
                             <tbody class="text-sm divide-y divide-slate-100">
                                 <tr class="hover:bg-slate-50 transition-colors">
-                                    <td class="p-4 font-medium text-slate-800 flex items-center gap-3">
-                                        <div class="w-8 h-8 rounded bg-teal-50 text-teal-600 flex items-center justify-center"><i class="fa-solid fa-school"></i></div>
-                                        BKK SMKN 1 Jakarta
-                                    </td>
+                                    <td class="p-4 font-medium text-slate-800">BKK SMKN 1 Jakarta</td>
                                     <td class="p-4 text-slate-600">Bpk. Haryanto</td>
-                                    <td class="p-4">
-                                        <a href="#" class="text-primary hover:underline font-medium flex items-center gap-1.5"><i class="fa-brands fa-whatsapp text-emerald-500"></i> 0812-3456-7890</a>
-                                    </td>
-                                    <td class="p-4"><span class="bg-slate-100 text-slate-600 text-xs px-2.5 py-1 rounded font-medium">Sekolah/Kampus</span></td>
-                                </tr>
-                                <tr class="hover:bg-slate-50 transition-colors">
-                                    <td class="p-4 font-medium text-slate-800 flex items-center gap-3">
-                                        <div class="w-8 h-8 rounded bg-blue-50 text-blue-600 flex items-center justify-center"><i class="fa-solid fa-users-viewfinder"></i></div>
-                                        Komunitas Sales JABODETABEK
-                                    </td>
-                                    <td class="p-4 text-slate-600">Ibu Dian Sastro</td>
-                                    <td class="p-4">
-                                        <a href="#" class="text-primary hover:underline font-medium flex items-center gap-1.5"><i class="fa-brands fa-whatsapp text-emerald-500"></i> 0857-9988-7766</a>
-                                    </td>
-                                    <td class="p-4"><span class="bg-slate-100 text-slate-600 text-xs px-2.5 py-1 rounded font-medium">Komunitas</span></td>
-                                </tr>
-                                <tr class="hover:bg-slate-50 transition-colors">
-                                    <td class="p-4 font-medium text-slate-800 flex items-center gap-3">
-                                        <div class="w-8 h-8 rounded bg-orange-50 text-orange-600 flex items-center justify-center"><i class="fa-solid fa-building-ngo"></i></div>
-                                        Disnaker Jakarta Selatan
-                                    </td>
-                                    <td class="p-4 text-slate-600">Ibu Sri Wahyuni</td>
-                                    <td class="p-4">
-                                        <a href="#" class="text-primary hover:underline font-medium flex items-center gap-1.5"><i class="fa-solid fa-phone text-slate-400"></i> (021) 7654321</a>
-                                    </td>
-                                    <td class="p-4"><span class="bg-slate-100 text-slate-600 text-xs px-2.5 py-1 rounded font-medium">Pemerintah</span></td>
+                                    <td class="p-4 text-primary font-medium">0812-3456-7890</td>
                                 </tr>
                             </tbody>
                         </table>
@@ -326,28 +217,27 @@
                 <div class="mb-6 text-white flex items-center justify-between">
                     <div>
                         <h2 class="text-2xl lg:text-3xl font-bold mb-1 tracking-tight">Detail Status SO 📄</h2>
-                        <p class="text-white/80 max-w-2xl text-sm md:text-base font-light">Tabel di bawah memuat rincian data mentah yang tersinkronisasi dari file CSV terakhir Anda.</p>
+                        <p class="text-white/80 max-w-2xl text-sm md:text-base font-light">Tabel di bawah memuat rincian data tersinkronisasi dari <span class="font-semibold text-emerald-200">Cloud Storage</span>.</p>
                     </div>
                     <button onclick="switchTab('dashboard')" class="bg-white/20 hover:bg-white/30 text-white px-4 py-2 rounded-lg text-sm font-medium transition-all flex items-center gap-2">
-                        <i class="fa-solid fa-arrow-left"></i> Kembali ke Overview
+                        <i class="fa-solid fa-arrow-left"></i> Kembali
                     </button>
                 </div>
                 
                 <div class="bg-white rounded-2xl shadow-xl border-none overflow-hidden flex flex-col mb-8">
                     <div class="p-6 border-b border-slate-100 flex flex-col md:flex-row md:items-center justify-between gap-4">
                         <div>
-                            <h3 class="font-bold text-slate-800 text-lg">Tabel Data CSV</h3>
-                            <p class="text-xs text-slate-500 mt-1">Kolom akan otomatis menyesuaikan dengan data Excel/CSV yang diupload.</p>
+                            <h3 class="font-bold text-slate-800 text-lg">Tabel Data CSV (Cloud)</h3>
+                            <p class="text-xs text-slate-500 mt-1" id="last-update-text">Menunggu pembaruan data...</p>
                         </div>
                         <div class="flex items-center gap-3">
-                             <!-- Tambahan Filter ASSIGN RO -->
                              <div class="relative hidden md:block">
                                 <i class="fa-solid fa-filter absolute left-3 top-1/2 transform -translate-y-1/2 text-slate-400 text-sm"></i>
                                 <select id="filter-assign-ro" class="pl-9 pr-8 py-2 bg-slate-50 border border-slate-200 rounded-lg text-sm text-slate-700 focus:ring-2 focus:ring-primary focus:outline-none w-full transition-all appearance-none cursor-pointer">
                                     <option value="">Semua ASSIGN RO</option>
                                 </select>
                                 <i class="fa-solid fa-chevron-down absolute right-3 top-1/2 transform -translate-y-1/2 text-slate-400 text-xs pointer-events-none"></i>
-                            </div>
+                            </div>a
                              <div class="relative">
                                 <i class="fa-solid fa-search absolute left-3 top-1/2 transform -translate-y-1/2 text-slate-400 text-sm"></i>
                                 <input type="text" id="search-csv" placeholder="Cari data..." class="pl-9 pr-4 py-2 bg-slate-50 border border-slate-200 rounded-lg text-sm text-slate-700 focus:ring-2 focus:ring-primary focus:outline-none w-full md:w-64 transition-all">
@@ -355,15 +245,10 @@
                             <span class="text-xs bg-[#148e9e]/10 text-[#148e9e] border border-[#148e9e]/20 px-3 py-2 rounded-lg font-bold" id="total-row-count">0 Baris</span>
                         </div>
                     </div>
-                    <!-- Area Scroll untuk Tabel Besar -->
                     <div class="table-container overflow-x-auto overflow-y-auto max-h-[60vh] bg-slate-50/30">
                         <table class="w-full text-left border-collapse min-w-max">
-                            <thead id="so-table-head" class="sticky top-0 bg-white shadow-[0_1px_2px_rgba(0,0,0,0.05)] z-10">
-                                <!-- Head Generated via JS -->
-                            </thead>
-                            <tbody id="so-table-body" class="text-sm divide-y divide-slate-100 bg-white">
-                                <!-- Body Generated via JS -->
-                            </tbody>
+                            <thead id="so-table-head" class="sticky top-0 bg-white shadow-[0_1px_2px_rgba(0,0,0,0.05)] z-10"></thead>
+                            <tbody id="so-table-body" class="text-sm divide-y divide-slate-100 bg-white"></tbody>
                         </table>
                     </div>
                 </div>
@@ -372,172 +257,191 @@
         </main>
     </div>
 
-    <script>
-        // INIT DASHBOARD LOGIN DATA
-        let activeUser = null;
-        
-        function initDashboard() {
-            const userString = localStorage.getItem('currentUser');
-            if (!userString) {
-                console.log("Tidak ada sesi login ditemukan. Menggunakan akun default.");
-                activeUser = { name: 'Anya', role: 'Regional Manager' };
-            } else {
-                activeUser = JSON.parse(userString);
-            }
+    <!-- ======================================================= -->
+    <!-- FIREBASE & JAVASCRIPT LOGIC (ES MODULE) -->
+    <!-- ======================================================= -->
+    <script type="module">
+        // Import Firebase dari CDN resmi
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-app.js";
+        import { getAuth, signInAnonymously, signInWithCustomToken, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
+        import { getFirestore, doc, setDoc, onSnapshot } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
 
-            document.getElementById('profile-name').textContent = activeUser.name;
-            document.getElementById('profile-role').textContent = activeUser.role;
-            document.getElementById('profile-avatar').src = `https://ui-avatars.com/api/?name=${activeUser.name.replace(' ', '+')}&background=148e9e&color=fff`;
-            
-            const hour = new Date().getHours();
-            let greeting = "Good Evening";
-            if (hour < 12) greeting = "Good Morning";
-            else if (hour < 18) greeting = "Good Afternoon";
-            
-            document.getElementById('welcome-greeting').innerHTML = `${greeting}, ${activeUser.name}! ✨`;
+        // Mendaftarkan fungsi agar bisa dipanggil oleh tombol di HTML
+        window.switchTab = switchTab;
+        window.handleLogout = handleLogout;
+        window.handleFileUpload = handleFileUpload;
 
-            // Logic untuk menampilkan tombol Sync CSV HANYA jika yang login adalah Daffa
-            const syncBtn = document.getElementById('syncCsvLabel');
-            if (activeUser.name.toLowerCase() === 'daffa') {
-                syncBtn.style.display = 'flex'; // Munculkan tombol
-            } else {
-                syncBtn.style.display = 'none'; // Sembunyikan tombol
-            }
-        }
-
-        // ==========================================
-        // FUNGSI TAB SWITCHER (SINGLE PAGE APP)
-        // ==========================================
-        function switchTab(tabId) {
-            const viewDashboard = document.getElementById('view-dashboard');
-            const viewStatusSo = document.getElementById('view-status-so');
-            const navDashboard = document.getElementById('nav-dashboard');
-            const navStatusSo = document.getElementById('nav-status-so');
-            const headerTitle = document.getElementById('header-title');
-
-            // Reset semua tampilan
-            viewDashboard.classList.add('hidden');
-            viewStatusSo.classList.add('hidden');
-            
-            // Reset styling sidebar nav
-            const inactiveNavClass = "flex items-center gap-3 px-4 py-3 text-white/70 hover:bg-white/10 hover:text-white rounded-lg font-medium transition-all";
-            navDashboard.className = inactiveNavClass;
-            navStatusSo.className = inactiveNavClass;
-
-            // Aktifkan tampilan yang dipilih
-            const activeNavClass = "flex items-center gap-3 px-4 py-3 bg-white/20 text-white rounded-lg font-semibold transition-all shadow-sm";
-            
-            if (tabId === 'dashboard') {
-                viewDashboard.classList.remove('hidden');
-                navDashboard.className = activeNavClass;
-                headerTitle.innerHTML = 'Overview <span class="text-sm font-light text-white/70 ml-2">| Monitoring Team Jakarta</span>';
-            } 
-            else if (tabId === 'status-so') {
-                viewStatusSo.classList.remove('hidden');
-                navStatusSo.className = activeNavClass;
-                headerTitle.innerHTML = 'Status SO Berjalan <span class="text-sm font-light text-white/70 ml-2">| Detail Data CSV</span>';
-                
-                // Segarkan tabel sesaat setelah tab dibuka
-                renderSOTable();
-            }
-        }
-
-        // FUNGSI FLAG OFFICER REVO
-        function flagOfficer(targetCellId) {
-            const cell = document.getElementById(targetCellId);
-            
-            cell.innerHTML = `
-                <div class="flex items-center gap-3">
-                    <div class="relative">
-                        <img src="https://ui-avatars.com/api/?name=${activeUser.name.replace(' ', '+')}&background=148e9e&color=fff" class="w-8 h-8 rounded-full ring-2 ring-white shadow-sm">
-                        <span class="absolute -bottom-1 -right-1 flex h-3 w-3">
-                            <span class="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-75"></span>
-                            <span class="relative inline-flex rounded-full h-3 w-3 bg-emerald-500 border border-white"></span>
-                        </span>
-                    </div>
-                    <span class="font-medium text-slate-700">
-                        ${activeUser.name} 
-                        <span class="text-xs font-semibold text-[#148e9e] block mt-0.5">Assigned to you</span>
-                    </span>
-                </div>
-            `;
-        }
-
-        // FUNGSI LOGOUT
-        function handleLogout() {
-            localStorage.removeItem('currentUser');
-            try {
-                window.location.href = 'login.html';
-            } catch (error) {
-                console.warn("Redirect di-skip untuk lingkungan preview.", error);
-                alert("Berhasil Sign Out! (Ini adalah simulasi preview. Di GitHub kamu, layar akan pindah ke halaman login).");
-            }
-        }
-
-        initDashboard();
-
-        // CHART SETUP
+        // Inisialisasi Chart.js
         Chart.defaults.font.family = "'Inter', sans-serif";
         Chart.defaults.color = '#64748b'; 
-
         const ctxFulfill = document.getElementById('soFulfillChart').getContext('2d');
         const soFulfillChart = new Chart(ctxFulfill, {
             type: 'doughnut',
-            data: {
-                labels: ['Ter-Fulfill', 'Belum Fulfill'],
-                datasets: [{ data: [1, 1], backgroundColor: ['#148e9e', '#f43f5e'], borderWidth: 0, hoverOffset: 4 }]
-            },
+            data: { labels: ['Ter-Fulfill', 'Belum Fulfill'], datasets: [{ data: [1, 1], backgroundColor: ['#148e9e', '#f43f5e'], borderWidth: 0, hoverOffset: 4 }] },
             options: { responsive: true, maintainAspectRatio: false, cutout: '70%', plugins: { legend: { display: false } } }
         });
 
         const ctxOffering = document.getElementById('soOfferingChart').getContext('2d');
         const soOfferingChart = new Chart(ctxOffering, {
             type: 'doughnut',
-            data: {
-                labels: ['Sudah Offering', 'Belum Offering'],
-                datasets: [{ data: [1, 1], backgroundColor: ['#10b981', '#fbbf24'], borderWidth: 0, hoverOffset: 4 }]
-            },
+            data: { labels: ['Sudah Offering', 'Belum Offering'], datasets: [{ data: [1, 1], backgroundColor: ['#10b981', '#fbbf24'], borderWidth: 0, hoverOffset: 4 }] },
             options: { responsive: true, maintainAspectRatio: false, cutout: '70%', plugins: { legend: { display: false } } }
         });
 
-        // ==========================================
-        // FUNGSI UPLOAD & PARSING CSV LOKAL
-        // ==========================================
-        function handleFileUpload(event) {
+
+        // --- 1. SETUP DASHBOARD USER LOKAL ---
+        let activeUser = null;
+        function initDashboard() {
+            const userString = localStorage.getItem('currentUser');
+            activeUser = userString ? JSON.parse(userString) : { name: 'Daffa', role: 'Monitoring Staff' };
+
+            document.getElementById('profile-name').textContent = activeUser.name;
+            document.getElementById('profile-role').textContent = activeUser.role;
+            document.getElementById('profile-avatar').src = `https://ui-avatars.com/api/?name=${activeUser.name.replace(' ', '+')}&background=148e9e&color=fff`;
+            
+            const hour = new Date().getHours();
+            let greeting = hour < 12 ? "Good Morning" : hour < 18 ? "Good Afternoon" : "Good Evening";
+            document.getElementById('welcome-greeting').innerHTML = `${greeting}, ${activeUser.name}! ✨`;
+
+            // Tampilkan tombol upload cloud HANYA untuk Daffa
+            const syncBtn = document.getElementById('syncCsvLabel');
+            syncBtn.style.display = (activeUser.name.toLowerCase() === 'daffa') ? 'flex' : 'none';
+        }
+        initDashboard();
+
+        // --- 2. KONFIGURASI FIREBASE CLOUD ---
+        let db, auth, firebaseUser = null;
+        const appId = typeof __app_id !== 'undefined' ? __app_id : 'simgroup-dashboard-app';
+        
+        try {
+            // Mengambil konfigurasi dari lingkungan (tersedia otomatis di preview)
+            const firebaseConfig = typeof __firebase_config !== 'undefined' ? JSON.parse(__firebase_config) : {};
+            const app = initializeApp(firebaseConfig);
+            auth = getAuth(app);
+            db = getFirestore(app);
+
+            // Inisiasi Login Firebase secara tak terlihat
+            const initAuth = async () => {
+                if (typeof __initial_auth_token !== 'undefined' && __initial_auth_token) {
+                    await signInWithCustomToken(auth, __initial_auth_token);
+                } else {
+                    await signInAnonymously(auth);
+                }
+            };
+            initAuth();
+
+            // Mendengarkan status user dan mengambil data otomatis dari Cloud
+            onAuthStateChanged(auth, (user) => {
+                firebaseUser = user;
+                if (user) {
+                    document.getElementById('cloud-status').classList.remove('hidden');
+                    document.getElementById('cloud-status').classList.add('flex', 'cloud-syncing');
+
+                    // MENDENGARKAN PERUBAHAN DATA SECARA REAL-TIME DARI CLOUD!
+                    const docRef = doc(db, 'artifacts', appId, 'public', 'data', 'csv_uploads', 'latest');
+                    
+                    onSnapshot(docRef, (snapshot) => {
+                        if (snapshot.exists()) {
+                            const cloudData = snapshot.data();
+                            try {
+                                const parsedData = JSON.parse(cloudData.payload);
+                                
+                                // Simpan ke local storage juga agar load awal selalu cepat
+                                localStorage.setItem('savedDashboardData', cloudData.payload);
+                                
+                                // Update UI
+                                updateChartsWithData(parsedData);
+                                renderSOTable();
+
+                                // Update keterangan waktu upload
+                                const date = new Date(cloudData.updatedAt);
+                                document.getElementById('last-update-text').innerHTML = `Terakhir di-sync oleh <b>${cloudData.uploader}</b> pada ${date.toLocaleString('id-ID')}`;
+                            } catch(e) {
+                                console.error("Gagal mem-parsing data dari cloud:", e);
+                            }
+                        }
+                    }, (error) => {
+                        console.error("Gagal menarik data live:", error);
+                    });
+                }
+            });
+        } catch (error) {
+            console.warn("Firebase tidak terkonfigurasi. Berjalan dalam mode offline/lokal.");
+        }
+
+
+        // --- 3. FUNGSI UPLOAD KE CLOUD ---
+        async function handleFileUpload(event) {
             const file = event.target.files[0];
             if (!file) return;
+
+            // Efek loading di tombol
+            const btnLabel = document.getElementById('syncCsvLabel');
+            const originalHTML = btnLabel.innerHTML;
+            btnLabel.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i> Mengunggah ke Cloud...';
 
             Papa.parse(file, {
                 header: true,
                 skipEmptyLines: true,
-                complete: function(results) {
+                complete: async function(results) {
                     const data = results.data;
+                    const stringData = JSON.stringify(data);
                     
-                    // Simpan Ke Local Storage
-                    localStorage.setItem('savedDashboardData', JSON.stringify(data));
-                    
-                    // Update Chart & Tabel (meski sedang tersembunyi)
+                    // Simpan Lokal Terlebih Dahulu (Offline backup)
+                    localStorage.setItem('savedDashboardData', stringData);
                     updateChartsWithData(data);
                     renderSOTable();
-                    
-                    alert("✨ Data CSV berhasil di-sync! Grafik dan Tabel Detail telah diperbarui.");
+
+                    // Simpan ke CLOUD agar device lain bisa melihat!
+                    if (firebaseUser && db) {
+                        try {
+                            const docRef = doc(db, 'artifacts', appId, 'public', 'data', 'csv_uploads', 'latest');
+                            await setDoc(docRef, {
+                                uploader: activeUser.name,
+                                updatedAt: new Date().toISOString(),
+                                payload: stringData // Menyimpan seluruh isi CSV sebagai String ke Cloud
+                            });
+                            
+                            // Beri notifikasi custom bergaya modern
+                            const modal = document.createElement('div');
+                            modal.className = "fixed inset-0 z-50 flex items-center justify-center bg-black/50 backdrop-blur-sm animate-fade-in";
+                            modal.innerHTML = `
+                                <div class="bg-white p-6 rounded-2xl shadow-2xl max-w-sm text-center transform scale-100 transition-all">
+                                    <div class="w-16 h-16 bg-emerald-100 text-emerald-500 rounded-full flex items-center justify-center mx-auto mb-4 text-3xl">
+                                        <i class="fa-solid fa-cloud-arrow-up"></i>
+                                    </div>
+                                    <h3 class="text-xl font-bold text-slate-800 mb-2">Sinkronisasi Cloud Berhasil!</h3>
+                                    <p class="text-sm text-slate-500 mb-6">Data CSV berhasil disimpan secara online. Semua tim yang membuka dashboard sekarang akan melihat data yang sama.</p>
+                                    <button onclick="this.parentElement.parentElement.remove()" class="w-full bg-emerald-500 hover:bg-emerald-600 text-white font-semibold py-2 rounded-xl transition-colors">Tutup</button>
+                                </div>
+                            `;
+                            document.body.appendChild(modal);
+
+                        } catch (error) {
+                            console.error("Gagal simpan ke cloud:", error);
+                            alert("Data tersimpan di perangkat lokal, tapi gagal dikirim ke Cloud. Pastikan ukuran CSV tidak terlalu besar.");
+                        }
+                    } else {
+                        alert("Disimpan ke Lokal. Menunggu koneksi database...");
+                    }
+
+                    btnLabel.innerHTML = originalHTML; // Kembalikan tombol
                     event.target.value = ''; 
                 },
                 error: function(err) {
                     console.error("Gagal membaca file CSV:", err);
-                    alert("Oops, ada masalah saat membaca file CSV.");
+                    alert("Oops, format CSV ada yang salah.");
+                    btnLabel.innerHTML = originalHTML;
                 }
             });
         }
 
+        // --- 4. RENDER DATA (GRAFIK & TABEL) ---
         function updateChartsWithData(data) {
-            let terFulfill = 0, belumFulfill = 0;
-            let sudahOffering = 0, belumOffering = 0;
+            let terFulfill = 0, belumFulfill = 0, sudahOffering = 0, belumOffering = 0;
 
             data.forEach(row => {
                 const rowKeys = Object.keys(row);
-                
-                // Cari key dengan mengabaikan kapitalisasi dan spasi
                 const finishKey = rowKeys.find(k => k.trim().toLowerCase() === 'finish');
                 const unfulfillKey = rowKeys.find(k => k.trim().toLowerCase() === 'unfulfill');
                 const offeringKey = rowKeys.find(k => k.trim().toLowerCase() === 'offering');
@@ -546,12 +450,9 @@
                 const unfulfill = unfulfillKey ? (parseInt(row[unfulfillKey]) || 0) : 0;
                 const offering = offeringKey ? (parseInt(row[offeringKey]) || 0) : 0;
 
-                terFulfill += finish;
-                belumFulfill += unfulfill;
-
+                terFulfill += finish; belumFulfill += unfulfill;
                 if (finish === 1 || unfulfill === 1) {
-                    if (offering > 0) sudahOffering++;
-                    else belumOffering++;
+                    if (offering > 0) sudahOffering++; else belumOffering++;
                 }
             });
 
@@ -568,9 +469,6 @@
             document.getElementById('text-belum-offering').innerText = `Belum Offering (${totalOffering > 0 ? Math.round((belumOffering / totalOffering) * 100) : 0}%)`;
         }
 
-        // ==========================================
-        // FUNGSI RENDER TABEL DINAMIS DARI CSV
-        // ==========================================
         function renderSOTable() {
             const savedString = localStorage.getItem('savedDashboardData');
             const tbody = document.getElementById('so-table-body');
@@ -578,13 +476,7 @@
             const rowCount = document.getElementById('total-row-count');
             const filterAssignRo = document.getElementById('filter-assign-ro');
             
-            if (!savedString) {
-                tbody.innerHTML = '<tr><td colspan="100%" class="p-8 text-center text-slate-400 italic bg-slate-50/50">Belum ada data CSV yang di-sync. Silakan upload CSV di halaman Overview.</td></tr>';
-                thead.innerHTML = '';
-                if(rowCount) rowCount.innerText = '0 Baris';
-                if(filterAssignRo) filterAssignRo.innerHTML = '<option value="">Semua ASSIGN RO</option>';
-                return;
-            }
+            if (!savedString) return;
 
             try {
                 const data = JSON.parse(savedString);
@@ -592,7 +484,6 @@
 
                 if(rowCount) rowCount.innerText = `${data.length} Baris`;
 
-                // Tentukan kolom mana saja yang ingin ditampilkan berdasarkan permintaan
                 const allowedColumns = [
                     "SO INDUK", "SO PENAMBAH", "NAMA CLIENT", "NAMA AREA", "NAMA JOB", 
                     "TGL APPROVE", "ASSIGN RO", "AGING-SS", "SLA LT OFFERING", 
@@ -600,93 +491,85 @@
                     "TANGGAL INVALID - PENDING", "TASK ID", "RO LINE", "AGING UNFULFILL", 
                     "PARTICIPATE", "KATEGORI FULFILLMENT"
                 ];
-                
                 const assignRoSet = new Set();
                 
-                // --- Buat Header Tabel (thead) ---
-                let headHTML = '<tr class="text-slate-500 text-xs uppercase tracking-wider">';
-                headHTML += '<th class="p-4 font-semibold whitespace-nowrap border-b border-slate-200">No</th>';
-                allowedColumns.forEach(key => {
-                    headHTML += `<th class="p-4 font-semibold whitespace-nowrap border-b border-slate-200">${key}</th>`;
-                });
+                let headHTML = '<tr class="text-slate-500 text-xs uppercase tracking-wider"><th class="p-4 font-semibold whitespace-nowrap border-b border-slate-200">No</th>';
+                allowedColumns.forEach(key => { headHTML += `<th class="p-4 font-semibold whitespace-nowrap border-b border-slate-200">${key}</th>`; });
                 headHTML += '</tr>';
                 thead.innerHTML = headHTML;
 
-                // --- Buat Isi Tabel (tbody) ---
                 let bodyHTML = '';
                 data.forEach((row, index) => {
                     const rowKeys = Object.keys(row);
-
-                    // Cari key ASSIGN RO dengan mengabaikan spasi/huruf besar-kecil
                     const assignRoKey = rowKeys.find(k => k.trim().toUpperCase() === "ASSIGN RO");
                     const roValue = (assignRoKey && row[assignRoKey]) ? String(row[assignRoKey]).trim() : '';
                     if (roValue) assignRoSet.add(roValue);
 
-                    // Sisipkan nilai ASSIGN RO ke dalam dataset untuk memudahkan filter via javascript
                     bodyHTML += `<tr class="hover:bg-slate-50/80 transition-colors border-b border-slate-100 group" data-assign-ro="${roValue}">`;
                     bodyHTML += `<td class="p-4 text-slate-500 font-medium">${index + 1}</td>`;
-                    
                     allowedColumns.forEach(key => {
-                        // Cari kecocokan nama kolom (kebal spasi tersembunyi dan huruf besar/kecil)
                         const matchedKey = rowKeys.find(k => k.trim().toUpperCase() === key.toUpperCase());
-                        
-                        const cellData = (matchedKey && row[matchedKey] !== undefined && row[matchedKey] !== null && row[matchedKey] !== '') ? row[matchedKey] : '-';
+                        const cellData = (matchedKey && row[matchedKey]) ? row[matchedKey] : '-';
                         bodyHTML += `<td class="p-4 text-slate-700 whitespace-nowrap group-hover:text-slate-900">${cellData}</td>`;
                     });
-                    
                     bodyHTML += '</tr>';
                 });
                 tbody.innerHTML = bodyHTML;
 
-                // --- Isi Dropdown Filter ASSIGN RO ---
                 if (filterAssignRo) {
                     filterAssignRo.innerHTML = '<option value="">Semua ASSIGN RO</option>';
-                    Array.from(assignRoSet).sort().forEach(ro => {
-                        filterAssignRo.innerHTML += `<option value="${ro}">${ro}</option>`;
-                    });
+                    Array.from(assignRoSet).sort().forEach(ro => { filterAssignRo.innerHTML += `<option value="${ro}">${ro}</option>`; });
                 }
+            } catch (error) { console.error(error); }
+        }
 
-            } catch (error) {
-                console.error("Gagal merender tabel:", error);
+        // Jalankan render lokal segera untuk kecepatan
+        const savedString = localStorage.getItem('savedDashboardData');
+        if (savedString) {
+            try {
+                const parsedData = JSON.parse(savedString);
+                updateChartsWithData(parsedData);
+                renderSOTable();
+            } catch (error) {}
+        }
+
+        // --- 5. LOGIKA UI & FILTER ---
+        function switchTab(tabId) {
+            document.getElementById('view-dashboard').classList.add('hidden');
+            document.getElementById('view-status-so').classList.add('hidden');
+            const inactiveClass = "flex items-center gap-3 px-4 py-3 text-white/70 hover:bg-white/10 hover:text-white rounded-lg font-medium transition-all";
+            document.getElementById('nav-dashboard').className = inactiveClass;
+            document.getElementById('nav-status-so').className = inactiveClass;
+
+            const activeClass = "flex items-center gap-3 px-4 py-3 bg-white/20 text-white rounded-lg font-semibold transition-all shadow-sm";
+            if (tabId === 'dashboard') {
+                document.getElementById('view-dashboard').classList.remove('hidden');
+                document.getElementById('nav-dashboard').className = activeClass;
+                document.getElementById('header-title').innerHTML = 'Overview <span class="text-sm font-light text-white/70 ml-2">| Monitoring Team Jakarta</span>';
+            } else if (tabId === 'status-so') {
+                document.getElementById('view-status-so').classList.remove('hidden');
+                document.getElementById('nav-status-so').className = activeClass;
+                document.getElementById('header-title').innerHTML = 'Status SO Berjalan <span class="text-sm font-light text-white/70 ml-2">| Detail Data CSV</span>';
+                renderSOTable();
             }
         }
 
-        // ==========================================
-        // LOAD DATA SAAT HALAMAN DIBUKA
-        // ==========================================
-        function loadSavedData() {
-            const savedString = localStorage.getItem('savedDashboardData');
-            if (savedString) {
-                try {
-                    const parsedData = JSON.parse(savedString);
-                    updateChartsWithData(parsedData);
-                    renderSOTable(); // Render tabel di background
-                } catch (error) {
-                    console.error("Gagal memuat data tersimpan:", error);
-                }
-            }
+        function handleLogout() {
+            localStorage.removeItem('currentUser');
+            alert("Berhasil Sign Out! (Simulasi preview)");
+            window.location.reload();
         }
 
-        // Eksekusi load saat aplikasi dimuat
-        loadSavedData();
-
-        // ==========================================
-        // FUNGSI PENCARIAN & FILTER MULTIGANDA
-        // ==========================================
         function applyFilters() {
             const searchTerm = document.getElementById('search-csv').value.toLowerCase();
             const filterRo = document.getElementById('filter-assign-ro').value;
             const rows = document.getElementById('so-table-body').getElementsByTagName('tr');
             
             let visibleCount = 0;
-            
             Array.from(rows).forEach(row => {
-                // Lewati placeholder peringatan jika tabel kosong
                 if (row.children.length === 1) return; 
-
                 const text = row.innerText.toLowerCase();
                 const rowRo = row.getAttribute('data-assign-ro');
-                
                 const matchSearch = text.includes(searchTerm);
                 const matchRo = filterRo === "" || rowRo === filterRo;
                 
@@ -697,13 +580,10 @@
                     row.style.display = 'none';
                 }
             });
-
-            // Update hitungan total baris yang tampil
             const rowCount = document.getElementById('total-row-count');
             if (rowCount) rowCount.innerText = `${visibleCount} Baris`;
         }
 
-        // Jalankan applyFilters() jika ada ketikan di kolom pencarian atau perubahan di dropdown
         document.getElementById('search-csv').addEventListener('input', applyFilters);
         document.getElementById('filter-assign-ro').addEventListener('change', applyFilters);
 
