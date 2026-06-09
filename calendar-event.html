@@ -17,6 +17,8 @@
                     colors: {
                         primary: '#148e9e', // Deep Teal
                         secondary: '#0d6470',
+                        glass: 'rgba(255, 255, 255, 0.08)',
+                        glassBorder: 'rgba(255, 255, 255, 0.15)',
                     }
                 }
             }
@@ -27,37 +29,66 @@
         body { font-family: 'Inter', sans-serif; background-color: #f3f4f6; }
     </style>
 </head>
-<body class="text-gray-800">
+<body class="flex text-gray-800 h-screen overflow-hidden">
 
-    <!-- Header / Topbar Sederhana -->
-    <header class="bg-white shadow-sm border-b border-gray-200 px-8 py-4 flex justify-between items-center sticky top-0 z-10">
-        <div class="flex items-center">
-            <h1 class="text-2xl font-bold text-primary tracking-wider mr-4">SIMGROUP</h1>
-            <span class="text-gray-400">|</span>
-            <h2 class="text-lg font-semibold text-gray-600 ml-4">Calendar of Event</h2>
+    <!-- SIDEBAR KIRI -->
+    <aside class="w-64 bg-slate-800 text-white flex flex-col h-full shadow-xl z-20">
+        <div class="p-6 border-b border-slate-700 flex items-center justify-center">
+            <h1 class="text-2xl font-bold text-primary tracking-wider">SIMGROUP</h1>
         </div>
-        <a href="https://calendar.google.com/" target="_blank" class="bg-primary text-white px-4 py-2 rounded-lg hover:bg-secondary text-sm flex items-center font-medium transition shadow">
-            <i class="fas fa-external-link-alt mr-2"></i> Buka Google Calendar
-        </a>
-    </header>
-
-    <!-- Konten Utama -->
-    <main class="max-w-7xl mx-auto p-8">
         
-        <div class="mb-6">
-            <h2 class="text-2xl font-bold text-gray-800">Agenda Terdekat</h2>
-            <p class="text-sm text-gray-500 mt-1">Daftar kegiatan, event sourcing, dan meeting dalam 30 hari ke depan.</p>
+        <div class="p-4 flex-1 overflow-y-auto">
+            <p class="text-xs font-semibold text-slate-400 uppercase tracking-wider mb-4 px-3">Menu Utama</p>
+            <nav class="space-y-2">
+                <!-- Link kembali ke Dashboard -->
+                <a href="dashboard-internal.html" class="flex items-center gap-3 px-4 py-3 text-white/70 hover:bg-white/10 hover:text-white rounded-lg font-medium transition-all">
+                    <i class="fa-solid fa-chart-pie w-5 text-center"></i>
+                    Dashboard
+                </a>
+                <a href="#" class="flex items-center gap-3 px-4 py-3 text-white/70 hover:bg-white/10 hover:text-white rounded-lg font-medium transition-all">
+                    <i class="fa-solid fa-arrow-trend-up w-5 text-center"></i>
+                    Growth and Drowning
+                </a>
+                <!-- Menu Calendar (Status Aktif Menyala) -->
+                <a href="calendar-event.html" id="nav-calendar" class="flex items-center gap-3 px-4 py-3 bg-white/20 text-white rounded-lg font-semibold transition-all shadow-sm">
+                    <i class="fa-regular fa-calendar-check w-5 text-center"></i>
+                    Calendar of Event
+                </a>
+                <a href="#" class="flex items-center gap-3 px-4 py-3 text-white/70 hover:bg-white/10 hover:text-white rounded-lg font-medium transition-all">
+                    <i class="fa-solid fa-clipboard-list w-5 text-center"></i>
+                    Status SO Berjalan
+                </a>
+            </nav>
         </div>
+    </aside>
 
-        <!-- Wadah Kartu Kalender -->
-        <div id="calendar-container" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-            <!-- Loading State Default -->
-            <div class="col-span-full bg-white p-10 rounded-xl shadow-sm border border-gray-100 text-center">
-                <i class="fas fa-spinner fa-spin text-primary text-4xl mb-4"></i>
-                <p class="text-gray-500 font-medium">Sinkronisasi data dari Google Calendar...</p>
+    <!-- KONTEN KANAN -->
+    <main class="flex-1 flex flex-col h-full relative overflow-hidden">
+        
+        <!-- Header / Topbar -->
+        <header class="bg-white shadow-sm border-b border-gray-200 px-8 py-4 flex justify-between items-center z-10">
+            <h2 class="text-xl font-semibold text-gray-800">Calendar of Event</h2>
+            <a href="https://calendar.google.com/" target="_blank" class="bg-primary text-white px-4 py-2 rounded-lg hover:bg-secondary text-sm flex items-center font-medium transition shadow">
+                <i class="fas fa-external-link-alt mr-2"></i> Buka Google Calendar
+            </a>
+        </header>
+
+        <!-- Area Scroll Kalender -->
+        <div class="flex-1 overflow-y-auto p-8">
+            <div class="mb-6">
+                <h2 class="text-2xl font-bold text-gray-800">Agenda Terdekat</h2>
+                <p class="text-sm text-gray-500 mt-1">Daftar kegiatan, event sourcing, dan meeting dalam 30 hari ke depan.</p>
+            </div>
+
+            <!-- Wadah Kartu Kalender -->
+            <div id="calendar-container" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                <!-- Loading State Default -->
+                <div class="col-span-full bg-white p-10 rounded-xl shadow-sm border border-gray-100 text-center">
+                    <i class="fas fa-spinner fa-spin text-primary text-4xl mb-4"></i>
+                    <p class="text-gray-500 font-medium">Sinkronisasi data dari Google Calendar...</p>
+                </div>
             </div>
         </div>
-
     </main>
 
     <!-- KUMPULAN SCRIPT -->
@@ -65,7 +96,7 @@
         // ----------------------------------------------------
         // INTEGRASI GOOGLE CALENDAR
         // ----------------------------------------------------
-        // GANTI STRING DI BAWAH INI DENGAN URL WEB APP DARI GOOGLE APPS SCRIPT ANDA
+        // URL API Anda sudah terpasang
         const GOOGLE_CALENDAR_API_URL = "https://script.google.com/macros/s/AKfycbz0Ts_F69ZrKJ_6Bkeh52Z37fKQJ1b_HBeiozLb74yxJzwqMdf9NVz9WMFVGAVO7bcyyg/exec"; 
 
         async function loadGoogleCalendar() {
@@ -99,7 +130,6 @@
                     }, 1000);
                     return;
                 }
-                // ------------------------------------------------------------------------
 
                 // Fetch ke URL API ASLI
                 const response = await fetch(GOOGLE_CALENDAR_API_URL);
@@ -136,11 +166,11 @@
                 const startDate = new Date(event.startTime);
                 const endDate = new Date(event.endTime);
                 
-                // Format Tanggal (Misal: Senin, 15 Juni 2026)
+                // Format Tanggal
                 const optionsDate = { weekday: 'long', day: 'numeric', month: 'long', year: 'numeric' };
                 const formattedDate = startDate.toLocaleDateString('id-ID', optionsDate);
                 
-                // Format Jam (Misal: 09:00 - 11:00 WIB)
+                // Format Jam
                 const optionsTime = { hour: '2-digit', minute: '2-digit' };
                 const formattedTime = `${startDate.toLocaleTimeString('id-ID', optionsTime)} - ${endDate.toLocaleTimeString('id-ID', optionsTime)} WIB`;
                 
@@ -171,7 +201,7 @@
             });
         }
 
-        // Jalankan fungsi loadGoogleCalendar secara otomatis saat halaman pertama kali dibuka
+        // Jalankan fungsi otomatis
         document.addEventListener('DOMContentLoaded', loadGoogleCalendar);
 
     </script>
