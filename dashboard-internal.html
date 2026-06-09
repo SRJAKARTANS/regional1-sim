@@ -179,24 +179,40 @@
                 </div>
                 
                 <div class="bg-white rounded-2xl shadow-xl border-none overflow-hidden flex flex-col mb-8">
-                    <div class="p-6 border-b border-slate-100 flex flex-col md:flex-row md:items-center justify-between gap-4">
+                    <div class="p-6 border-b border-slate-100 flex flex-col xl:flex-row xl:items-center justify-between gap-4">
                         <div>
                             <h3 class="font-bold text-slate-800 text-lg" id="tabel-judul">Tabel Data CSV</h3>
                             <p class="text-xs text-slate-500 mt-1" id="last-update-text">Menunggu pembaruan data...</p>
                         </div>
-                        <div class="flex items-center gap-3">
-                             <div class="relative hidden md:block">
+                        <div class="flex flex-wrap items-center gap-3">
+                             <div class="relative">
                                 <i class="fa-solid fa-filter absolute left-3 top-1/2 transform -translate-y-1/2 text-slate-400 text-sm"></i>
                                 <select id="filter-assign-ro" class="pl-9 pr-8 py-2 bg-slate-50 border border-slate-200 rounded-lg text-sm text-slate-700 focus:ring-2 focus:ring-primary focus:outline-none w-full transition-all appearance-none cursor-pointer">
                                     <option value="">Semua ASSIGN RO</option>
                                 </select>
                                 <i class="fa-solid fa-chevron-down absolute right-3 top-1/2 transform -translate-y-1/2 text-slate-400 text-xs pointer-events-none"></i>
                             </div>
+                            <!-- Filter Baru: Kategori Fulfillment -->
+                             <div class="relative">
+                                <i class="fa-solid fa-tags absolute left-3 top-1/2 transform -translate-y-1/2 text-slate-400 text-sm"></i>
+                                <select id="filter-kategori" class="pl-9 pr-8 py-2 bg-slate-50 border border-slate-200 rounded-lg text-sm text-slate-700 focus:ring-2 focus:ring-primary focus:outline-none w-full transition-all appearance-none cursor-pointer">
+                                    <option value="">Semua Kategori</option>
+                                </select>
+                                <i class="fa-solid fa-chevron-down absolute right-3 top-1/2 transform -translate-y-1/2 text-slate-400 text-xs pointer-events-none"></i>
+                            </div>
+                            <!-- Filter Baru: SLA LT Offering -->
+                             <div class="relative">
+                                <i class="fa-regular fa-clock absolute left-3 top-1/2 transform -translate-y-1/2 text-slate-400 text-sm"></i>
+                                <select id="filter-sla" class="pl-9 pr-8 py-2 bg-slate-50 border border-slate-200 rounded-lg text-sm text-slate-700 focus:ring-2 focus:ring-primary focus:outline-none w-full transition-all appearance-none cursor-pointer">
+                                    <option value="">Semua SLA</option>
+                                </select>
+                                <i class="fa-solid fa-chevron-down absolute right-3 top-1/2 transform -translate-y-1/2 text-slate-400 text-xs pointer-events-none"></i>
+                            </div>
                              <div class="relative">
                                 <i class="fa-solid fa-search absolute left-3 top-1/2 transform -translate-y-1/2 text-slate-400 text-sm"></i>
-                                <input type="text" id="search-csv" placeholder="Cari data..." class="pl-9 pr-4 py-2 bg-slate-50 border border-slate-200 rounded-lg text-sm text-slate-700 focus:ring-2 focus:ring-primary focus:outline-none w-full md:w-64 transition-all">
+                                <input type="text" id="search-csv" placeholder="Cari data..." class="pl-9 pr-4 py-2 bg-slate-50 border border-slate-200 rounded-lg text-sm text-slate-700 focus:ring-2 focus:ring-primary focus:outline-none w-full md:w-48 transition-all">
                             </div>
-                            <span class="text-xs bg-[#148e9e]/10 text-[#148e9e] border border-[#148e9e]/20 px-3 py-2 rounded-lg font-bold" id="total-row-count">0 Baris</span>
+                            <span class="text-xs bg-[#148e9e]/10 text-[#148e9e] border border-[#148e9e]/20 px-3 py-2 rounded-lg font-bold whitespace-nowrap" id="total-row-count">0 Baris</span>
                         </div>
                     </div>
                     <div class="table-container overflow-x-auto overflow-y-auto max-h-[60vh] bg-slate-50/30">
@@ -449,7 +465,11 @@
             const tbody = document.getElementById('so-table-body');
             const thead = document.getElementById('so-table-head');
             const rowCount = document.getElementById('total-row-count');
+            
+            // Filter Elements
             const filterAssignRo = document.getElementById('filter-assign-ro');
+            const filterKategori = document.getElementById('filter-kategori');
+            const filterSla = document.getElementById('filter-sla');
             
             if (!savedString || !tbody || !thead) return;
 
@@ -466,47 +486,115 @@
                     "TANGGAL INVALID - PENDING", "TASK ID", "RO LINE", "AGING UNFULFILL", 
                     "PARTICIPATE", "KATEGORI FULFILLMENT"
                 ];
+                
+                // Sets untuk opsi dropdown dinamis
                 const assignRoSet = new Set();
+                const kategoriSet = new Set();
+                const slaSet = new Set();
                 
                 let headHTML = '<tr class="text-slate-500 text-xs uppercase tracking-wider"><th class="p-4 font-semibold whitespace-nowrap border-b border-slate-200">No</th>';
                 allowedColumns.forEach(key => { headHTML += `<th class="p-4 font-semibold whitespace-nowrap border-b border-slate-200">${key}</th>`; });
                 headHTML += '</tr>';
                 thead.innerHTML = headHTML;
 
+                // Hari ini (00:00) untuk perhitungan Due Date
+                const today = new Date();
+                today.setHours(0,0,0,0);
+
                 let bodyHTML = '';
                 data.forEach((row, index) => {
                     const rowKeys = Object.keys(row);
+                    
+                    // Ambil nilai untuk filter
                     const assignRoKey = rowKeys.find(k => k.trim().toUpperCase() === "ASSIGN RO");
-                    const roValue = (assignRoKey && row[assignRoKey]) ? String(row[assignRoKey]).trim() : '';
-                    if (roValue) assignRoSet.add(roValue);
+                    const kategoriKey = rowKeys.find(k => k.trim().toUpperCase() === "KATEGORI FULFILLMENT");
+                    const slaKey = rowKeys.find(k => k.trim().toUpperCase() === "SLA LT OFFERING");
+                    const dueDateKey = rowKeys.find(k => k.trim().toUpperCase() === "DUE DATE FULFILLMENT");
 
-                    bodyHTML += `<tr class="hover:bg-slate-50/80 transition-colors border-b border-slate-100 group" data-assign-ro="${roValue}">`;
+                    const roValue = (assignRoKey && row[assignRoKey]) ? String(row[assignRoKey]).trim() : '';
+                    const kategoriValue = (kategoriKey && row[kategoriKey]) ? String(row[kategoriKey]).trim() : '';
+                    const slaValue = (slaKey && row[slaKey]) ? String(row[slaKey]).trim() : '';
+                    const dueDateStr = (dueDateKey && row[dueDateKey]) ? String(row[dueDateKey]).trim() : '';
+
+                    if (roValue) assignRoSet.add(roValue);
+                    if (kategoriValue) kategoriSet.add(kategoriValue);
+                    if (slaValue) slaSet.add(slaValue);
+
+                    // --- LOGIKA HIGHLIGHT URGENCY (DUE DATE) ---
+                    let rowClass = "hover:bg-slate-50/80 transition-colors border-b border-slate-100 group";
+                    let dueBadge = '';
+
+                    if (dueDateStr && dueDateStr !== '-' && dueDateStr !== '') {
+                        // Memparsing tanggal dari format CSV yang umum (DD/MM/YYYY atau YYYY-MM-DD)
+                        let dueDateObj = null;
+                        if (dueDateStr.includes('/')) {
+                            const parts = dueDateStr.split('/');
+                            if (parts.length === 3) dueDateObj = new Date(parts[2], parts[1] - 1, parts[0]);
+                        } else {
+                            dueDateObj = new Date(dueDateStr);
+                        }
+
+                        if (dueDateObj && !isNaN(dueDateObj)) {
+                            const diffTime = dueDateObj - today;
+                            const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
+
+                            if (diffDays < 0) {
+                                // Lewat tenggat waktu (Merah)
+                                rowClass = "bg-rose-50 hover:bg-rose-100 transition-colors border-b border-rose-200 group";
+                                dueBadge = `<span class="ml-2 inline-flex items-center px-2 py-0.5 rounded text-[10px] font-bold bg-rose-500 text-white shadow-sm"><i class="fa-solid fa-circle-exclamation mr-1"></i> Overdue</span>`;
+                            } else if (diffDays <= 3) {
+                                // Mendekati (Kuning/Oranye)
+                                rowClass = "bg-orange-50 hover:bg-orange-100 transition-colors border-b border-orange-200 group";
+                                dueBadge = `<span class="ml-2 inline-flex items-center px-2 py-0.5 rounded text-[10px] font-bold bg-orange-500 text-white shadow-sm"><i class="fa-solid fa-triangle-exclamation mr-1"></i> H-${diffDays}</span>`;
+                            }
+                        }
+                    }
+
+                    // Tambahkan data-attribute agar filter bekerja
+                    bodyHTML += `<tr class="${rowClass}" data-assign-ro="${roValue}" data-kategori="${kategoriValue}" data-sla="${slaValue}">`;
                     bodyHTML += `<td class="p-4 text-slate-500 font-medium">${index + 1}</td>`;
                     allowedColumns.forEach(key => {
                         const matchedKey = rowKeys.find(k => k.trim().toUpperCase() === key.toUpperCase());
                         const cellData = (matchedKey && row[matchedKey]) ? row[matchedKey] : '-';
-                        bodyHTML += `<td class="p-4 text-slate-700 whitespace-nowrap group-hover:text-slate-900">${cellData}</td>`;
+                        
+                        // Sisipkan badge pada sel Due Date
+                        if (key === "DUE DATE FULFILLMENT") {
+                            bodyHTML += `<td class="p-4 text-slate-700 whitespace-nowrap group-hover:text-slate-900 font-medium">${cellData} ${dueBadge}</td>`;
+                        } else {
+                            bodyHTML += `<td class="p-4 text-slate-700 whitespace-nowrap group-hover:text-slate-900">${cellData}</td>`;
+                        }
                     });
                     bodyHTML += '</tr>';
                 });
                 tbody.innerHTML = bodyHTML;
 
+                // Populate Dropdown Filter RO
                 if (filterAssignRo) {
                     const currentSelection = filterAssignRo.value;
                     filterAssignRo.innerHTML = '<option value="">Semua ASSIGN RO</option>';
                     Array.from(assignRoSet).sort().forEach(ro => { filterAssignRo.innerHTML += `<option value="${ro}">${ro}</option>`; });
                     filterAssignRo.value = currentSelection;
                 }
-            } catch (error) {}
-        }
+                
+                // Populate Dropdown Filter Kategori
+                if (filterKategori) {
+                    const currentSelection = filterKategori.value;
+                    filterKategori.innerHTML = '<option value="">Semua Kategori</option>';
+                    Array.from(kategoriSet).sort().forEach(kat => { filterKategori.innerHTML += `<option value="${kat}">${kat}</option>`; });
+                    filterKategori.value = currentSelection;
+                }
+                
+                // Populate Dropdown Filter SLA
+                if (filterSla) {
+                    const currentSelection = filterSla.value;
+                    filterSla.innerHTML = '<option value="">Semua SLA</option>';
+                    Array.from(slaSet).sort().forEach(sla => { filterSla.innerHTML += `<option value="${sla}">${sla}</option>`; });
+                    filterSla.value = currentSelection;
+                }
 
-        const savedString = localStorage.getItem('savedDashboardData');
-        if (savedString) {
-            try {
-                const parsedData = JSON.parse(savedString);
-                updateChartsWithData(parsedData);
-                renderSOTable();
-            } catch (error) {}
+            } catch (error) {
+                console.error("Gagal merender tabel", error);
+            }
         }
 
         // --- FILTER & UI ---
@@ -546,24 +634,38 @@
         function applyFilters() {
             const searchInput = document.getElementById('search-csv');
             const filterInput = document.getElementById('filter-assign-ro');
+            const filterKategoriInput = document.getElementById('filter-kategori');
+            const filterSlaInput = document.getElementById('filter-sla');
+            
             const tbody = document.getElementById('so-table-body');
             const rowCount = document.getElementById('total-row-count');
             
-            if (!searchInput || !filterInput || !tbody) return;
+            if (!tbody) return;
 
-            const searchTerm = searchInput.value.toLowerCase();
-            const filterRo = filterInput.value;
+            const searchTerm = searchInput ? searchInput.value.toLowerCase() : "";
+            const filterRo = filterInput ? filterInput.value : "";
+            const filterKat = filterKategoriInput ? filterKategoriInput.value : "";
+            const filterSla = filterSlaInput ? filterSlaInput.value : "";
+            
             const rows = tbody.getElementsByTagName('tr');
             
             let visibleCount = 0;
             Array.from(rows).forEach(row => {
                 if (row.children.length === 1) return; 
                 const text = row.innerText.toLowerCase();
-                const rowRo = row.getAttribute('data-assign-ro');
+                
+                // Ambil attribute dari tag <tr>
+                const rowRo = row.getAttribute('data-assign-ro') || "";
+                const rowKat = row.getAttribute('data-kategori') || "";
+                const rowSla = row.getAttribute('data-sla') || "";
+                
+                // Validasi kecocokan
                 const matchSearch = text.includes(searchTerm);
                 const matchRo = filterRo === "" || rowRo === filterRo;
+                const matchKat = filterKat === "" || rowKat === filterKat;
+                const matchSla = filterSla === "" || rowSla === filterSla;
                 
-                if (matchSearch && matchRo) {
+                if (matchSearch && matchRo && matchKat && matchSla) {
                     row.style.display = '';
                     visibleCount++;
                 } else {
@@ -579,6 +681,12 @@
         
         const filterEl = document.getElementById('filter-assign-ro');
         if(filterEl) filterEl.addEventListener('change', applyFilters);
+        
+        const filterKatEl = document.getElementById('filter-kategori');
+        if(filterKatEl) filterKatEl.addEventListener('change', applyFilters);
+        
+        const filterSlaEl = document.getElementById('filter-sla');
+        if(filterSlaEl) filterSlaEl.addEventListener('change', applyFilters);
 
     </script>
 </body>
