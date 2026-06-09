@@ -15,7 +15,7 @@
             theme: {
                 extend: {
                     colors: {
-                        primary: '#148e9e', // Deep Teal
+                        primary: '#148e9e', // Deep Teal SIMGROUP
                         secondary: '#0d6470',
                         glass: 'rgba(255, 255, 255, 0.08)',
                         glassBorder: 'rgba(255, 255, 255, 0.15)',
@@ -26,19 +26,23 @@
     </script>
     <style>
         @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap');
-        body { font-family: 'Inter', sans-serif; background-color: #f3f4f6; }
+        body { font-family: 'Inter', sans-serif; }
+        ::-webkit-scrollbar { width: 6px; }
+        ::-webkit-scrollbar-track { background: transparent; }
+        ::-webkit-scrollbar-thumb { background: #cbd5e1; border-radius: 4px; }
+        ::-webkit-scrollbar-thumb:hover { background: #94a3b8; }
     </style>
 </head>
-<body class="flex text-gray-800 h-screen overflow-hidden">
+<body class="flex h-screen bg-gray-50 text-gray-800 overflow-hidden">
 
-    <!-- SIDEBAR KIRI -->
-    <aside class="w-64 bg-slate-800 text-white flex flex-col h-full shadow-xl z-20">
-        <div class="p-6 border-b border-slate-700 flex items-center justify-center">
-            <h1 class="text-2xl font-bold text-primary tracking-wider">SIMGROUP</h1>
+    <!-- SIDEBAR KIRI (Desain sama persis dengan Dashboard Internal) -->
+    <aside class="w-64 bg-primary text-white flex flex-col h-full shadow-2xl z-20">
+        <div class="p-6 border-b border-white/10 flex items-center justify-center">
+            <h1 class="text-2xl font-bold tracking-wider">SIMGROUP</h1>
         </div>
         
         <div class="p-4 flex-1 overflow-y-auto">
-            <p class="text-xs font-semibold text-slate-400 uppercase tracking-wider mb-4 px-3">Menu Utama</p>
+            <p class="text-xs font-semibold text-white/50 uppercase tracking-wider mb-4 px-3">Menu Utama</p>
             <nav class="space-y-2">
                 <!-- Link kembali ke Dashboard -->
                 <a href="dashboard-internal.html" class="flex items-center gap-3 px-4 py-3 text-white/70 hover:bg-white/10 hover:text-white rounded-lg font-medium transition-all">
@@ -49,8 +53,8 @@
                     <i class="fa-solid fa-arrow-trend-up w-5 text-center"></i>
                     Growth and Drowning
                 </a>
-                <!-- Menu Calendar (Status Aktif Menyala) -->
-                <a href="calendar-event.html" id="nav-calendar" class="flex items-center gap-3 px-4 py-3 bg-white/20 text-white rounded-lg font-semibold transition-all shadow-sm">
+                <!-- Menu Calendar (Status Aktif dengan efek bg-white/20 seperti di dashboard) -->
+                <a href="calendar-event.html" id="nav-calendar" class="flex items-center gap-3 px-4 py-3 bg-white/20 text-white rounded-lg font-semibold transition-all shadow-sm border border-white/10">
                     <i class="fa-regular fa-calendar-check w-5 text-center"></i>
                     Calendar of Event
                 </a>
@@ -60,30 +64,48 @@
                 </a>
             </nav>
         </div>
+        
+        <!-- Info Admin di Bawah Sidebar -->
+        <div class="p-4 border-t border-white/10 bg-black/10">
+            <div class="flex items-center">
+                <div class="w-10 h-10 rounded-full bg-white text-primary flex items-center justify-center font-bold shadow-md">
+                    TA
+                </div>
+                <div class="ml-3">
+                    <p class="text-sm font-semibold text-white">Tim Admin</p>
+                    <p class="text-xs text-white/60">Regional 1</p>
+                </div>
+            </div>
+        </div>
     </aside>
 
     <!-- KONTEN KANAN -->
-    <main class="flex-1 flex flex-col h-full relative overflow-hidden">
+    <main class="flex-1 flex flex-col h-full relative overflow-hidden bg-gray-50">
         
         <!-- Header / Topbar -->
         <header class="bg-white shadow-sm border-b border-gray-200 px-8 py-4 flex justify-between items-center z-10">
             <h2 class="text-xl font-semibold text-gray-800">Calendar of Event</h2>
-            <a href="https://calendar.google.com/" target="_blank" class="bg-primary text-white px-4 py-2 rounded-lg hover:bg-secondary text-sm flex items-center font-medium transition shadow">
+            <a href="https://calendar.google.com/" target="_blank" class="bg-primary text-white px-4 py-2 rounded-lg hover:bg-secondary text-sm flex items-center font-medium transition shadow-sm hover:shadow">
                 <i class="fas fa-external-link-alt mr-2"></i> Buka Google Calendar
             </a>
         </header>
 
         <!-- Area Scroll Kalender -->
         <div class="flex-1 overflow-y-auto p-8">
-            <div class="mb-6">
-                <h2 class="text-2xl font-bold text-gray-800">Agenda Terdekat</h2>
-                <p class="text-sm text-gray-500 mt-1">Daftar kegiatan, event sourcing, dan meeting dalam 30 hari ke depan.</p>
+            <div class="mb-6 flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
+                <div>
+                    <h2 class="text-2xl font-bold text-gray-800">Agenda Terdekat</h2>
+                    <p class="text-sm text-gray-500 mt-1">Daftar kegiatan, event sourcing, dan meeting dalam 30 hari ke depan.</p>
+                </div>
+                <button onclick="loadGoogleCalendar()" class="text-primary hover:text-secondary text-sm font-medium flex items-center bg-teal-50 px-3 py-1.5 rounded-lg transition">
+                    <i class="fas fa-sync-alt mr-2"></i> Refresh Data
+                </button>
             </div>
 
             <!-- Wadah Kartu Kalender -->
             <div id="calendar-container" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
                 <!-- Loading State Default -->
-                <div class="col-span-full bg-white p-10 rounded-xl shadow-sm border border-gray-100 text-center">
+                <div class="col-span-full bg-white p-12 rounded-xl shadow-sm border border-gray-100 text-center">
                     <i class="fas fa-spinner fa-spin text-primary text-4xl mb-4"></i>
                     <p class="text-gray-500 font-medium">Sinkronisasi data dari Google Calendar...</p>
                 </div>
@@ -96,41 +118,21 @@
         // ----------------------------------------------------
         // INTEGRASI GOOGLE CALENDAR
         // ----------------------------------------------------
-        // URL API Anda sudah terpasang
+        // URL API Anda sudah terpasang dan siap digunakan
         const GOOGLE_CALENDAR_API_URL = "https://script.google.com/macros/s/AKfycbz0Ts_F69ZrKJ_6Bkeh52Z37fKQJ1b_HBeiozLb74yxJzwqMdf9NVz9WMFVGAVO7bcyyg/exec"; 
 
         async function loadGoogleCalendar() {
             const container = document.getElementById('calendar-container');
             
+            // Set loading state
+            container.innerHTML = `
+                <div class="col-span-full bg-white p-12 rounded-xl shadow-sm border border-gray-100 text-center">
+                    <i class="fas fa-spinner fa-spin text-primary text-4xl mb-4"></i>
+                    <p class="text-gray-500 font-medium">Mengambil jadwal terbaru...</p>
+                </div>
+            `;
+            
             try {
-                // --- BAGIAN INI HANYA UNTUK PREVIEW MOCKUP JIKA URL API BELUM DIISI ---
-                if (GOOGLE_CALENDAR_API_URL === "https://script.google.com/macros/s/AKfycbz0Ts_F69ZrKJ_6Bkeh52Z37fKQJ1b_HBeiozLb74yxJzwqMdf9NVz9WMFVGAVO7bcyyg/exec" || GOOGLE_CALENDAR_API_URL === "") {
-                    setTimeout(() => {
-                        const mockData = [
-                            {
-                                title: "Sourcing Workshop Regional 1", location: "Ruang Meeting A - Lt.2",
-                                startTime: new Date(Date.now() + 86400000).toISOString(),
-                                endTime: new Date(Date.now() + 93600000).toISOString(),
-                                description: "Workshop strategi sourcing kandidat di lapangan bersama tim rekrutmen."
-                            },
-                            {
-                                title: "Review SLA Bulanan Tim Revo", location: "Online (Google Meet)",
-                                startTime: new Date(Date.now() + (86400000 * 3)).toISOString(),
-                                endTime: new Date(Date.now() + (86400000 * 3) + 7200000).toISOString(),
-                                description: "Evaluasi performa pemenuhan SO bulan ini."
-                            },
-                            {
-                                title: "Job Fair Universitas Indonesia", location: "Balairung UI, Depok",
-                                startTime: new Date(Date.now() + (86400000 * 5)).toISOString(),
-                                endTime: new Date(Date.now() + (86400000 * 5) + 28800000).toISOString(),
-                                description: "Stand SIMGROUP nomor B-12. PIC: Mas Budi."
-                            }
-                        ];
-                        renderEvents(mockData);
-                    }, 1000);
-                    return;
-                }
-
                 // Fetch ke URL API ASLI
                 const response = await fetch(GOOGLE_CALENDAR_API_URL);
                 const events = await response.json();
@@ -155,9 +157,11 @@
             if (!events || events.length === 0 || events.error) {
                 container.innerHTML = `
                     <div class="col-span-full bg-white p-12 rounded-xl shadow-sm border border-gray-100 text-center text-gray-500">
-                        <i class="fas fa-calendar-check text-5xl mb-4 text-gray-300"></i>
-                        <h3 class="text-xl font-medium text-gray-700">Jadwal Kosong</h3>
-                        <p class="mt-2">Tidak ada agenda yang terjadwal dalam 30 hari ke depan.</p>
+                        <div class="w-16 h-16 bg-gray-100 rounded-full flex items-center justify-center mx-auto mb-4">
+                            <i class="fas fa-calendar-check text-2xl text-gray-400"></i>
+                        </div>
+                        <h3 class="text-lg font-bold text-gray-700">Jadwal Kosong</h3>
+                        <p class="mt-1 text-sm">Tidak ada agenda yang terjadwal dalam 30 hari ke depan.</p>
                     </div>`;
                 return;
             }
@@ -201,7 +205,7 @@
             });
         }
 
-        // Jalankan fungsi otomatis
+        // Jalankan fungsi otomatis saat halaman dimuat
         document.addEventListener('DOMContentLoaded', loadGoogleCalendar);
 
     </script>
