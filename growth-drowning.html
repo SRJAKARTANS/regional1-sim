@@ -1,0 +1,197 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Growth & Drowning - SIMGROUP Dashboard</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- Font Awesome -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <!-- Tailwind Config Dashboard Internal -->
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        primary: '#148e9e', // Deep Teal
+                        secondary: '#0d6470',
+                        glass: 'rgba(255, 255, 255, 0.08)',
+                        glassBorder: 'rgba(255, 255, 255, 0.15)',
+                    }
+                }
+            }
+        }
+    </script>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap');
+        body {
+            font-family: 'Inter', sans-serif;
+        }
+    </style>
+</head>
+<body class="bg-gray-100 text-gray-900">
+
+    <div class="flex h-screen">
+        <!-- Sidebar -->
+        <aside class="w-64 bg-white border-r border-gray-200 hidden md:flex flex-col">
+            <div class="p-6 text-xl font-bold text-primary">SIMGROUP</div>
+            <nav class="flex-1 px-4 space-y-2">
+                <!-- Tautan kembali ke Dashboard Utama -->
+                <a href="dashboard-internal.html" class="block px-4 py-2 text-gray-600 hover:bg-gray-100 font-medium rounded-md transition-colors">
+                    <i class="fas fa-home w-5 text-center mr-1"></i> Dashboard
+                </a>
+                
+                <!-- Tautan Aktif di halaman ini -->
+                <a href="#" class="block px-4 py-2 bg-primary/10 text-primary font-medium rounded-md transition-colors">
+                    <i class="fas fa-chart-line w-5 text-center mr-1"></i> Growth & Drowning
+                </a>
+            </nav>
+        </aside>
+
+        <!-- Main Content -->
+        <main class="flex-1 p-6 md:p-8 overflow-y-auto">
+            
+            <!-- Header Area -->
+            <header class="mb-8 flex flex-col md:flex-row md:justify-between md:items-end gap-4">
+                <div>
+                    <h1 class="text-2xl font-bold text-gray-800">Growth & Drowning</h1>
+                    <p class="text-gray-500 mt-1">Analisis performa pemenuhan target dan SLA Service Order.</p>
+                </div>
+                <div>
+                    <span class="bg-primary/10 text-primary border border-primary/20 text-xs font-semibold px-4 py-1.5 rounded-full inline-flex items-center">
+                        <i class="far fa-calendar-alt mr-2"></i> Bulan Ini: Juni 2026
+                    </span>
+                </div>
+            </header>
+
+            <!-- Card Summary Area -->
+            <section class="grid grid-cols-1 md:grid-cols-2 gap-6 mb-8">
+                <!-- Growth Card (Kiri, Aksen Hijau) -->
+                <div class="bg-white p-6 rounded-xl border-l-4 border-emerald-500 shadow-sm flex items-center justify-between">
+                    <div>
+                        <h2 class="text-sm font-semibold text-gray-500 uppercase tracking-wider">Total Fulfill (Growth)</h2>
+                        <p class="text-3xl font-bold mt-2 text-gray-800">142 <span class="text-sm font-medium text-emerald-600 ml-2"><i class="fas fa-arrow-up"></i> 12%</span></p>
+                    </div>
+                    <div class="p-3 bg-emerald-50 rounded-full text-emerald-600">
+                        <i class="fas fa-rocket text-xl"></i>
+                    </div>
+                </div>
+
+                <!-- Drowning Card (Kanan, Aksen Merah) -->
+                <div class="bg-white p-6 rounded-xl border-l-4 border-rose-500 shadow-sm flex items-center justify-between">
+                    <div>
+                        <h2 class="text-sm font-semibold text-gray-500 uppercase tracking-wider">Overdue SLA (Drowning)</h2>
+                        <p class="text-3xl font-bold mt-2 text-gray-800">18 <span class="text-sm font-medium text-rose-600 ml-2">Butuh Perhatian!</span></p>
+                    </div>
+                    <div class="p-3 bg-rose-50 rounded-full text-rose-600">
+                        <i class="fas fa-exclamation-triangle text-xl"></i>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Table Area (Grid 2 Kolom) -->
+            <section class="grid grid-cols-1 lg:grid-cols-2 gap-6">
+                
+                <!-- Kiri: Tabel Growth -->
+                <div class="bg-white rounded-xl border border-gray-200 shadow-sm overflow-hidden">
+                    <div class="p-5 border-b border-gray-100 bg-emerald-50/30 flex justify-between items-center">
+                        <h2 class="text-lg font-bold text-emerald-800 flex items-center">
+                            <i class="fas fa-check-circle mr-2 text-emerald-600"></i> Area Positif (Top Fulfill)
+                        </h2>
+                    </div>
+                    <div class="overflow-x-auto p-2">
+                        <table class="w-full text-left text-sm">
+                            <thead>
+                                <tr class="text-gray-500 border-b border-gray-100">
+                                    <th class="p-4 font-medium">Klien & Cabang</th>
+                                    <th class="p-4 font-medium">PIC Sourcing</th>
+                                    <th class="p-4 font-medium">Status</th>
+                                </tr>
+                            </thead>
+                            <tbody class="divide-y divide-gray-50">
+                                <tr class="hover:bg-gray-50 transition-colors">
+                                    <td class="p-4">
+                                        <div class="font-semibold text-gray-900">PT. FIF Group</div>
+                                        <div class="text-gray-500 text-xs mt-0.5">Jakarta Pusat</div>
+                                    </td>
+                                    <td class="p-4 text-gray-700">Bpk. Haryanto</td>
+                                    <td class="p-4">
+                                        <span class="inline-flex items-center px-2.5 py-1 rounded-md text-xs font-medium bg-emerald-100 text-emerald-800">
+                                            Fulfill Cepat
+                                        </span>
+                                    </td>
+                                </tr>
+                                <tr class="hover:bg-gray-50 transition-colors">
+                                    <td class="p-4">
+                                        <div class="font-semibold text-gray-900">Adira Finance</div>
+                                        <div class="text-gray-500 text-xs mt-0.5">Kelapa Gading</div>
+                                    </td>
+                                    <td class="p-4 text-gray-700">Ibu Dian Sastro</td>
+                                    <td class="p-4">
+                                        <span class="inline-flex items-center px-2.5 py-1 rounded-md text-xs font-medium bg-emerald-100 text-emerald-800">
+                                            Sesuai Target
+                                        </span>
+                                    </td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+
+                <!-- Kanan: Tabel Drowning -->
+                <div class="bg-white rounded-xl border border-gray-200 shadow-sm overflow-hidden">
+                    <div class="p-5 border-b border-gray-100 bg-rose-50/30 flex justify-between items-center">
+                        <h2 class="text-lg font-bold text-rose-800 flex items-center">
+                            <i class="fas fa-exclamation-circle mr-2 text-rose-600"></i> Area Kritis (SLA Overdue)
+                        </h2>
+                    </div>
+                    <div class="overflow-x-auto p-2">
+                        <table class="w-full text-left text-sm">
+                            <thead>
+                                <tr class="text-gray-500 border-b border-gray-100">
+                                    <th class="p-4 font-medium">Posisi & Klien</th>
+                                    <th class="p-4 font-medium">SLA Days</th>
+                                    <th class="p-4 font-medium">Action</th>
+                                </tr>
+                            </thead>
+                            <tbody class="divide-y divide-gray-50">
+                                <tr class="hover:bg-gray-50 transition-colors">
+                                    <td class="p-4">
+                                        <div class="font-semibold text-gray-900">Sales REVO</div>
+                                        <div class="text-gray-500 text-xs mt-0.5">Mandiri Multifinance</div>
+                                    </td>
+                                    <td class="p-4">
+                                        <span class="text-rose-600 font-bold bg-rose-50 px-2 py-1 rounded"><i class="far fa-clock mr-1"></i> > 14 Hari</span>
+                                    </td>
+                                    <td class="p-4">
+                                        <button class="bg-rose-100 hover:bg-rose-200 text-rose-700 py-1.5 px-3 rounded-md text-xs font-semibold transition-colors">
+                                            Eskalasi
+                                        </button>
+                                    </td>
+                                </tr>
+                                <tr class="hover:bg-gray-50 transition-colors">
+                                    <td class="p-4">
+                                        <div class="font-semibold text-gray-900">Admin Credit</div>
+                                        <div class="text-gray-500 text-xs mt-0.5">FIF JKT Selatan</div>
+                                    </td>
+                                    <td class="p-4">
+                                        <span class="text-orange-500 font-bold bg-orange-50 px-2 py-1 rounded"><i class="far fa-clock mr-1"></i> 10 Hari</span>
+                                    </td>
+                                    <td class="p-4">
+                                        <button class="bg-orange-100 hover:bg-orange-200 text-orange-700 py-1.5 px-3 rounded-md text-xs font-semibold transition-colors">
+                                            Follow Up
+                                        </button>
+                                    </td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+
+            </section>
+
+        </main>
+    </div>
+
+</body>
+</html>
