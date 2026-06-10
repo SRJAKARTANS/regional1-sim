@@ -36,53 +36,52 @@
 <body class="flex h-screen bg-gray-50 text-gray-800 overflow-hidden">
 
     <!-- SIDEBAR KIRI (Dikembalikan ke warna bg-slate-800 persis seperti laman Dashboard) -->
-    <aside class="w-64 bg-slate-800 text-white flex flex-col h-full shadow-xl z-20">
-        <div class="p-6 border-b border-slate-700 flex items-center justify-center">
-            <h1 class="text-2xl font-bold text-primary tracking-wider">SIMGROUP</h1>
+     <aside class="w-64 bg-glass backdrop-blur-xl border-r border-glassBorder hidden md:flex flex-col z-20">
+        <div class="h-20 flex items-center justify-center border-b border-glassBorder">
+            <div class="flex items-center gap-2 text-white font-bold text-xl tracking-wider">
+                <i class="fa-solid fa-building"></i>
+                <span>SIMGROUP</span>
+            </div>
         </div>
-        
-        <div class="p-4 flex-1 overflow-y-auto">
-            <p class="text-xs font-semibold text-slate-400 uppercase tracking-wider mb-4 px-3">Menu Utama</p>
-            <nav class="space-y-2">
-                <a href="dashboard-internal.html" class="flex items-center gap-3 px-4 py-3 text-white/70 hover:bg-white/10 hover:text-white rounded-lg font-medium transition-all">
+        <div class="flex-1 overflow-y-auto py-4">
+            <nav class="space-y-1.5 px-3">
+                <a href="#" onclick="switchTab('dashboard')" id="nav-dashboard" class="flex items-center gap-3 px-4 py-3 bg-white/20 text-white rounded-lg font-semibold transition-all shadow-sm">
                     <i class="fa-solid fa-chart-pie w-5 text-center"></i>
                     Dashboard
                 </a>
-                <a href="dashboard-internal.html" class="flex items-center gap-3 px-4 py-3 text-white/70 hover:bg-white/10 hover:text-white rounded-lg font-medium transition-all">
+                <a href="#" class="flex items-center gap-3 px-4 py-3 text-white/70 hover:bg-white/10 hover:text-white rounded-lg font-medium transition-all">
                     <i class="fa-solid fa-arrow-trend-up w-5 text-center"></i>
                     Growth and Drowning
                 </a>
-                <!-- Menu Calendar Aktif -->
-                <a href="calendar-event.html" id="nav-calendar" class="flex items-center gap-3 px-4 py-3 bg-white/20 text-white rounded-lg font-semibold transition-all shadow-sm">
+                <a href="calendar-event.html" id="nav-calendar" class="flex items-center gap-3 px-4 py-3 text-white/70 hover:bg-white/10 hover:text-white rounded-lg font-medium transition-all">
                     <i class="fa-regular fa-calendar-check w-5 text-center"></i>
                     Calendar of Event
                 </a>
-                <a href="dashboard-internal.html" class="flex items-center gap-3 px-4 py-3 text-white/70 hover:bg-white/10 hover:text-white rounded-lg font-medium transition-all">
+                <a href="#" onclick="switchTab('status-so')" id="nav-status-so" class="flex items-center gap-3 px-4 py-3 text-white/70 hover:bg-white/10 hover:text-white rounded-lg font-medium transition-all">
                     <i class="fa-solid fa-clipboard-list w-5 text-center"></i>
                     Status SO Berjalan
                 </a>
-                <a href="dashboard-internal.html" class="flex items-center gap-3 px-4 py-3 text-white/70 hover:bg-white/10 hover:text-white rounded-lg font-medium transition-all">
+                <a href="#" class="flex items-center gap-3 px-4 py-3 text-white/70 hover:bg-white/10 hover:text-white rounded-lg font-medium transition-all">
                     <i class="fa-solid fa-database w-5 text-center"></i>
                     Bank Buffer Management
                 </a>
-                <a href="dashboard-internal.html" class="flex items-center gap-3 px-4 py-3 text-white/70 hover:bg-white/10 hover:text-white rounded-lg font-medium transition-all">
-                    <i class="fa-solid fa-timeline w-5 text-center"></i>
+                <a href="timeline-kegiatan.html" class="flex items-center gap-3 px-4 py-3 text-white/70 hover:bg-white/10 hover:text-white rounded-lg font-medium transition-all">
+                    <i class="fa-solid fa-clock-rotate-left w-5 text-center"></i>
                     Timeline Kegiatan
                 </a>
-                <a href="dashboard-internal.html" class="flex items-center gap-3 px-4 py-3 text-white/70 hover:bg-white/10 hover:text-white rounded-lg font-medium transition-all">
-                    <i class="fa-solid fa-handshake w-5 text-center"></i>
+                <a href="report-media-partner.html" class="flex items-center gap-3 px-4 py-3 text-white/70 hover:bg-white/10 hover:text-white rounded-lg font-medium transition-all">
+                    <i class="fa-solid fa-bullhorn w-5 text-center"></i>
                     Report Media Partner
                 </a>
             </nav>
-
-            <div class="mt-8 px-3">
-                <p class="text-xs font-semibold text-slate-400 uppercase tracking-wider mb-3">Manajemen Data</p>
-                <a href="dashboard-internal.html" class="flex items-center justify-center gap-2 px-4 py-3 bg-white/5 hover:bg-white/10 text-white/90 rounded-lg font-medium transition-all border border-slate-600 border-dashed cursor-pointer">
-                    <i class="fa-solid fa-cloud-arrow-up"></i>
-                    <span class="text-sm">Upload CSV Baru</span>
-                </a>
-            </div>
         </div>
+        <div class="p-4 border-t border-glassBorder">
+            <button onclick="handleLogout()" class="flex items-center justify-center gap-2 w-full py-2.5 bg-rose-500/20 border border-rose-500/30 text-white rounded-lg hover:bg-rose-500/40 transition-all font-medium text-sm">
+                <i class="fa-solid fa-arrow-right-from-bracket"></i>
+                Sign Out
+            </button>
+             </div>
+    </aside>
         
         <div class="p-4 border-t border-slate-700 bg-slate-900/50 flex justify-between items-center">
             <div class="flex items-center">
