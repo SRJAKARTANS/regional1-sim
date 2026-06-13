@@ -344,7 +344,34 @@
         <p class="text-sm font-semibold" id="toast-message">Data berhasil diperbarui!</p>
     </div>
 
-    <script>
+    <!-- Gunakan type="module" untuk mendukung integrasi Firebase -->
+    <script type="module">
+        // Import layanan Firebase
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-app.js";
+        import { getFirestore, doc, setDoc, onSnapshot } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
+        import { getAuth, signInAnonymously, onAuthStateChanged, signInWithCustomToken } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
+
+        // 1. MASUKKAN KONFIGURASI FIREBASE ANDA DI SINI
+        const firebaseConfig = {
+            apiKey: "AIzaSyDGWDjaE9ZKU1oUm57gdgONlpw_aZnLGpo",
+            authDomain: "jakartans-dashboard.firebaseapp.com",
+            projectId: "jakartans-dashboard",
+            storageBucket: "jakartans-dashboard.firebasestorage.app",
+            messagingSenderId: "648533447432",
+            appId: "1:648533447432:web:f11e41a82a62f766c892bd",
+            measurementId: "G-H5M7GNR99G"
+        };
+
+        // Inisialisasi Firebase (dengan fallback aman jika berjalan di sistem preview)
+        const configToUse = typeof __firebase_config !== 'undefined' ? JSON.parse(__firebase_config) : firebaseConfig;
+        const app = initializeApp(configToUse);
+        const auth = getAuth(app);
+        const db = getFirestore(app);
+
+        // Path penyimpanan aman (Mendukung integrasi GitHub Anda maupun Canvas)
+        const systemAppId = typeof __app_id !== 'undefined' ? __app_id : 'regional1-sim';
+        const docRef = doc(db, 'artifacts', systemAppId, 'public', 'data', 'dashboard', 'csv_data');
+
         // Init Icons
         lucide.createIcons();
 
@@ -366,41 +393,92 @@
             }, 3500);
         }
 
-        // Buffer Kandidat Logic
-        function takeOverKandidat(id) {
+        // Buffer Kandidat Logic (Diekspos ke window agar bisa dipanggil dari HTML)
+        window.takeOverKandidat = function(id) {
             const picCell = document.getElementById(`pic-kandidat-${id}`);
             picCell.innerHTML = `<span class="bg-teal-100 text-teal-800 px-2.5 py-1 rounded-full text-xs font-black border border-teal-200">Daffa (You)</span>`;
             showNotification("Kandidat berhasil diambil alih oleh Anda!");
         }
 
-        // Simulated CSV / CSV LocalStorage Logic
-        function handleFileUpload(event) {
+        // ==========================================
+        // LOGIKA FIREBASE: AUTENTIKASI & TARIK DATA
+        // ==========================================
+        
+        // Autentikasi anonim di background agar bisa membaca/menulis ke database
+        const initAuth = async () => {
+            try {
+                if (typeof __initial_auth_token !== 'undefined' && __initial_auth_token) {
+                    await signInWithCustomToken(auth, __initial_auth_token);
+                } else {
+                    await signInAnonymously(auth);
+                }
+            } catch (error) {
+                console.error("Kesalahan inisiasi Autentikasi:", error);
+            }
+        };
+        initAuth();
+
+        // Dengarkan perubahan status login
+        onAuthStateChanged(auth, (user) => {
+            if (!user) return; // Cegah query sebelum login berhasil
+
+            // Tarik data secara otomatis & realtime dari Firebase
+            onSnapshot(docRef, (snapshot) => {
+                if (snapshot.exists()) {
+                    const data = snapshot.data();
+                    if (data.csvText) {
+                        processCSVData(data.csvText);
+                        console.log("Data CSV disinkronkan dari Firebase Cloud.");
+                    }
+                } else {
+                    // Data belum ada di Cloud, tampilkan mock data
+                    updateDashboardMetrics(82, 23, 64, 41);
+                }
+            }, (error) => {
+                console.error("Gagal mendengarkan data Firestore:", error);
+                showNotification("Gagal menyinkronkan data dari Cloud.");
+            });
+        });
+
+        // ==========================================
+        // LOGIKA FIREBASE: UPLOAD DATA
+        // ==========================================
+        window.handleFileUpload = function(event) {
             const file = event.target.files[0];
             if (file) {
                 const reader = new FileReader();
-                reader.onload = function(e) {
+                reader.onload = async function(e) {
                     const text = e.target.result;
-                    // Simple CSV Parser logic
-                    const rows = text.split('\n').filter(r => r.trim() !== "");
                     
-                    // Simpan data mentah ke localStorage
-                    localStorage.setItem('savedDashboardData', text);
-                    
-                    // Olah data untuk perbarui visual chart / ringkasan
+                    // Proses data secara lokal agar UI merespon cepat
                     processCSVData(text);
-                    showNotification("Berhasil! Berkas CSV terbaru disimpan.");
+                    
+                    // Simpan data mentah ke Firebase (Cloud)
+                    try {
+                        const user = auth.currentUser;
+                        if (!user) {
+                            showNotification("Gagal: Menunggu koneksi ke Cloud...");
+                            return;
+                        }
+                        await setDoc(docRef, { csvText: text, updatedAt: new Date().toISOString() }, { merge: true });
+                        showNotification("Berhasil! Berkas CSV tersimpan di Cloud.");
+                    } catch(error) {
+                        console.error("Kesalahan saat menyimpan ke Firebase:", error);
+                        showNotification("Gagal menyimpan ke Cloud. Periksa konfigurasi.");
+                    }
                 };
                 reader.readAsText(file);
             }
         }
 
+        // ==========================================
+        // PROSES DATA CSV
+        // ==========================================
         function processCSVData(csvText) {
-            // Simulasi hitung baris dan kategori CSV untuk mendemokan fungsionalitas
             const rows = csvText.split('\n').filter(r => r.trim() !== "");
-            const totalLines = rows.length - 1; // Kurangi Header
+            const totalLines = rows.length - 1; // Kurangi baris Header
 
             if (totalLines > 0) {
-                // Simulasikan proporsi data yang dibaca dari CSV
                 const fulfillSuccess = Math.floor(totalLines * 0.78);
                 const fulfillPending = totalLines - fulfillSuccess;
                 const offeringSuccess = Math.floor(totalLines * 0.62);
@@ -429,31 +507,22 @@
             document.getElementById('offering-donut-progress').setAttribute('stroke-dasharray', `${oPct}, 100`);
         }
 
-        // Load data on start (Persist data check)
-        window.onload = function() {
-            const savedData = localStorage.getItem('savedDashboardData');
-            if (savedData) {
-                processCSVData(savedData);
-            } else {
-                // Default Mock data if clean start
-                updateDashboardMetrics(82, 23, 64, 41);
-            }
-        };
-
-        // Modal Logout
-        function showLogoutModal() {
+        // ==========================================
+        // MODAL LOGOUT LOGIC
+        // ==========================================
+        window.showLogoutModal = function() {
             const modal = document.getElementById('logout-modal');
             modal.classList.remove('pointer-events-none', 'opacity-0');
             modal.children[0].classList.remove('scale-95');
         }
 
-        function hideLogoutModal() {
+        window.hideLogoutModal = function() {
             const modal = document.getElementById('logout-modal');
             modal.classList.add('pointer-events-none', 'opacity-0');
             modal.children[0].classList.add('scale-95');
         }
 
-        function confirmLogout() {
+        window.confirmLogout = function() {
             window.location.href = "login.html"; // Simulated redirect
         }
     </script>
