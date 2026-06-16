@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Kalender Event - SIMGROUP</title>
+    <title>Kalender Event - JAKARTANS TEAM</title>
     <!-- Tailwind CSS CDN -->
     <script src="https://cdn.tailwindcss.com"></script>
     <!-- Lucide Icons -->
@@ -337,6 +337,34 @@
                 showNotification("Sistem Google API belum siap, mohon tunggu sebentar...");
                 return;
             }
+
+            const syncIcon = document.getElementById('sync-icon');
+            syncIcon.classList.add('animate-spin');
+            
+            tokenClient.callback = async (resp) => {
+                if (resp.error !== undefined) {
+                    syncIcon.classList.remove('animate-spin');
+                    throw (resp);
+                }
+                
+                const syncBtn = document.getElementById('sync-btn');
+                syncBtn.classList.remove('bg-slate-500/20', 'border-slate-500/30', 'text-slate-200');
+                syncBtn.classList.add('bg-emerald-500/20', 'border-emerald-500/30', 'text-emerald-300');
+                
+                document.getElementById('sync-text').innerText = 'Sistem Terhubung';
+                syncIcon.classList.remove('animate-spin', 'lucide-refresh-cw');
+                syncIcon.outerHTML = '<span class="w-2 h-2 rounded-full bg-emerald-400 animate-pulse mr-2"></span>';
+
+                showNotification("Otorisasi berhasil. Menarik jadwal...");
+                await listUpcomingEvents();
+            };
+
+            // MODIFIKASI DISINI: Paksa Google memunculkan pilihan akun dan arahkan ke email target
+            tokenClient.requestAccessToken({
+                prompt: 'select_account', 
+                login_hint: 'sr.dkijakarta01@gmail.com'
+            });
+        }
 
             // Ubah UI tombol saat proses loading
             const syncIcon = document.getElementById('sync-icon');
