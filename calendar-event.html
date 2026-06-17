@@ -2,45 +2,63 @@
 <html lang="id">
 <head>
     <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Kalender Event - SIMGROUP</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://unpkg.com/lucide@latest"></script>
+    <!-- Google Identity Services & GAPI -->
     <script src="https://accounts.google.com/gsi/client" async defer></script>
     <script src="https://apis.google.com/js/api.js" async defer></script>
 </head>
 <body class="bg-[#0A262C] text-white flex min-h-screen font-sans">
 
-    <!-- Sidebar yang Lebih Elegan -->
-    <aside class="w-64 bg-[#0d5360] p-6 border-r border-white/10 flex flex-col shadow-2xl">
+    <!-- Sidebar -->
+    <aside class="w-64 bg-[#0d5360] p-6 border-r border-white/10 flex flex-col shadow-2xl hidden md:flex">
         <div class="flex items-center space-x-3 mb-10">
-            <div class="bg-teal-500/20 p-2 rounded-xl"><i data-lucide="layers" class="text-teal-300 w-6 h-6"></i></div>
+            <div class="bg-teal-500/20 p-2 rounded-xl">
+                <i data-lucide="layers" class="text-teal-300 w-6 h-6"></i>
+            </div>
             <span class="text-xl font-bold tracking-widest text-white">SIMGROUP</span>
         </div>
         <nav class="space-y-3 flex-1">
-            <a href="#" class="flex items-center space-x-3 px-4 py-3 rounded-xl text-teal-100 hover:bg-white/10 transition"><i data-lucide="layout-dashboard" class="w-5 h-5"></i><span>Dashboard</span></a>
-            <a href="#" class="flex items-center space-x-3 px-4 py-3 rounded-xl text-teal-100 hover:bg-white/10 transition"><i data-lucide="trending-up" class="w-5 h-5"></i><span>Growth & Drowning</span></a>
-            <a href="#" class="flex items-center space-x-3 px-4 py-3 rounded-xl bg-teal-600/30 text-white shadow-inner font-semibold border border-teal-500/30"><i data-lucide="calendar" class="w-5 h-5 text-teal-300"></i><span>Calendar of Event</span></a>
-            <a href="#" class="flex items-center space-x-3 px-4 py-3 rounded-xl text-teal-100 hover:bg-white/10 transition"><i data-lucide="activity" class="w-5 h-5"></i><span>Status SO Berjalan</span></a>
-            <a href="#" class="flex items-center space-x-3 px-4 py-3 rounded-xl text-teal-100 hover:bg-white/10 transition"><i data-lucide="database" class="w-5 h-5"></i><span>Bank Buffer Management</span></a>
-            <a href="#" class="flex items-center space-x-3 px-4 py-3 rounded-xl text-teal-100 hover:bg-white/10 transition"><i data-lucide="clock" class="w-5 h-5"></i><span>Timeline Kegiatan</span></a>
-            <a href="#" class="flex items-center space-x-3 px-4 py-3 rounded-xl text-teal-100 hover:bg-white/10 transition"><i data-lucide="file-text" class="w-5 h-5"></i><span>Report Media Partner</span></a>
+            <a href="#" class="flex items-center space-x-3 px-4 py-3 rounded-xl text-teal-100 hover:bg-white/10 transition">
+                <i data-lucide="layout-dashboard" class="w-5 h-5"></i><span>Dashboard</span>
+            </a>
+            <a href="#" class="flex items-center space-x-3 px-4 py-3 rounded-xl text-teal-100 hover:bg-white/10 transition">
+                <i data-lucide="trending-up" class="w-5 h-5"></i><span>Growth & Drowning</span>
+            </a>
+            <a href="#" class="flex items-center space-x-3 px-4 py-3 rounded-xl bg-teal-600/30 text-white shadow-inner font-semibold border border-teal-500/30">
+                <i data-lucide="calendar" class="w-5 h-5 text-teal-300"></i><span>Calendar of Event</span>
+            </a>
+            <a href="#" class="flex items-center space-x-3 px-4 py-3 rounded-xl text-teal-100 hover:bg-white/10 transition">
+                <i data-lucide="activity" class="w-5 h-5"></i><span>Status SO Berjalan</span>
+            </a>
+            <a href="#" class="flex items-center space-x-3 px-4 py-3 rounded-xl text-teal-100 hover:bg-white/10 transition">
+                <i data-lucide="database" class="w-5 h-5"></i><span>Bank Buffer Management</span>
+            </a>
+            <a href="#" class="flex items-center space-x-3 px-4 py-3 rounded-xl text-teal-100 hover:bg-white/10 transition">
+                <i data-lucide="clock" class="w-5 h-5"></i><span>Timeline Kegiatan</span>
+            </a>
+            <a href="#" class="flex items-center space-x-3 px-4 py-3 rounded-xl text-teal-100 hover:bg-white/10 transition">
+                <i data-lucide="file-text" class="w-5 h-5"></i><span>Report Media Partner</span>
+            </a>
         </nav>
     </aside>
 
     <!-- Main Content -->
-    <main class="flex-1 p-10 bg-gradient-to-br from-[#116A7B] to-[#0A262C]">
-        <header class="flex justify-between items-end mb-10 border-b border-white/10 pb-6">
+    <main class="flex-1 p-6 md:p-10 bg-gradient-to-br from-[#116A7B] to-[#0A262C] overflow-y-auto">
+        <header class="flex flex-col md:flex-row justify-between items-start md:items-end mb-10 border-b border-white/10 pb-6 gap-4">
             <div>
-                <h1 class="text-4xl font-extrabold tracking-tight">Calendar of Event</h1>
+                <h1 class="text-3xl md:text-4xl font-extrabold tracking-tight">Calendar of Event</h1>
                 <p class="text-teal-200/70 mt-2 font-medium">Monitoring agenda operasional wilayah Jakarta</p>
             </div>
-            <button id="sync-btn" class="bg-teal-500 hover:bg-teal-600 text-white px-8 py-3 rounded-2xl font-bold transition-all shadow-lg flex items-center gap-2 transform hover:scale-105 active:scale-95">
-                <i data-lucide="refresh-cw" class="w-4 h-4"></i>
+            <button id="sync-btn" class="bg-teal-500 hover:bg-teal-600 text-white px-6 md:px-8 py-3 rounded-2xl font-bold transition-all shadow-lg flex items-center gap-2 transform hover:scale-105 active:scale-95 disabled:opacity-50 disabled:cursor-not-allowed">
+                <i data-lucide="refresh-cw" id="sync-icon" class="w-4 h-4"></i>
                 <span id="sync-text">Sinkronkan Calendar</span>
             </button>
         </header>
 
-        <div id="agenda-event-list" class="grid grid-cols-1 md:grid-cols-2 gap-6">
+        <div id="agenda-event-list" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
             <!-- Kartu Kosong Awal -->
             <div class="col-span-full border-2 border-dashed border-white/10 rounded-3xl p-12 text-center flex flex-col items-center">
                 <div class="bg-white/5 p-4 rounded-full mb-4">
@@ -53,54 +71,149 @@
     </main>
 
     <script>
+        // Inisialisasi ikon Lucide
         lucide.createIcons();
+
+        // ==============================================================================
+        // ⚠️ LANGKAH SELANJUTNYA UNTUKMU:
+        // 1. Pergi ke Google Cloud Console (halaman yang kamu screenshot sebelumnya).
+        // 2. Klik "Create OAuth client".
+        // 3. Pilih tipe "Web application".
+        // 4. Masukkan URL tempat kamu menjalankan file ini (misal: http://127.0.0.1:5500) 
+        //    ke bagian "Authorized JavaScript origins".
+        // 5. Copy "Client ID" yang diberikan Google dan paste di bawah ini:
+        // ==============================================================================
+        
         const CLIENT_ID = 'MASUKKAN_CLIENT_ID_BARU_DISINI'; 
+        
+        // ==============================================================================
+
         const SCOPE = 'https://www.googleapis.com/auth/calendar.readonly';
+        const TARGET_CALENDAR_ID = 'sr.dkijakarta01@gmail.com';
+        
         let tokenClient;
+        const syncBtn = document.getElementById('sync-btn');
+        const syncText = document.getElementById('sync-text');
+        const syncIcon = document.getElementById('sync-icon');
 
         window.onload = () => {
+            // Setup Token Client dari Google Identity Services
             tokenClient = google.accounts.oauth2.initTokenClient({
                 client_id: CLIENT_ID,
                 scope: SCOPE,
                 prompt: 'select_account',
-                callback: (resp) => { if (resp.error) return; fetchCalendarEvents(); },
+                callback: (resp) => { 
+                    if (resp.error) {
+                        console.error(resp);
+                        resetButtonStatus();
+                        alert("Autentikasi gagal atau dibatalkan.");
+                        return; 
+                    }
+                    fetchCalendarEvents(); 
+                },
             });
+
+            // Load GAPI client untuk akses Calendar API
             gapi.load('client', async () => {
-                await gapi.client.init({ discoveryDocs: ['https://www.googleapis.com/discovery/v1/apis/calendar/v3/rest'] });
+                try {
+                    await gapi.client.init({ 
+                        discoveryDocs: ['https://www.googleapis.com/discovery/v1/apis/calendar/v3/rest'] 
+                    });
+                } catch (error) {
+                    console.error("Error initializing GAPI client", error);
+                }
             });
-            document.getElementById('sync-btn').onclick = () => tokenClient.requestAccessToken({ login_hint: 'sr.dkijakarta01@gmail.com' });
+
+            // Event listener tombol sinkronisasi
+            syncBtn.onclick = () => {
+                if (CLIENT_ID === 'MASUKKAN_CLIENT_ID_BARU_DISINI') {
+                    alert("Oops! Kamu belum memasukkan CLIENT_ID di dalam kode HTML. Silakan cek kodenya ya.");
+                    return;
+                }
+                
+                setLoadingStatus();
+                // Request access token (akan memunculkan popup login Google)
+                tokenClient.requestAccessToken({ login_hint: TARGET_CALENDAR_ID });
+            };
         };
 
+        function setLoadingStatus() {
+            syncBtn.disabled = true;
+            syncText.innerText = 'Menyinkronkan...';
+            syncIcon.classList.add('animate-spin');
+        }
+
+        function resetButtonStatus() {
+            syncBtn.disabled = false;
+            syncText.innerText = 'Sinkronkan Calendar';
+            syncIcon.classList.remove('animate-spin');
+        }
+
         async function fetchCalendarEvents() {
-            document.getElementById('sync-text').innerText = 'Sinkronisasi...';
             try {
+                // Mengambil list event dari calendar
                 const response = await gapi.client.calendar.events.list({
-                    'calendarId': 'sr.dkijakarta01@gmail.com',
+                    'calendarId': TARGET_CALENDAR_ID,
                     'timeMin': new Date().toISOString(),
                     'singleEvents': true,
-                    'orderBy': 'startTime'
+                    'orderBy': 'startTime',
+                    'maxResults': 10 // Ambil 10 agenda terdekat agar rapi
                 });
                 
                 const events = response.result.items;
                 const container = document.getElementById('agenda-event-list');
-                container.innerHTML = events.length > 0 
-                    ? events.map(e => `
-                        <div class="bg-white/95 text-slate-800 p-6 rounded-3xl shadow-xl hover:shadow-2xl transition-all hover:scale-[1.02] border-l-8 border-teal-500">
-                            <h3 class="font-bold text-xl text-slate-900">${e.summary}</h3>
-                            <div class="mt-4 flex items-center text-sm text-slate-500 gap-2">
-                                <i data-lucide="calendar" class="w-4 h-4"></i>
-                                <span>${new Date(e.start.dateTime || e.start.date).toLocaleDateString('id-ID', { weekday: 'long', day: 'numeric', month: 'long' })}</span>
+                
+                if (events.length > 0) {
+                    container.innerHTML = events.map(e => {
+                        const eventDate = new Date(e.start.dateTime || e.start.date);
+                        const isAllDay = !e.start.dateTime;
+                        
+                        return `
+                        <div class="bg-white/95 text-slate-800 p-6 rounded-3xl shadow-xl hover:shadow-2xl transition-all hover:scale-[1.02] border-l-8 border-teal-500 flex flex-col justify-between">
+                            <div>
+                                <h3 class="font-bold text-xl text-slate-900 line-clamp-2">${e.summary || '(Tanpa Judul)'}</h3>
+                                ${e.location ? `<p class="text-sm text-slate-600 mt-2 flex items-start gap-1"><i data-lucide="map-pin" class="w-4 h-4 mt-0.5 text-teal-600 shrink-0"></i><span class="line-clamp-2">${e.location}</span></p>` : ''}
                             </div>
-                            <div class="mt-1 flex items-center text-sm text-slate-500 gap-2">
-                                <i data-lucide="clock" class="w-4 h-4"></i>
-                                <span>${new Date(e.start.dateTime || e.start.date).toLocaleTimeString('id-ID', { hour: '2-digit', minute: '2-digit' })} WIB</span>
+                            <div class="mt-4 pt-4 border-t border-slate-200">
+                                <div class="flex items-center text-sm font-semibold text-teal-700 gap-2 mb-1">
+                                    <i data-lucide="calendar-days" class="w-4 h-4"></i>
+                                    <span>${eventDate.toLocaleDateString('id-ID', { weekday: 'long', day: 'numeric', month: 'long', year: 'numeric' })}</span>
+                                </div>
+                                <div class="flex items-center text-sm text-slate-500 gap-2">
+                                    <i data-lucide="clock" class="w-4 h-4"></i>
+                                    <span>${isAllDay ? 'Seharian Penuh' : eventDate.toLocaleTimeString('id-ID', { hour: '2-digit', minute: '2-digit' }) + ' WIB'}</span>
+                                </div>
                             </div>
-                        </div>`).join('')
-                    : "<p class='text-center'>Tidak ada agenda dalam waktu dekat.</p>";
-                document.getElementById('sync-text').innerText = 'Data Terupdate';
+                        </div>`;
+                    }).join('');
+                } else {
+                    container.innerHTML = `
+                    <div class="col-span-full border-2 border-dashed border-white/10 rounded-3xl p-12 text-center flex flex-col items-center">
+                        <div class="bg-white/5 p-4 rounded-full mb-4">
+                            <i data-lucide="calendar-check" class="w-8 h-8 text-teal-400"></i>
+                        </div>
+                        <h3 class="text-xl font-bold">Jadwal Kosong</h3>
+                        <p class="text-teal-200/60 max-w-sm mt-2">Tidak ada agenda event dalam waktu dekat di kalender ini.</p>
+                    </div>`;
+                }
+                
+                // Re-init icons untuk elemen baru yang baru dirender
                 lucide.createIcons();
+                
+                // Kembalikan tombol ke state normal
+                syncText.innerText = 'Terupdate!';
+                syncIcon.classList.remove('animate-spin');
+                syncBtn.disabled = false;
+                
+                // Set kembali teks setelah beberapa detik
+                setTimeout(() => {
+                    syncText.innerText = 'Sinkronkan Calendar';
+                }, 3000);
+
             } catch (err) {
-                alert("Gagal mengambil data. Pastikan Client ID sudah benar dan email masuk di Test Users.");
+                console.error("Fetch error:", err);
+                resetButtonStatus();
+                alert("Gagal mengambil data. Pastikan akun kamu punya akses ke kalender tersebut.");
             }
         }
     </script>
