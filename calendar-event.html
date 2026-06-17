@@ -108,7 +108,7 @@
             
             <div class="flex items-center space-x-4">
                 <!-- Tombol Sinkronisasi -->
-                <button onclick="handleAuthClick()" id="sync-btn" class="flex items-center space-x-2 text-xs bg-slate-500/20 text-slate-200 hover:bg-emerald-500/20 hover:text-emerald-300 px-3 py-1.5 rounded-full border border-slate-500/30 transition-all duration-300">
+                <button onclick="fetchCalendarEvents()" id="sync-btn" class="flex items-center space-x-2 text-xs bg-slate-500/20 text-slate-200 hover:bg-emerald-500/20 hover:text-emerald-300 px-3 py-1.5 rounded-full border border-slate-500/30 transition-all duration-300">
                     <i data-lucide="refresh-cw" class="w-3.5 h-3.5" id="sync-icon"></i>
                     <span id="sync-text">Sinkronkan Google Calendar</span>
                 </button>
@@ -133,7 +133,7 @@
                 </div>
                 <button onclick="showCreateEventModal()" class="flex items-center justify-center space-x-2 bg-white/95 text-teal-900 hover:bg-teal-50 hover:scale-[1.02] active:scale-95 font-bold py-3 px-6 rounded-2xl transition-all shadow-xl self-start md:self-auto border border-white/20">
                     <i data-lucide="calendar-plus" class="w-5 h-5 text-teal-700"></i>
-                    <span>Buat Event Baru</span>
+                    <span>Buat Event Lokal</span>
                 </button>
             </div>
 
@@ -146,7 +146,7 @@
                         <div class="flex items-center justify-between border-b border-slate-100 pb-4 mb-4">
                             <h3 class="font-bold text-slate-900 text-lg flex items-center gap-2">
                                 <i data-lucide="calendar-days" class="text-teal-600"></i>
-                                <span>Juni 2026</span>
+                                <span id="current-month-year">Memuat...</span>
                             </h3>
                             <div class="flex gap-1">
                                 <button class="p-1 hover:bg-slate-100 rounded-lg text-slate-500"><i data-lucide="chevron-left" class="w-4 h-4"></i></button>
@@ -156,41 +156,8 @@
                         <div class="grid grid-cols-7 gap-2 text-center text-xs font-bold text-slate-400 mb-2">
                             <span>Mg</span><span>Sn</span><span>Sl</span><span>Rb</span><span>Km</span><span>Jm</span><span>Sb</span>
                         </div>
-                        <div class="grid grid-cols-7 gap-2 text-center text-sm font-semibold">
-                            <!-- Inactive last month -->
-                            <span class="py-1 text-slate-200">25</span><span class="py-1 text-slate-200">26</span><span class="py-1 text-slate-200">27</span><span class="py-1 text-slate-200">28</span><span class="py-1 text-slate-200">29</span><span class="py-1 text-slate-200">30</span><span class="py-1 text-slate-200">31</span>
-                            <!-- This month active -->
-                            <span class="py-1 text-slate-700 hover:bg-teal-50 rounded-lg cursor-pointer">1</span>
-                            <span class="py-1 text-slate-700 hover:bg-teal-50 rounded-lg cursor-pointer">2</span>
-                            <span class="py-1 text-slate-700 hover:bg-teal-50 rounded-lg cursor-pointer">3</span>
-                            <span class="py-1 text-slate-700 hover:bg-teal-50 rounded-lg cursor-pointer">4</span>
-                            <span class="py-1 text-slate-700 hover:bg-teal-50 rounded-lg cursor-pointer">5</span>
-                            <span class="py-1 text-slate-700 hover:bg-teal-50 rounded-lg cursor-pointer">6</span>
-                            <span class="py-1 text-slate-700 hover:bg-teal-50 rounded-lg cursor-pointer">7</span>
-                            <span class="py-1 text-slate-700 hover:bg-teal-50 rounded-lg cursor-pointer">8</span>
-                            <span class="py-1 text-slate-700 hover:bg-teal-50 rounded-lg cursor-pointer">9</span>
-                            <!-- Current Day -->
-                            <span class="py-1 bg-teal-600 text-white rounded-lg font-black shadow-md cursor-pointer relative">10<span class="absolute bottom-0.5 left-1/2 -translate-x-1/2 w-1 h-1 bg-white rounded-full"></span></span>
-                            <span class="py-1 text-slate-700 hover:bg-teal-50 rounded-lg cursor-pointer">11</span>
-                            <span class="py-1 text-slate-700 hover:bg-teal-50 rounded-lg cursor-pointer">12</span>
-                            <span class="py-1 text-slate-700 hover:bg-teal-50 rounded-lg cursor-pointer">13</span>
-                            <span class="py-1 text-slate-700 hover:bg-teal-50 rounded-lg cursor-pointer">14</span>
-                            <span class="py-1 text-slate-700 hover:bg-teal-50 rounded-lg cursor-pointer">15</span>
-                            <span class="py-1 text-slate-700 hover:bg-teal-50 rounded-lg cursor-pointer">16</span>
-                            <span class="py-1 text-slate-700 hover:bg-teal-50 rounded-lg cursor-pointer">17</span>
-                            <span class="py-1 text-slate-700 hover:bg-teal-50 rounded-lg cursor-pointer">18</span>
-                            <span class="py-1 text-slate-700 hover:bg-teal-50 rounded-lg cursor-pointer">19</span>
-                            <span class="py-1 text-slate-700 hover:bg-teal-50 rounded-lg cursor-pointer">20</span>
-                            <span class="py-1 text-slate-700 hover:bg-teal-50 rounded-lg cursor-pointer">21</span>
-                            <span class="py-1 text-slate-700 hover:bg-teal-50 rounded-lg cursor-pointer">22</span>
-                            <span class="py-1 text-slate-700 hover:bg-teal-50 rounded-lg cursor-pointer">23</span>
-                            <span class="py-1 text-slate-700 hover:bg-teal-50 rounded-lg cursor-pointer">24</span>
-                            <span class="py-1 text-slate-700 hover:bg-teal-50 rounded-lg cursor-pointer">25</span>
-                            <span class="py-1 text-slate-700 hover:bg-teal-50 rounded-lg cursor-pointer">26</span>
-                            <span class="py-1 text-slate-700 hover:bg-teal-50 rounded-lg cursor-pointer">27</span>
-                            <span class="py-1 text-slate-700 hover:bg-teal-50 rounded-lg cursor-pointer">28</span>
-                            <span class="py-1 text-slate-700 hover:bg-teal-50 rounded-lg cursor-pointer">29</span>
-                            <span class="py-1 text-slate-700 hover:bg-teal-50 rounded-lg cursor-pointer">30</span>
+                        <div id="calendar-grid" class="grid grid-cols-7 gap-2 text-center text-sm font-semibold">
+                            <!-- Tanggal akan di-generate otomatis oleh JavaScript di sini -->
                         </div>
                     </div>
                     
@@ -203,7 +170,7 @@
                 <!-- Upcoming Event Cards Container -->
                 <div class="lg:col-span-2 space-y-4" id="agenda-event-list">
                     <!-- Placeholder sebelum tersinkronisasi -->
-                    <div class="bg-white/5 border border-dashed border-white/20 rounded-3xl p-10 flex flex-col items-center justify-center text-center">
+                    <div class="bg-white/5 border border-dashed border-white/20 rounded-3xl p-10 flex flex-col items-center justify-center text-center transition-all">
                         <div class="bg-white/10 p-4 rounded-full mb-4">
                             <i data-lucide="calendar-search" class="w-10 h-10 text-teal-200 opacity-50"></i>
                         </div>
@@ -216,11 +183,11 @@
         </div>
     </main>
 
-    <!-- Create Event Modal -->
+    <!-- Create Event Modal (Mode Lokal) -->
     <div id="event-modal" class="fixed inset-0 bg-black/60 backdrop-blur-sm flex items-center justify-center opacity-0 pointer-events-none transition-opacity duration-300 z-50">
         <div class="bg-white text-slate-800 p-8 rounded-3xl shadow-2xl max-w-md w-full mx-4 transform scale-95 transition-transform duration-300">
             <div class="flex justify-between items-center mb-6">
-                <h3 class="text-2xl font-black text-slate-950">Buat Event Baru</h3>
+                <h3 class="text-2xl font-black text-slate-950">Buat Event Lokal</h3>
                 <button onclick="hideCreateEventModal()" class="p-1 hover:bg-slate-100 rounded-lg text-slate-400"><i data-lucide="x" class="w-5 h-5"></i></button>
             </div>
             
@@ -233,13 +200,13 @@
                     <label class="block text-xs font-bold uppercase tracking-wider text-slate-400 mb-1">Kategori Agenda</label>
                     <select id="event-category" class="w-full bg-slate-50 border border-slate-200 py-3 px-4 rounded-xl text-slate-800 focus:outline-none focus:ring-2 focus:ring-teal-500 font-semibold text-sm">
                         <option value="Recruitment">Recruitment on Street</option>
-                        <option value="Client">Virtual Hiring Day</option>
-                        <option value="Evaluation">Walk Interview</option>
-                        <option value="Evaluation">Jobfair</option>
-                        <option value="Evaluation">COCS Adira</option>
-                        <option value="Evaluation">SIM Group Mengajar</option>
-                        <option value="Evaluation">Review Weekly</option>
-                        <option value="Evaluation">Review Monthly</option>
+                        <option value="Virtual">Virtual Hiring Day</option>
+                        <option value="WalkIn">Walk Interview</option>
+                        <option value="Jobfair">Jobfair</option>
+                        <option value="COCS">COCS Adira</option>
+                        <option value="Mengajar">SIM Group Mengajar</option>
+                        <option value="ReviewW">Review Weekly</option>
+                        <option value="ReviewM">Review Monthly</option>
                     </select>
                 </div>
                 <div>
@@ -290,153 +257,148 @@
         // Init Icons
         lucide.createIcons();
 
-        // --- KONFIGURASI GOOGLE API MULAI DARI SINI ---
+        // --- RENDER KALENDER KIRI OTOMATIS ---
+        function renderMiniCalendar() {
+            const date = new Date();
+            const year = date.getFullYear();
+            const month = date.getMonth();
+            const today = date.getDate();
 
-        // PERHATIAN: Masukkan kredensial kamu pada baris di bawah ini. HARUS DIAPIT TANDA KUTIP!
-        const CLIENT_ID = '271685278113-ib7etfbpre91r5v49no5gcfevrrdn256.apps.googleusercontent.com'; 
-        
-        const DISCOVERY_DOC = 'https://www.googleapis.com/discovery/v1/apis/calendar/v3/rest';
-        const SCOPES = 'https://www.googleapis.com/auth/calendar.readonly';
+            const monthNames = ["Januari", "Februari", "Maret", "April", "Mei", "Juni", "Juli", "Agustus", "September", "Oktober", "November", "Desember"];
+            document.getElementById('current-month-year').innerText = `${monthNames[month]} ${year}`;
 
-        let tokenClient;
-        let gapiInited = false;
-        let gisInited = false;
+            const firstDayIndex = new Date(year, month, 1).getDay();
+            const lastDay = new Date(year, month + 1, 0).getDate();
+            const prevLastDay = new Date(year, month, 0).getDate();
 
-        // Dipanggil saat library gapi selesai diload
-        function gapiLoaded() {
-            gapi.load('client', intializeGapiClient);
-        }
+            let daysHTML = "";
 
-        async function intializeGapiClient() {
-            try {
-                await gapi.client.init({
-                    discoveryDocs: [DISCOVERY_DOC],
-                });
-                gapiInited = true;
-            } catch (error) {
-                console.error('Error saat inisialisasi GAPI:', error);
-                showNotification("Gagal memuat API Google.");
+            // Tanggal bulan lalu yang masuk di minggu pertama
+            for (let x = firstDayIndex; x > 0; x--) {
+                daysHTML += `<span class="py-1 text-slate-200">${prevLastDay - x + 1}</span>`;
             }
+
+            // Tanggal bulan ini
+            for (let i = 1; i <= lastDay; i++) {
+                if (i === today) {
+                    daysHTML += `<span class="py-1 bg-teal-600 text-white rounded-lg font-black shadow-md cursor-pointer relative">${i}<span class="absolute bottom-0.5 left-1/2 -translate-x-1/2 w-1 h-1 bg-white rounded-full"></span></span>`;
+                } else {
+                    daysHTML += `<span class="py-1 text-slate-700 hover:bg-teal-50 rounded-lg cursor-pointer">${i}</span>`;
+                }
+            }
+
+            document.getElementById('calendar-grid').innerHTML = daysHTML;
         }
 
-        // Dipanggil saat library gis selesai diload
-        function gisLoaded() {
-            tokenClient = google.accounts.oauth2.initTokenClient({
-                client_id: CLIENT_ID,
-                scope: SCOPES,
-                callback: '', // Akan diisi dinamis saat tombol diklik
-            });
-            gisInited = true;
-        }
+        // Panggil fungsi kalender saat halaman dimuat
+        renderMiniCalendar();
 
-        // Proses Login & Tarik Data
-        function handleAuthClick() {
-            if (!gapiInited || !gisInited) {
-                showNotification("Sistem Google API belum siap, mohon tunggu sebentar...");
+
+        // --- KONFIGURASI FETCH API GOOGLE CALENDAR (METODE PUBLIK TANPA LOGIN) ---
+        
+        // PERHATIAN: Masukkan API KEY kamu di bawah ini
+        const API_KEY = 'MASUKKAN_API_KEY_KAMU_DISINI'; 
+        const CALENDAR_ID = 'sr.dkijakarta01@gmail.com';
+
+        async function fetchCalendarEvents() {
+            const syncIcon = document.getElementById('sync-icon');
+            const syncText = document.getElementById('sync-text');
+            const syncBtn = document.getElementById('sync-btn');
+            
+            // Tampilan Loading
+            if (syncIcon.tagName === 'I') {
+                syncIcon.classList.add('animate-spin');
+            }
+            syncText.innerText = 'Menyinkronkan...';
+
+            if (API_KEY === 'MASUKKAN_API_KEY_KAMU_DISINI') {
+                showNotification("Gagal: API KEY belum dimasukkan ke dalam kode!");
+                if (syncIcon.tagName === 'I') syncIcon.classList.remove('animate-spin');
+                syncText.innerText = 'Sinkronkan Google Calendar';
                 return;
             }
 
-            const syncIcon = document.getElementById('sync-icon');
-            syncIcon.classList.add('animate-spin');
-            
-            tokenClient.callback = async (resp) => {
-                if (resp.error !== undefined) {
-                    syncIcon.classList.remove('animate-spin');
-                    throw (resp);
-                }
+            try {
+                // Ambil jadwal mulai dari jam saat ini
+                const timeMin = new Date().toISOString();
                 
-                const syncBtn = document.getElementById('sync-btn');
+                // URL API Google Calendar Public Endpoint (Tanpa gapi library)
+                const url = `https://www.googleapis.com/calendar/v3/calendars/${encodeURIComponent(CALENDAR_ID)}/events?key=${API_KEY}&timeMin=${encodeURIComponent(timeMin)}&singleEvents=true&orderBy=startTime&maxResults=10`;
+                
+                const response = await fetch(url);
+                const data = await response.json();
+
+                if (!response.ok) {
+                    throw new Error(data.error.message || 'Gagal terhubung ke Google Calendar');
+                }
+
+                const events = data.items;
+                const listContainer = document.getElementById('agenda-event-list');
+                listContainer.innerHTML = ''; // Kosongkan placeholder
+
+                if (!events || events.length === 0) {
+                    listContainer.innerHTML = `
+                        <div class="bg-white/95 rounded-3xl p-8 text-center shadow-xl">
+                            <p class="text-slate-500 font-medium">Tidak ada jadwal mendatang di Google Calendar ${CALENDAR_ID}.</p>
+                        </div>`;
+                    document.getElementById('total-event-count').innerText = "0 Event";
+                } else {
+                    document.getElementById('total-event-count').innerText = `${events.length} Event`;
+
+                    events.forEach((event) => {
+                        const start = event.start.dateTime || event.start.date;
+                        const dateObj = new Date(start);
+                        const formattedDate = dateObj.toLocaleDateString('id-ID', { day: 'numeric', month: 'long', year: 'numeric' });
+                        
+                        let timeVal = "Seharian";
+                        if(event.start.dateTime) {
+                            timeVal = dateObj.toLocaleTimeString('id-ID', { hour: '2-digit', minute: '2-digit' }) + ' WIB';
+                        }
+                        
+                        const title = event.summary || 'Tanpa Judul';
+                        const location = event.location || 'Lokasi belum ditentukan';
+
+                        const eventHTML = `
+                            <div class="bg-white/95 text-slate-800 rounded-3xl p-6 shadow-xl border-l-8 border-blue-500 flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 hover:scale-[1.01] transition-transform duration-200">
+                                <div class="space-y-1">
+                                    <span class="bg-blue-100 text-blue-800 text-[10px] font-black tracking-widest uppercase px-2 py-0.5 rounded-md">Google Calendar</span>
+                                    <h4 class="font-extrabold text-slate-900 text-lg mt-1">${title}</h4>
+                                    <p class="text-xs text-slate-400 flex items-center gap-1.5"><i data-lucide="map-pin" class="w-3.5 h-3.5 text-slate-400"></i> ${location}</p>
+                                </div>
+                                <div class="flex items-center gap-4 bg-slate-50 border border-slate-100 py-3 px-4 rounded-2xl w-full sm:w-auto justify-between sm:justify-start">
+                                    <div class="text-center sm:text-right pr-4 border-r border-slate-200">
+                                        <p class="text-xs text-slate-400">${formattedDate}</p>
+                                        <p class="text-sm font-bold text-slate-800">${timeVal}</p>
+                                    </div>
+                                    <span class="p-2 bg-blue-100 text-blue-600 rounded-xl"><i data-lucide="calendar-check" class="w-5 h-5"></i></span>
+                                </div>
+                            </div>
+                        `;
+                        listContainer.insertAdjacentHTML('beforeend', eventHTML);
+                    });
+                }
+
+                // Ubah status tombol menjadi berhasil
                 syncBtn.classList.remove('bg-slate-500/20', 'border-slate-500/30', 'text-slate-200');
                 syncBtn.classList.add('bg-emerald-500/20', 'border-emerald-500/30', 'text-emerald-300');
+                syncText.innerText = 'Sistem Terhubung';
                 
-                document.getElementById('sync-text').innerText = 'Sistem Terhubung';
-                syncIcon.classList.remove('animate-spin', 'lucide-refresh-cw');
-                syncIcon.outerHTML = '<span class="w-2 h-2 rounded-full bg-emerald-400 animate-pulse mr-2"></span>';
-
-                showNotification("Otorisasi berhasil. Menarik jadwal...");
-                
-                // Mulai ambil data
-                await listUpcomingEvents();
-            };
-
-            // Paksa Google memunculkan pilihan akun dan arahkan ke email target
-            tokenClient.requestAccessToken({
-                prompt: 'select_account', 
-                login_hint: 'sr.dkijakarta01@gmail.com'
-            });
-        }
-
-        async function listUpcomingEvents() {
-            let response;
-            try {
-                const request = {
-                    'calendarId': 'sr.dkijakarta01@gmail.com', // Tarik dari kalender spesifik
-                    'timeMin': (new Date()).toISOString(),
-                    'showDeleted': false,
-                    'singleEvents': true,
-                    'maxResults': 10,
-                    'orderBy': 'startTime',
-                };
-                response = await gapi.client.calendar.events.list(request);
-            } catch (err) {
-                console.error("Gagal mengambil data jadwal:", err);
-                showNotification("Gagal menarik data jadwal. Pastikan email memiliki akses.");
-                return;
-            }
-
-            const events = response.result.items;
-            const listContainer = document.getElementById('agenda-event-list');
-            listContainer.innerHTML = ''; // Hapus placeholder state
-
-            if (!events || events.length == 0) {
-                listContainer.innerHTML = `
-                    <div class="bg-white/95 rounded-3xl p-8 text-center shadow-xl">
-                        <p class="text-slate-500 font-medium">Tidak ada jadwal mendatang yang ditemukan di kalender Anda.</p>
-                    </div>`;
-                document.getElementById('total-event-count').innerText = "0 Event";
-                return;
-            }
-
-            // Update Total Angka
-            document.getElementById('total-event-count').innerText = `${events.length} Event`;
-
-            // Mapping HTML
-            events.forEach((event) => {
-                const start = event.start.dateTime || event.start.date;
-                const dateObj = new Date(start);
-                const formattedDate = dateObj.toLocaleDateString('id-ID', { day: 'numeric', month: 'long', year: 'numeric' });
-                
-                let timeVal = "Seharian";
-                if(event.start.dateTime) {
-                    timeVal = dateObj.toLocaleTimeString('id-ID', { hour: '2-digit', minute: '2-digit' }) + ' WIB';
+                // Ubah icon refresh menjadi titik hijau berkedip
+                if (syncIcon.tagName === 'I') {
+                    syncIcon.outerHTML = '<span class="w-2 h-2 rounded-full bg-emerald-400 animate-pulse mr-2" id="sync-icon"></span>';
                 }
                 
-                const title = event.summary || 'Tanpa Judul';
-                const location = event.location || 'Lokasi belum ditentukan';
+                lucide.createIcons();
+                showNotification("Jadwal sukses ditarik dari Google!");
 
-                // Tema visual Google Sync (Warna Biru)
-                const eventHTML = `
-                    <div class="bg-white/95 text-slate-800 rounded-3xl p-6 shadow-xl border-l-8 border-blue-500 flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 hover:scale-[1.01] transition-transform duration-200">
-                        <div class="space-y-1">
-                            <span class="bg-blue-100 text-blue-800 text-[10px] font-black tracking-widest uppercase px-2 py-0.5 rounded-md">Google Sync</span>
-                            <h4 class="font-extrabold text-slate-900 text-lg mt-1">${title}</h4>
-                            <p class="text-xs text-slate-400 flex items-center gap-1.5"><i data-lucide="map-pin" class="w-3.5 h-3.5 text-slate-400"></i> ${location}</p>
-                        </div>
-                        <div class="flex items-center gap-4 bg-slate-50 border border-slate-100 py-3 px-4 rounded-2xl w-full sm:w-auto justify-between sm:justify-start">
-                            <div class="text-center sm:text-right pr-4 border-r border-slate-200">
-                                <p class="text-xs text-slate-400">${formattedDate}</p>
-                                <p class="text-sm font-bold text-slate-800">${timeVal}</p>
-                            </div>
-                            <span class="p-2 bg-blue-100 text-blue-600 rounded-xl"><i data-lucide="calendar-check" class="w-5 h-5"></i></span>
-                        </div>
-                    </div>
-                `;
-                listContainer.insertAdjacentHTML('beforeend', eventHTML);
-            });
-            
-            lucide.createIcons();
-            showNotification("Jadwal sukses disinkronkan!");
+            } catch (err) {
+                console.error("Fetch Error:", err);
+                showNotification("Gagal: Pastikan Calendar Publik & API Key benar.");
+                if (syncIcon.tagName === 'I') syncIcon.classList.remove('animate-spin');
+                syncText.innerText = 'Gagal, Coba Lagi';
+            }
         }
+
 
         // --- SCRIPT UI BAWAAN ---
         function showNotification(msg) {
@@ -461,7 +423,6 @@
         }
 
         function submitNewEvent() {
-            // Fungsi ini sekarang hanya menambahkan event ke lokal HTML (sementara/tidak masuk google)
             const title = document.getElementById('event-title').value;
             const category = document.getElementById('event-category').value;
             const location = document.getElementById('event-location').value;
@@ -469,7 +430,7 @@
             const timeVal = document.getElementById('event-time').value;
 
             if(!title || !location || !dateVal || !timeVal) {
-                showNotification("Harap isi semua kolom!");
+                showNotification("Harap isi semua kolom form!");
                 return;
             }
 
@@ -477,10 +438,10 @@
             let bgBadge = "bg-purple-100 text-purple-800";
             let iconName = "file-bar-chart";
 
-            if (category === "Recruitment") {
+            if (["Recruitment", "WalkIn", "Jobfair"].includes(category)) {
                 borderStyle = "border-emerald-500"; bgBadge = "bg-emerald-100 text-emerald-800"; iconName = "briefcase";
-            } else if (category === "Client") {
-                borderStyle = "border-indigo-500"; bgBadge = "bg-indigo-100 text-indigo-800"; iconName = "handshake";
+            } else if (category === "Virtual" || category === "COCS") {
+                borderStyle = "border-indigo-500"; bgBadge = "bg-indigo-100 text-indigo-800"; iconName = "monitor";
             }
 
             const dateObj = new Date(dateVal);
@@ -489,7 +450,9 @@
             const list = document.getElementById('agenda-event-list');
             
             // Hapus placeholder jika masih ada
-            if(list.innerHTML.includes("Belum Tersinkronisasi")) { list.innerHTML = ''; }
+            if(list.innerHTML.includes("Belum Tersinkronisasi") || list.innerHTML.includes("Tidak ada jadwal mendatang")) { 
+                list.innerHTML = ''; 
+            }
 
             const newEventHTML = `
                 <div class="bg-white/95 text-slate-800 rounded-3xl p-6 shadow-xl border-l-8 ${borderStyle} flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 hover:scale-[1.01] transition-transform duration-200">
@@ -514,7 +477,11 @@
             hideCreateEventModal();
             showNotification("Event ditambahkan secara lokal!");
 
-            document.getElementById('event-title').value = ""; document.getElementById('event-location').value = ""; document.getElementById('event-date').value = ""; document.getElementById('event-time').value = "";
+            // Kosongkan isian
+            document.getElementById('event-title').value = ""; 
+            document.getElementById('event-location').value = ""; 
+            document.getElementById('event-date').value = ""; 
+            document.getElementById('event-time').value = "";
         }
 
         function showLogoutModal() {
@@ -531,10 +498,5 @@
             window.location.href = "login.html";
         }
     </script>
-    
-    <!-- Memuat Library Google API -->
-    <script async defer src="https://apis.google.com/js/api.js" onload="gapiLoaded()"></script>
-    <script async defer src="https://accounts.google.com/gsi/client" onload="gisLoaded()"></script>
-
 </body>
 </html>
