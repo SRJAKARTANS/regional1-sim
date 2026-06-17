@@ -9,7 +9,8 @@
 </head>
 <body class="bg-[#0A262C] text-white flex min-h-screen font-sans">
 
-    <aside class="w-64 bg-[#0d5360] p-6 border-r border-white/10 flex flex-col shadow-2xl hidden md:flex">
+    <!-- Sidebar -->
+    <aside class="w-64 bg-[#0d5360] p-6 border-r border-white/10 flex flex-col shadow-2xl hidden md:flex shrink-0">
         <div class="flex items-center space-x-3 mb-10">
             <div class="bg-teal-500/20 p-2 rounded-xl">
                 <i data-lucide="layers" class="text-teal-300 w-6 h-6"></i>
@@ -17,16 +18,16 @@
             <span class="text-xl font-bold tracking-widest text-white">SIMGROUP</span>
         </div>
         <nav class="space-y-3 flex-1">
-            <a href="#" class="flex items-center space-x-3 px-4 py-3 rounded-xl text-teal-100 hover:bg-white/10 transition">
+            <a href="dashboar-internal.html" class="flex items-center space-x-3 px-4 py-3 rounded-xl text-teal-100 hover:bg-white/10 transition">
                 <i data-lucide="layout-dashboard" class="w-5 h-5"></i><span>Dashboard</span>
             </a>
-            <a href="#" class="flex items-center space-x-3 px-4 py-3 rounded-xl text-teal-100 hover:bg-white/10 transition">
+            <a href="growth-drowning.html" class="flex items-center space-x-3 px-4 py-3 rounded-xl text-teal-100 hover:bg-white/10 transition">
                 <i data-lucide="trending-up" class="w-5 h-5"></i><span>Growth & Drowning</span>
             </a>
-            <a href="#" class="flex items-center space-x-3 px-4 py-3 rounded-xl bg-teal-600/30 text-white shadow-inner font-semibold border border-teal-500/30">
+            <a href="calendar-event.html" class="flex items-center space-x-3 px-4 py-3 rounded-xl bg-teal-600/30 text-white shadow-inner font-semibold border border-teal-500/30">
                 <i data-lucide="calendar" class="w-5 h-5 text-teal-300"></i><span>Calendar of Event</span>
             </a>
-            <a href="#" class="flex items-center space-x-3 px-4 py-3 rounded-xl text-teal-100 hover:bg-white/10 transition">
+            <a href="status-so.html" class="flex items-center space-x-3 px-4 py-3 rounded-xl text-teal-100 hover:bg-white/10 transition">
                 <i data-lucide="activity" class="w-5 h-5"></i><span>Status SO Berjalan</span>
             </a>
             <a href="#" class="flex items-center space-x-3 px-4 py-3 rounded-xl text-teal-100 hover:bg-white/10 transition">
@@ -41,6 +42,7 @@
         </nav>
     </aside>
 
+    <!-- Main Content -->
     <main class="flex-1 p-6 md:p-10 bg-gradient-to-br from-[#116A7B] to-[#0A262C] overflow-y-auto">
         <header class="flex flex-col md:flex-row justify-between items-start md:items-end mb-10 border-b border-white/10 pb-6 gap-4">
             <div>
@@ -53,83 +55,195 @@
             </button>
         </header>
 
-        <div id="agenda-event-list" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-            <div class="col-span-full border-2 border-dashed border-white/10 rounded-3xl p-12 text-center flex flex-col items-center">
-                <div class="bg-white/5 p-4 rounded-full mb-4 animate-spin">
-                    <i data-lucide="refresh-cw" class="w-8 h-8 text-teal-400"></i>
+        <!-- Layout 2 Kolom: Kalender Visual & List Agenda -->
+        <div class="grid grid-cols-1 xl:grid-cols-3 gap-8">
+            
+            <!-- KOLOM KIRI: Visual Kalender Widget -->
+            <div class="xl:col-span-1">
+                <div class="bg-[#0d5360]/80 backdrop-blur-md rounded-3xl p-6 shadow-2xl border border-white/5 sticky top-6">
+                    <div class="flex justify-between items-center mb-6">
+                        <h2 id="calendar-month-year" class="text-xl font-bold text-white tracking-wide">Bulan Tahun</h2>
+                        <div class="flex gap-2">
+                            <button id="prev-month" class="p-2 rounded-lg bg-white/5 hover:bg-white/10 transition">
+                                <i data-lucide="chevron-left" class="w-5 h-5"></i>
+                            </button>
+                            <button id="next-month" class="p-2 rounded-lg bg-white/5 hover:bg-white/10 transition">
+                                <i data-lucide="chevron-right" class="w-5 h-5"></i>
+                            </button>
+                        </div>
+                    </div>
+                    
+                    <!-- Nama Hari -->
+                    <div class="grid grid-cols-7 gap-1 text-center text-xs font-semibold text-teal-200/60 mb-2">
+                        <div>Min</div><div>Sen</div><div>Sel</div><div>Rab</div><div>Kam</div><div>Jum</div><div>Sab</div>
+                    </div>
+                    
+                    <!-- Grid Tanggal -->
+                    <div id="calendar-days" class="grid grid-cols-7 gap-1 text-center justify-items-center">
+                        <!-- Javascript akan mengisi grid ini -->
+                    </div>
                 </div>
-                <h3 class="text-xl font-bold">Memuat Agenda...</h3>
-                <p class="text-teal-200/60 max-w-sm mt-2">Sedang menarik data otomatis dari Google Calendar.</p>
             </div>
+
+            <!-- KOLOM KANAN: Daftar Agenda -->
+            <div class="xl:col-span-2">
+                <div class="flex items-center gap-3 mb-6">
+                    <i data-lucide="list-todo" class="w-6 h-6 text-teal-400"></i>
+                    <h2 class="text-2xl font-bold">Agenda Mendatang</h2>
+                </div>
+                
+                <div id="agenda-event-list" class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                    <!-- Loading State -->
+                    <div class="col-span-full border-2 border-dashed border-white/10 rounded-3xl p-12 text-center flex flex-col items-center">
+                        <div class="bg-white/5 p-4 rounded-full mb-4 animate-spin">
+                            <i data-lucide="refresh-cw" class="w-8 h-8 text-teal-400"></i>
+                        </div>
+                        <h3 class="text-xl font-bold">Memuat Agenda...</h3>
+                        <p class="text-teal-200/60 max-w-sm mt-2">Sedang menarik data otomatis dari Google Calendar.</p>
+                    </div>
+                </div>
+            </div>
+
         </div>
     </main>
 
     <script>
-        // Inisialisasi ikon Lucide pertama kali
         lucide.createIcons();
 
-        // ==============================================================================
-        // ⚠️ MASUKKAN API KEY BARU ANDA DI SINI
-        // ==============================================================================
         const API_KEY = 'AIzaSyDt_TQcOXYDZPMzjpR5pmYxTqAoNkA088M';
         const TARGET_CALENDAR_ID = 'sr.dkijakarta01@gmail.com';
-        // ==============================================================================
 
         const refreshBtn = document.getElementById('refresh-btn');
         const refreshText = document.getElementById('refresh-text');
         const refreshIcon = document.getElementById('refresh-icon');
         const container = document.getElementById('agenda-event-list');
+        
+        let globalEventsData = []; // Menyimpan data event untuk digambar di kalender
+        let currentNavDate = new Date(); // Menyimpan bulan/tahun yang sedang dilihat di widget
 
-        // Panggil fungsi secara otomatis saat website dibuka
         window.onload = () => {
             fetchCalendarEvents();
 
-            // Pasang fungsi ke tombol refresh jika user ingin update manual
             refreshBtn.onclick = () => {
                 fetchCalendarEvents();
             };
+
+            document.getElementById('prev-month').onclick = () => {
+                currentNavDate.setMonth(currentNavDate.getMonth() - 1);
+                renderCalendarWidget();
+            };
+
+            document.getElementById('next-month').onclick = () => {
+                currentNavDate.setMonth(currentNavDate.getMonth() + 1);
+                renderCalendarWidget();
+            };
         };
 
+        // Fungsi untuk menggambar Widget Kalender Visual
+        function renderCalendarWidget() {
+            const calendarDaysDiv = document.getElementById('calendar-days');
+            const monthYearLabel = document.getElementById('calendar-month-year');
+            const monthNames = ["Januari", "Februari", "Maret", "April", "Mei", "Juni", "Juli", "Agustus", "September", "Oktober", "November", "Desember"];
+            
+            calendarDaysDiv.innerHTML = '';
+            
+            const year = currentNavDate.getFullYear();
+            const month = currentNavDate.getMonth();
+            
+            monthYearLabel.innerText = `${monthNames[month]} ${year}`;
+
+            const firstDayIndex = new Date(year, month, 1).getDay(); // 0 = Minggu, 1 = Senin, dst
+            const daysInMonth = new Date(year, month + 1, 0).getDate(); // Jumlah hari dalam bulan
+            const today = new Date();
+
+            // Ekstrak tanggal yang ada eventnya untuk diberi titik
+            const eventDates = globalEventsData.map(e => {
+                const d = new Date(e.start.dateTime || e.start.date);
+                return `${d.getFullYear()}-${d.getMonth()}-${d.getDate()}`;
+            });
+
+            // Isi kotak kosong sebelum tanggal 1
+            for (let i = 0; i < firstDayIndex; i++) {
+                calendarDaysDiv.innerHTML += `<div class="h-10 w-10"></div>`;
+            }
+
+            // Render tanggal 1 sampai akhir bulan
+            for (let i = 1; i <= daysInMonth; i++) {
+                const checkDateString = `${year}-${month}-${i}`;
+                const hasEvent = eventDates.includes(checkDateString);
+                const isToday = i === today.getDate() && month === today.getMonth() && year === today.getFullYear();
+
+                let cellClasses = "h-10 w-10 flex flex-col items-center justify-center rounded-xl text-sm font-medium transition-all ";
+                let dotHtml = "";
+
+                if (isToday) {
+                    cellClasses += "bg-teal-500 text-white shadow-lg shadow-teal-500/50 scale-110";
+                    if (hasEvent) dotHtml = `<div class="w-1.5 h-1.5 bg-white rounded-full mt-0.5"></div>`;
+                } else if (hasEvent) {
+                    cellClasses += "bg-teal-500/20 text-teal-100 hover:bg-teal-500/40 border border-teal-500/30";
+                    dotHtml = `<div class="w-1.5 h-1.5 bg-teal-400 rounded-full mt-0.5 shadow-[0_0_5px_rgba(45,212,191,0.8)]"></div>`;
+                } else {
+                    cellClasses += "text-slate-300 hover:bg-white/10";
+                }
+
+                calendarDaysDiv.innerHTML += `
+                    <div class="${cellClasses}">
+                        <span class="${hasEvent || isToday ? '-mb-1' : ''}">${i}</span>
+                        ${dotHtml}
+                    </div>
+                `;
+            }
+        }
+
         async function fetchCalendarEvents() {
-            // Set tombol ke status loading
             refreshBtn.disabled = true;
             refreshText.innerText = 'Memperbarui...';
             refreshIcon.classList.add('animate-spin');
 
-            // URL Endpoint API Google Calendar (Tanpa butuh library gapi/gsi tambahan)
-            const url = `https://www.googleapis.com/calendar/v3/calendars/${encodeURIComponent(TARGET_CALENDAR_ID)}/events?key=${API_KEY}&timeMin=${new Date().toISOString()}&singleEvents=true&orderBy=startTime&maxResults=12`;
+            // Set timeMin ke awal bulan ini agar event di awal bulan tetap muncul di kalender visual
+            const startOfMonth = new Date(currentNavDate.getFullYear(), currentNavDate.getMonth(), 1);
+            const url = `https://www.googleapis.com/calendar/v3/calendars/${encodeURIComponent(TARGET_CALENDAR_ID)}/events?key=${API_KEY}&timeMin=${startOfMonth.toISOString()}&singleEvents=true&orderBy=startTime&maxResults=50`;
 
             try {
                 const response = await fetch(url);
                 if (!response.ok) {
-                    if (response.status === 403) {
-                        throw new Error("403_FORBIDDEN");
-                    }
+                    if (response.status === 403) throw new Error("403_FORBIDDEN");
                     throw new Error(`HTTP error! status: ${response.status}`);
                 }
                 
                 const data = await response.json();
-                const events = data.items || [];
+                globalEventsData = data.items || [];
                 
-                if (events.length > 0) {
-                    container.innerHTML = events.map(e => {
+                // Pisahkan agenda mendatang (mulai hari ini ke depan) untuk ditampilkan di daftar list
+                const now = new Date();
+                const upcomingEvents = globalEventsData.filter(e => {
+                    const eventDate = new Date(e.start.dateTime || e.start.date);
+                    // Filter event yang belum berlalu (berdasarkan hari ini)
+                    eventDate.setHours(23, 59, 59, 999); 
+                    return eventDate >= now;
+                }).slice(0, 10); // Ambil 10 terdekat untuk list
+                
+                if (upcomingEvents.length > 0) {
+                    container.innerHTML = upcomingEvents.map(e => {
                         const eventDate = new Date(e.start.dateTime || e.start.date);
                         const isAllDay = !e.start.dateTime;
                         
                         return `
-                        <div class="bg-white/95 text-slate-800 p-6 rounded-3xl shadow-xl hover:shadow-2xl transition-all hover:scale-[1.02] border-l-8 border-teal-500 flex flex-col justify-between">
+                        <div class="bg-white/95 text-slate-800 p-5 rounded-3xl shadow-xl hover:shadow-2xl transition-all hover:-translate-y-1 border-l-8 border-teal-500 flex flex-col justify-between h-full">
                             <div>
-                                <h3 class="font-bold text-xl text-slate-900 line-clamp-2">${e.summary || '(Tanpa Judul)'}</h3>
-                                ${e.location ? `<p class="text-sm text-slate-600 mt-2 flex items-start gap-1"><i data-lucide="map-pin" class="w-4 h-4 mt-0.5 text-teal-600 shrink-0"></i><span class="line-clamp-2">${e.location}</span></p>` : ''}
+                                <h3 class="font-bold text-lg text-slate-900 line-clamp-2 leading-tight">${e.summary || '(Tanpa Judul)'}</h3>
+                                ${e.location ? `<p class="text-sm text-slate-600 mt-2 flex items-start gap-1.5"><i data-lucide="map-pin" class="w-4 h-4 mt-0.5 text-teal-600 shrink-0"></i><span class="line-clamp-2">${e.location}</span></p>` : ''}
                             </div>
-                            <div class="mt-4 pt-4 border-t border-slate-200">
-                                <div class="flex items-center text-sm font-semibold text-teal-700 gap-2 mb-1">
-                                    <i data-lucide="calendar-days" class="w-4 h-4"></i>
-                                    <span>${eventDate.toLocaleDateString('id-ID', { weekday: 'long', day: 'numeric', month: 'long', year: 'numeric' })}</span>
-                                </div>
-                                <div class="flex items-center text-sm text-slate-500 gap-2">
-                                    <i data-lucide="clock" class="w-4 h-4"></i>
-                                    <span>${isAllDay ? 'Seharian Penuh' : eventDate.toLocaleTimeString('id-ID', { hour: '2-digit', minute: '2-digit' }) + ' WIB'}</span>
+                            <div class="mt-4 pt-4 border-t border-slate-200/80">
+                                <div class="flex justify-between items-end">
+                                    <div class="flex items-center text-sm font-bold text-teal-700 gap-2 mb-1">
+                                        <i data-lucide="calendar-days" class="w-4 h-4"></i>
+                                        <span>${eventDate.toLocaleDateString('id-ID', { day: 'numeric', month: 'short' })}</span>
+                                    </div>
+                                    <div class="flex items-center text-xs font-semibold text-slate-500 bg-slate-100 px-2 py-1 rounded-lg gap-1.5">
+                                        <i data-lucide="clock" class="w-3.5 h-3.5"></i>
+                                        <span>${isAllDay ? 'Seharian' : eventDate.toLocaleTimeString('id-ID', { hour: '2-digit', minute: '2-digit' })}</span>
+                                    </div>
                                 </div>
                             </div>
                         </div>`;
@@ -140,17 +254,19 @@
                         <div class="bg-white/5 p-4 rounded-full mb-4">
                             <i data-lucide="calendar-check" class="w-8 h-8 text-teal-400"></i>
                         </div>
-                        <h3 class="text-xl font-bold">Jadwal Kosong</h3>
-                        <p class="text-teal-200/60 max-w-sm mt-2">Tidak ada agenda event dalam waktu dekat di kalender ini.</p>
+                        <h3 class="text-xl font-bold">Tidak Ada Agenda</h3>
+                        <p class="text-teal-200/60 max-w-sm mt-2">Belum ada agenda operasional untuk beberapa waktu ke depan.</p>
                     </div>`;
                 }
+
+                // Render Visual Kalender setelah data didapatkan
+                renderCalendarWidget();
+
             } catch (err) {
                 let errorMessage = "Pastikan setelan Google Calendar sudah diatur ke 'Publik' dan API Key Anda sudah benar.";
-                
                 if (err.message === "403_FORBIDDEN") {
                     errorMessage = "Akses ditolak (Error 403). Ini wajar terjadi di halaman Preview karena API Key Anda sudah dikunci hanya untuk URL GitHub Pages. Silakan push kode ini ke GitHub dan buka website aslinya!";
                 } else {
-                    // Hanya memunculkan console error jika errornya BUKAN 403
                     console.error("Fetch error:", err);
                 }
 
@@ -163,7 +279,6 @@
                     <p class="text-teal-200/60 max-w-md mt-2">${errorMessage}</p>
                 </div>`;
             } finally {
-                // Kembalikan tombol ke status normal setelah selesai loading
                 lucide.createIcons();
                 refreshIcon.classList.remove('animate-spin');
                 refreshText.innerText = 'Perbarui Data';
