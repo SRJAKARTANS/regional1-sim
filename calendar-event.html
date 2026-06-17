@@ -67,7 +67,7 @@
             tokenClient = google.accounts.oauth2.initTokenClient({
                 client_id: CLIENT_ID,
                 scope: SCOPE,
-                prompt: 'select_account',
+                prompt: 'sr.dkijakarta01@gmail.com',
                 callback: (tokenResponse) => {
                     if (tokenResponse.error) return;
                     fetchCalendarEvents();
