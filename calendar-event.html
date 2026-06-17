@@ -91,11 +91,6 @@
         };
 
         async function fetchCalendarEvents() {
-            if (API_KEY === 'AIzaSyDt_TQcOXYDZPMzjpR5pmYxTqAoNkA088M') {
-                container.innerHTML = `<p class="col-span-full text-center text-red-400">Gagal memuat: API Key belum dimasukkan ke dalam kode HTML.</p>`;
-                return;
-            }
-
             // Set tombol ke status loading
             refreshBtn.disabled = true;
             refreshText.innerText = 'Memperbarui...';
@@ -107,6 +102,9 @@
             try {
                 const response = await fetch(url);
                 if (!response.ok) {
+                    if (response.status === 403) {
+                        throw new Error("403_FORBIDDEN");
+                    }
                     throw new Error(`HTTP error! status: ${response.status}`);
                 }
                 
@@ -147,14 +145,22 @@
                     </div>`;
                 }
             } catch (err) {
-                console.error("Fetch error:", err);
+                let errorMessage = "Pastikan setelan Google Calendar sudah diatur ke 'Publik' dan API Key Anda sudah benar.";
+                
+                if (err.message === "403_FORBIDDEN") {
+                    errorMessage = "Akses ditolak (Error 403). Ini wajar terjadi di halaman Preview karena API Key Anda sudah dikunci hanya untuk URL GitHub Pages. Silakan push kode ini ke GitHub dan buka website aslinya!";
+                } else {
+                    // Hanya memunculkan console error jika errornya BUKAN 403
+                    console.error("Fetch error:", err);
+                }
+
                 container.innerHTML = `
                 <div class="col-span-full border-2 border-dashed border-red-500/20 rounded-3xl p-12 text-center flex flex-col items-center">
                     <div class="bg-red-500/10 p-4 rounded-full mb-4">
                         <i data-lucide="alert-circle" class="w-8 h-8 text-red-400"></i>
                     </div>
                     <h3 class="text-xl font-bold text-red-400">Gagal Memuat Agenda</h3>
-                    <p class="text-teal-200/60 max-w-md mt-2">Pastikan setelan Google Calendar sudah diatur ke "Publik" dan API Key Anda sudah benar.</p>
+                    <p class="text-teal-200/60 max-w-md mt-2">${errorMessage}</p>
                 </div>`;
             } finally {
                 // Kembalikan tombol ke status normal setelah selesai loading
