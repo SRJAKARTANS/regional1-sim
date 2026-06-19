@@ -3,64 +3,91 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Login - SIMGROUP Internal</title>
+    <title>Login - JAKARTANS Dashboard</title>
     <script src="https://cdn.tailwindcss.com"></script>
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-    <script>
-        tailwind.config = { theme: { extend: { colors: { primary: '#148e9e', secondary: '#0d6470' } } } }
-    </script>
+    <script src="https://unpkg.com/lucide@latest"></script>
 </head>
-<body class="bg-gradient-to-br from-primary to-secondary min-h-screen flex items-center justify-center p-4">
-    <div class="bg-white rounded-[2rem] shadow-2xl w-full max-w-md p-10">
+<body class="bg-[#0d5360] min-h-screen flex items-center justify-center font-sans p-4">
+
+    <div class="bg-white/10 backdrop-blur-lg border border-white/20 p-8 md:p-10 rounded-3xl shadow-2xl max-w-md w-full">
         <div class="text-center mb-8">
-            <h1 class="text-2xl font-bold text-slate-800">SIMGROUP Login</h1>
-            <p class="text-slate-500 text-sm mt-2">Masuk untuk monitoring data</p>
+            <div class="bg-white/10 p-3 rounded-2xl inline-flex mb-4 border border-white/10">
+                <i data-lucide="layers" class="text-teal-300 w-10 h-10"></i>
+            </div>
+            <h1 class="text-3xl font-black text-white tracking-wider">JAKARTANS</h1>
+            <p class="text-teal-200 text-sm mt-2">Operational Monitoring System</p>
         </div>
-        <form onsubmit="handleLogin(event)">
-            <div id="error-message" class="hidden bg-red-50 text-red-500 text-sm p-3 rounded-xl mb-5 text-center border border-red-100">
-                Username/Password salah!
+
+        <form id="loginForm" class="space-y-5">
+            <div>
+                <label class="block text-teal-100 text-xs font-bold mb-2 uppercase tracking-wide">Username</label>
+                <div class="relative">
+                    <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                        <i data-lucide="user" class="w-5 h-5 text-teal-600"></i>
+                    </div>
+                    <input type="text" id="username" class="w-full bg-white text-slate-900 pl-10 pr-4 py-3 rounded-xl focus:outline-none focus:ring-4 focus:ring-teal-500/50 transition-all font-medium" placeholder="Masukkan username..." required>
+                </div>
             </div>
-            <div class="mb-5">
-                <label class="block text-sm font-semibold text-slate-700 mb-2">Username</label>
-                <input type="text" id="username" required class="w-full px-4 py-3 rounded-xl border border-slate-200 bg-slate-50">
+            <div>
+                <label class="block text-teal-100 text-xs font-bold mb-2 uppercase tracking-wide">Password</label>
+                <div class="relative">
+                    <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                        <i data-lucide="lock" class="w-5 h-5 text-teal-600"></i>
+                    </div>
+                    <input type="password" id="password" class="w-full bg-white text-slate-900 pl-10 pr-4 py-3 rounded-xl focus:outline-none focus:ring-4 focus:ring-teal-500/50 transition-all font-medium" placeholder="••••••••" required>
+                </div>
             </div>
-            <div class="mb-6">
-                <label class="block text-sm font-semibold text-slate-700 mb-2">Password</label>
-                <input type="password" id="password" required class="w-full px-4 py-3 rounded-xl border border-slate-200 bg-slate-50">
+
+            <div id="error-message" class="hidden bg-red-500/20 border border-red-500/50 text-red-200 text-sm p-3 rounded-xl text-center font-medium">
+                Username atau password salah!
             </div>
-            <button type="submit" class="w-full bg-primary hover:bg-secondary text-white font-semibold py-3.5 rounded-xl transition-all">Sign In</button>
+
+            <button type="submit" class="w-full bg-teal-500 hover:bg-teal-400 text-white font-bold py-3.5 px-4 rounded-xl shadow-lg transition-all transform hover:-translate-y-0.5 mt-4 flex items-center justify-center space-x-2">
+                <span>Sign In</span>
+                <i data-lucide="arrow-right" class="w-5 h-5"></i>
+            </button>
         </form>
     </div>
 
     <script>
-        const officerDatabase = {
-            'daffa': { password: '1312', role: 'Area Operational Manager', name: 'Daffa' },
-            'ali': { password: '1312', role: 'REVO FIF Jakarta', name: 'Ali' },
-            'ilham': { password: '1312', role: 'REVO FIF Jakarta 2', name: 'Ilham' },
-            'roky': { password: '1312', role: 'REVO FIF Taman Palem', name: 'Roky' },
-            'indra': { password: '1312', role: 'REVO Multifinance Jakarta', name: 'Indra' },
-            'edy': { password: '1312', role: 'Revo Adira Jakarta', name: 'Edy' },
-            'simon': { password: '1312', role: 'RM Jakarta', name: 'Simon' }
+        lucide.createIcons();
+
+        // Database Akun (Hardcoded berdasarkan permintaan)
+        const userDatabase = {
+            "daffa": { password: "jakartans123", name: "Daffa", role: "super_admin", title: "Area Operational Manager" },
+            "simon": { password: "1312", name: "Simon", role: "co_admin", title: "Representative Manager" },
+            "ali":   { password: "1312", name: "Ali", role: "staff", title: "Representative Officer FIF Jakarta" },
+            "roky":  { password: "1312", name: "Roky", role: "staff", title: "Representative Officer FIF Taman Palem" },
+            "ilham": { password: "1312", name: "Ilham", role: "staff", title: "Representative Officer FIF Jakarta" },
+            "indra": { password: "1312", name: "Indra", role: "staff", title: "Representative Officer MF Jakarta" },
+            "edy":   { password: "1312", name: "Edy", role: "staff", title: "Representative Officer Adira Jakarta" }
         };
 
-        function handleLogin(event) {
-            event.preventDefault();
-            const usernameInput = document.getElementById('username').value.toLowerCase().trim();
-            const passwordInput = document.getElementById('password').value;
+        document.getElementById('loginForm').addEventListener('submit', function(e) {
+            e.preventDefault();
+            const user = document.getElementById('username').value.toLowerCase().trim();
+            const pass = document.getElementById('password').value;
             const errorMsg = document.getElementById('error-message');
 
-            if (officerDatabase[usernameInput] && officerDatabase[usernameInput].password === passwordInput) {
-                // SIMPAN DENGAN KEY USERNAME AGAR BISA DICEK DI DASHBOARD
-                const loggedInUser = { 
-                    ...officerDatabase[usernameInput], 
-                    username: usernameInput 
+            // Cek Kredensial
+            if (userDatabase[user] && userDatabase[user].password === pass) {
+                errorMsg.classList.add('hidden');
+                
+                // Simpan Sesi Login ke Local Storage
+                const sessionData = {
+                    username: user,
+                    name: userDatabase[user].name,
+                    role: userDatabase[user].role,
+                    title: userDatabase[user].title
                 };
-                localStorage.setItem('currentUser', JSON.stringify(loggedInUser));
-                window.location.href = 'dashboard-internal.html';
+                localStorage.setItem('userSession', JSON.stringify(sessionData));
+                
+                // Pindah ke Dashboard
+                window.location.href = "dashboard-internal.html"; // Pastikan ini nama file dashboard Anda
             } else {
                 errorMsg.classList.remove('hidden');
             }
-        }
+        });
     </script>
 </body>
 </html>
