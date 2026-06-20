@@ -82,12 +82,12 @@
         <!-- Profile Footer -->
         <div class="p-6 border-t border-white/10 bg-black/10">
             <div class="flex items-center space-x-3 mb-4">
-                <div class="w-10 h-10 rounded-full bg-teal-500/20 border border-teal-300/30 flex items-center justify-center font-bold text-teal-200">
+                <div id="profile-initials" class="w-10 h-10 rounded-full bg-teal-500/20 border border-teal-300/30 flex items-center justify-center font-bold text-teal-200">
                     DA
                 </div>
                 <div>
-                    <h4 class="text-sm font-semibold text-white">Daffa</h4>
-                    <p class="text-xs text-teal-300">Area Operational Mgr</p>
+                    <h4 id="profile-name" class="text-sm font-semibold text-white">Daffa</h4>
+                    <p id="profile-title" class="text-xs text-teal-300">Area Operational Mgr</p>
                 </div>
             </div>
             <button onclick="showLogoutModal()" class="w-full flex items-center justify-center space-x-2 py-2 px-4 rounded-lg bg-red-500/20 hover:bg-red-500/30 text-red-200 hover:text-white border border-red-500/30 transition-all duration-200 text-sm font-medium">
@@ -124,7 +124,7 @@
             <!-- Welcome Jumbotron -->
             <div class="bg-gradient-to-r from-teal-800/80 to-[#0d5360]/80 border border-white/15 p-6 rounded-3xl shadow-2xl flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
                 <div>
-                    <h2 class="text-2xl font-black text-white">Welcome Back, Daffa! ✨</h2>
+                    <h2 class="text-2xl font-black text-white">Welcome Back, <span id="welcome-name">Daffa</span>! ✨</h2>
                     <p class="text-teal-100 text-sm mt-1">Berikut adalah ringkasan operasional terkini: Status pemenuhan Service Order (SO), Buffer Kandidat, dan Sourcing Partner.</p>
                 </div>
                 <div class="flex items-center space-x-3 bg-white/10 p-2.5 rounded-2xl border border-white/10">
@@ -134,7 +134,7 @@
             </div>
 
             <!-- CSV Upload Card (Contrast Boosted) -->
-            <div class="bg-white/95 text-slate-800 rounded-3xl p-6 shadow-xl border-t-8 border-teal-500 flex flex-col md:flex-row items-center justify-between gap-6">
+            <div id="csv-upload-card" class="bg-white/95 text-slate-800 rounded-3xl p-6 shadow-xl border-t-8 border-teal-500 flex flex-col md:flex-row items-center justify-between gap-6">
                 <div class="space-y-1">
                     <span class="bg-teal-100 text-teal-800 text-xs font-bold px-2.5 py-1 rounded-full uppercase tracking-wider">Database Integrator</span>
                     <h3 class="text-xl font-bold text-slate-950 mt-1">Unggah Laporan CSV Operasional</h3>
@@ -351,180 +351,237 @@
         import { getFirestore, doc, setDoc, onSnapshot } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
         import { getAuth, signInAnonymously, onAuthStateChanged, signInWithCustomToken } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
 
-        // 1. MASUKKAN KONFIGURASI FIREBASE ANDA DI SINI
-        const firebaseConfig = {
-            apiKey: "AIzaSyDGWDjaE9ZKU1oUm57gdgONlpw_aZnLGpo",
-            authDomain: "jakartans-dashboard.firebaseapp.com",
-            projectId: "jakartans-dashboard",
-            storageBucket: "jakartans-dashboard.firebasestorage.app",
-            messagingSenderId: "648533447432",
-            appId: "1:648533447432:web:f11e41a82a62f766c892bd",
-            measurementId: "G-H5M7GNR99G"
-        };
-
-        // Inisialisasi Firebase (dengan fallback aman jika berjalan di sistem preview)
-        const configToUse = typeof __firebase_config !== 'undefined' ? JSON.parse(__firebase_config) : firebaseConfig;
-        const app = initializeApp(configToUse);
-        const auth = getAuth(app);
-        const db = getFirestore(app);
-
-        // Path penyimpanan aman (Mendukung integrasi GitHub Anda maupun Canvas)
-        const systemAppId = typeof __app_id !== 'undefined' ? __app_id : 'regional1-sim';
-        const docRef = doc(db, 'artifacts', systemAppId, 'public', 'data', 'dashboard', 'csv_data');
-
-        // Init Icons
-        lucide.createIcons();
-
-        // Display current date / time
-        function updateTime() {
-            const date = new Date();
-            const options = { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' };
-            document.getElementById('current-time-badge').innerText = date.toLocaleDateString('id-ID', options);
-        }
-        updateTime();
-
-        // Custom Toast Notification helper
-        function showNotification(msg) {
-            const toast = document.getElementById('toast');
-            document.getElementById('toast-message').innerText = msg;
-            toast.classList.remove('translate-y-20', 'opacity-0');
-            setTimeout(() => {
-                toast.classList.add('translate-y-20', 'opacity-0');
-            }, 3500);
-        }
-
-        // Buffer Kandidat Logic (Diekspos ke window agar bisa dipanggil dari HTML)
-        window.takeOverKandidat = function(id) {
-            const picCell = document.getElementById(`pic-kandidat-${id}`);
-            picCell.innerHTML = `<span class="bg-teal-100 text-teal-800 px-2.5 py-1 rounded-full text-xs font-black border border-teal-200">Daffa (You)</span>`;
-            showNotification("Kandidat berhasil diambil alih oleh Anda!");
-        }
-
         // ==========================================
-        // LOGIKA FIREBASE: AUTENTIKASI & TARIK DATA
+        // 1. CEK SESI LOGIN LOKAL DENGAN PENGAMANAN PREVIEW
         // ==========================================
+        const sessionData = localStorage.getItem('userSession');
         
-        // Autentikasi anonim di background agar bisa membaca/menulis ke database
-        const initAuth = async () => {
+        if (!sessionData) {
+            // Tampilan darurat jika belum login. Ini mencegah halaman kosong atau error di mode sandbox/preview
+            document.body.innerHTML = `
+                <div class="min-h-screen flex items-center justify-center p-4 text-center bg-[#0d5360] w-full">
+                    <div class="bg-white/10 p-8 rounded-3xl backdrop-blur-md border border-white/20 shadow-2xl max-w-md w-full">
+                        <i data-lucide="lock" class="w-16 h-16 text-teal-400 mx-auto mb-4"></i>
+                        <h1 class="text-2xl font-bold text-white mb-2">Akses Terkunci</h1>
+                        <p class="text-teal-100 mb-6 text-sm">Anda belum login atau sesi telah berakhir. Harap login kembali.</p>
+                        <a href="login.html" class="bg-teal-500 hover:bg-teal-600 text-white font-bold py-3 px-6 rounded-xl shadow-lg inline-block w-full">Ke Halaman Login</a>
+                    </div>
+                </div>
+            `;
+            lucide.createIcons(); // Muat ulang ikon untuk tampilan darurat
+
+            // Mencegah error "'' is not a valid URL" jika dibuka di Iframe Sandbox (seperti pada Preview Assistant ini)
             try {
-                if (typeof __initial_auth_token !== 'undefined' && __initial_auth_token) {
-                    await signInWithCustomToken(auth, __initial_auth_token);
-                } else {
-                    await signInAnonymously(auth);
+                if (window.location.protocol !== 'blob:' && window.location.protocol !== 'about:') {
+                    window.location.href = 'login.html'; 
                 }
-            } catch (error) {
-                console.error("Kesalahan inisiasi Autentikasi:", error);
+            } catch (err) {
+                console.warn("Mencegah crash di lingkungan Preview. Harap buka 'login.html' secara terpisah.");
             }
-        };
-        initAuth();
+        } else {
+            // ==========================================
+            // 2. LOGIKA UTAMA JIKA SESI TERSEDIA
+            // ==========================================
+            const userSession = JSON.parse(sessionData);
 
-        // Dengarkan perubahan status login
-        onAuthStateChanged(auth, (user) => {
-            if (!user) return; // Cegah query sebelum login berhasil
+            // Ubah text profil di HTML sesuai user yang berhasil login
+            const profileNameEl = document.getElementById('profile-name');
+            const welcomeNameEl = document.getElementById('welcome-name');
+            const profileInitialsEl = document.getElementById('profile-initials');
+            const profileTitleEl = document.getElementById('profile-title');
 
-            // Tarik data secara otomatis & realtime dari Firebase
-            onSnapshot(docRef, (snapshot) => {
-                if (snapshot.exists()) {
-                    const data = snapshot.data();
-                    if (data.csvText) {
-                        processCSVData(data.csvText);
-                        console.log("Data CSV disinkronkan dari Firebase Cloud.");
-                    }
-                } else {
-                    // Data belum ada di Cloud, tampilkan mock data
-                    updateDashboardMetrics(82, 23, 64, 41);
+            if (profileNameEl) profileNameEl.innerText = userSession.name;
+            if (welcomeNameEl) welcomeNameEl.innerText = userSession.name;
+            if (profileTitleEl) profileTitleEl.innerText = userSession.title;
+            if (profileInitialsEl) profileInitialsEl.innerText = userSession.name.substring(0, 2).toUpperCase();
+
+            // Sembunyikan fitur Upload CSV jika akun yang login adalah "Staff"
+            if (userSession.role === 'staff') {
+                const csvCard = document.getElementById('csv-upload-card');
+                if (csvCard) csvCard.style.display = 'none';
+            }
+
+            // 3. KONFIGURASI FIREBASE
+            const firebaseConfig = {
+                apiKey: "AIzaSyDGWDjaE9ZKU1oUm57gdgONlpw_aZnLGpo",
+                authDomain: "jakartans-dashboard.firebaseapp.com",
+                projectId: "jakartans-dashboard",
+                storageBucket: "jakartans-dashboard.firebasestorage.app",
+                messagingSenderId: "648533447432",
+                appId: "1:648533447432:web:f11e41a82a62f766c892bd",
+                measurementId: "G-H5M7GNR99G"
+            };
+
+            const configToUse = typeof __firebase_config !== 'undefined' ? JSON.parse(__firebase_config) : firebaseConfig;
+            const app = initializeApp(configToUse);
+            const auth = getAuth(app);
+            const db = getFirestore(app);
+
+            const systemAppId = typeof __app_id !== 'undefined' ? __app_id : 'regional1-sim';
+            const docRef = doc(db, 'artifacts', systemAppId, 'public', 'data', 'dashboard', 'csv_data');
+
+            // Init Icons
+            lucide.createIcons();
+
+            // Display current date / time
+            function updateTime() {
+                const date = new Date();
+                const options = { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' };
+                const timeBadge = document.getElementById('current-time-badge');
+                if(timeBadge) timeBadge.innerText = date.toLocaleDateString('id-ID', options);
+            }
+            updateTime();
+
+            // Custom Toast Notification helper
+            function showNotification(msg) {
+                const toast = document.getElementById('toast');
+                const toastMsg = document.getElementById('toast-message');
+                if(toast && toastMsg) {
+                    toastMsg.innerText = msg;
+                    toast.classList.remove('translate-y-20', 'opacity-0');
+                    setTimeout(() => {
+                        toast.classList.add('translate-y-20', 'opacity-0');
+                    }, 3500);
                 }
-            }, (error) => {
-                console.error("Gagal mendengarkan data Firestore:", error);
-                showNotification("Gagal menyinkronkan data dari Cloud.");
-            });
-        });
+            }
 
-        // ==========================================
-        // LOGIKA FIREBASE: UPLOAD DATA
-        // ==========================================
-        window.handleFileUpload = function(event) {
-            const file = event.target.files[0];
-            if (file) {
-                const reader = new FileReader();
-                reader.onload = async function(e) {
-                    const text = e.target.result;
-                    
-                    // Proses data secara lokal agar UI merespon cepat
-                    processCSVData(text);
-                    
-                    // Simpan data mentah ke Firebase (Cloud)
-                    try {
-                        const user = auth.currentUser;
-                        if (!user) {
-                            showNotification("Gagal: Menunggu koneksi ke Cloud...");
-                            return;
+            // Memastikan fungsi window tersedia secara global
+            window.takeOverKandidat = function(id) {
+                const picCell = document.getElementById(`pic-kandidat-${id}`);
+                const currentName = userSession.name;
+                
+                if(picCell) {
+                    picCell.innerHTML = `<span class="bg-teal-100 text-teal-800 px-2.5 py-1 rounded-full text-xs font-black border border-teal-200">${currentName} (You)</span>`;
+                    showNotification("Kandidat berhasil diambil alih oleh Anda!");
+                }
+            }
+
+            // ==========================================
+            // PROSES DATA CSV & FIREBASE
+            // ==========================================
+            function processCSVData(csvText) {
+                const rows = csvText.split('\n').filter(r => r.trim() !== "");
+                const totalLines = rows.length - 1; 
+
+                if (totalLines > 0) {
+                    const fulfillSuccess = Math.floor(totalLines * 0.78);
+                    const fulfillPending = totalLines - fulfillSuccess;
+                    const offeringSuccess = Math.floor(totalLines * 0.62);
+                    const offeringPending = totalLines - offeringSuccess;
+
+                    updateDashboardMetrics(fulfillSuccess, fulfillPending, offeringSuccess, offeringPending);
+                }
+            }
+
+            function updateDashboardMetrics(fSuccess, fPending, oSuccess, oPending) {
+                const fTotal = fSuccess + fPending;
+                const oTotal = oSuccess + oPending;
+
+                const elFulfillTotal = document.getElementById('fulfillment-total');
+                if(elFulfillTotal) {
+                    elFulfillTotal.innerText = `${fSuccess}/${fTotal} SO`;
+                    document.getElementById('fulfillment-success').innerText = fSuccess;
+                    document.getElementById('fulfillment-pending').innerText = fPending;
+                    const fPct = fTotal > 0 ? Math.round((fSuccess / fTotal) * 100) : 0;
+                    document.getElementById('fulfillment-percentage').innerText = `${fPct}%`;
+                    document.getElementById('fulfillment-donut-progress').setAttribute('stroke-dasharray', `${fPct}, 100`);
+
+                    document.getElementById('offering-total').innerText = `${oSuccess}/${oTotal} SO`;
+                    document.getElementById('offering-success').innerText = oSuccess;
+                    document.getElementById('offering-pending').innerText = oPending;
+                    const oPct = oTotal > 0 ? Math.round((oSuccess / oTotal) * 100) : 0;
+                    document.getElementById('offering-percentage').innerText = `${oPct}%`;
+                    document.getElementById('offering-donut-progress').setAttribute('stroke-dasharray', `${oPct}, 100`);
+                }
+            }
+
+            const initAuth = async () => {
+                try {
+                    if (typeof __initial_auth_token !== 'undefined' && __initial_auth_token) {
+                        await signInWithCustomToken(auth, __initial_auth_token);
+                    } else {
+                        await signInAnonymously(auth);
+                    }
+                } catch (error) {
+                    console.error("Kesalahan inisiasi Autentikasi:", error);
+                }
+            };
+            initAuth();
+
+            onAuthStateChanged(auth, (user) => {
+                if (!user) return; 
+
+                onSnapshot(docRef, (snapshot) => {
+                    if (snapshot.exists()) {
+                        const data = snapshot.data();
+                        if (data.csvText) {
+                            processCSVData(data.csvText);
                         }
-                        await setDoc(docRef, { csvText: text, updatedAt: new Date().toISOString() }, { merge: true });
-                        showNotification("Berhasil! Berkas CSV tersimpan di Cloud.");
-                    } catch(error) {
-                        console.error("Kesalahan saat menyimpan ke Firebase:", error);
-                        showNotification("Gagal menyimpan ke Cloud. Periksa konfigurasi.");
+                    } else {
+                        updateDashboardMetrics(82, 23, 64, 41);
                     }
-                };
-                reader.readAsText(file);
+                }, (error) => {
+                    console.error("Gagal mendengarkan data Firestore:", error);
+                });
+            });
+
+            window.handleFileUpload = function(event) {
+                const file = event.target.files[0];
+                if (file) {
+                    const reader = new FileReader();
+                    reader.onload = async function(e) {
+                        const text = e.target.result;
+                        processCSVData(text);
+                        
+                        try {
+                            const user = auth.currentUser;
+                            if (!user) {
+                                showNotification("Gagal: Menunggu koneksi ke Cloud...");
+                                return;
+                            }
+                            await setDoc(docRef, { csvText: text, updatedAt: new Date().toISOString() }, { merge: true });
+                            showNotification("Berhasil! Berkas CSV tersimpan di Cloud.");
+                        } catch(error) {
+                            console.error("Kesalahan saat menyimpan ke Firebase:", error);
+                            showNotification("Gagal menyimpan ke Cloud.");
+                        }
+                    };
+                    reader.readAsText(file);
+                }
             }
-        }
 
-        // ==========================================
-        // PROSES DATA CSV
-        // ==========================================
-        function processCSVData(csvText) {
-            const rows = csvText.split('\n').filter(r => r.trim() !== "");
-            const totalLines = rows.length - 1; // Kurangi baris Header
-
-            if (totalLines > 0) {
-                const fulfillSuccess = Math.floor(totalLines * 0.78);
-                const fulfillPending = totalLines - fulfillSuccess;
-                const offeringSuccess = Math.floor(totalLines * 0.62);
-                const offeringPending = totalLines - offeringSuccess;
-
-                updateDashboardMetrics(fulfillSuccess, fulfillPending, offeringSuccess, offeringPending);
+            // ==========================================
+            // MODAL LOGOUT LOGIC
+            // ==========================================
+            window.showLogoutModal = function() {
+                const modal = document.getElementById('logout-modal');
+                if(modal) {
+                    modal.classList.remove('pointer-events-none', 'opacity-0');
+                    modal.children[0].classList.remove('scale-95');
+                }
             }
-        }
 
-        function updateDashboardMetrics(fSuccess, fPending, oSuccess, oPending) {
-            const fTotal = fSuccess + fPending;
-            const oTotal = oSuccess + oPending;
+            window.hideLogoutModal = function() {
+                const modal = document.getElementById('logout-modal');
+                if(modal) {
+                    modal.classList.add('pointer-events-none', 'opacity-0');
+                    modal.children[0].classList.add('scale-95');
+                }
+            }
 
-            document.getElementById('fulfillment-total').innerText = `${fSuccess}/${fTotal} SO`;
-            document.getElementById('fulfillment-success').innerText = fSuccess;
-            document.getElementById('fulfillment-pending').innerText = fPending;
-            const fPct = fTotal > 0 ? Math.round((fSuccess / fTotal) * 100) : 0;
-            document.getElementById('fulfillment-percentage').innerText = `${fPct}%`;
-            document.getElementById('fulfillment-donut-progress').setAttribute('stroke-dasharray', `${fPct}, 100`);
-
-            document.getElementById('offering-total').innerText = `${oSuccess}/${oTotal} SO`;
-            document.getElementById('offering-success').innerText = oSuccess;
-            document.getElementById('offering-pending').innerText = oPending;
-            const oPct = oTotal > 0 ? Math.round((oSuccess / oTotal) * 100) : 0;
-            document.getElementById('offering-percentage').innerText = `${oPct}%`;
-            document.getElementById('offering-donut-progress').setAttribute('stroke-dasharray', `${oPct}, 100`);
-        }
-
-        // ==========================================
-        // MODAL LOGOUT LOGIC
-        // ==========================================
-        window.showLogoutModal = function() {
-            const modal = document.getElementById('logout-modal');
-            modal.classList.remove('pointer-events-none', 'opacity-0');
-            modal.children[0].classList.remove('scale-95');
-        }
-
-        window.hideLogoutModal = function() {
-            const modal = document.getElementById('logout-modal');
-            modal.classList.add('pointer-events-none', 'opacity-0');
-            modal.children[0].classList.add('scale-95');
-        }
-
-        window.confirmLogout = function() {
-            window.location.href = "login.html"; // Simulated redirect
-        }
+            window.confirmLogout = function() {
+                localStorage.removeItem('userSession'); // Hapus memori login
+                try {
+                    if (window.location.protocol !== 'blob:' && window.location.protocol !== 'about:') {
+                        window.location.href = "login.html"; 
+                    } else {
+                        location.reload(); // Hanya reload di mode preview
+                    }
+                } catch(e) {
+                    location.reload();
+                }
+            }
+        } // End of Else Block
     </script>
 </body>
 </html>
