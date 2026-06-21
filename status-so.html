@@ -247,9 +247,9 @@
         const appId = typeof __app_id !== 'undefined' ? __app_id : 'simgroup-dashboard-app'; 
         const activeUser = { name: "Daffa" }; 
         const officerMapping = {
-    "Indra": "REVO MF Jakarta",
-    "Faiz": "REVO MF Jakarta",
-    "Edy": "REVO Adira Jakarta"
+            "Indra": "REVO MF Jakarta",
+            "Faiz": "REVO MF Jakarta",
+            "Edy": "REVO Adira Jakarta"
 };
         
         // --- State Manajemen untuk Sorting ---
@@ -354,6 +354,10 @@
 
             try {
                 // Di dalam renderSOTable, tepat setelah JSON.parse(savedString)
+            let rawData = JSON.parse(savedString);
+                function renderSOTable() {
+                const savedString = localStorage.getItem('savedDashboardData');
+                    try {
             let rawData = JSON.parse(savedString);
             checkNotifications(rawData); // <--- Tambahkan baris ini
                 if (!rawData || rawData.length === 0) return;
@@ -724,6 +728,53 @@ function updateNotificationBadge(count) {
         const badge = `<span class="absolute -top-1 -right-1 bg-red-500 text-[10px] text-white px-1.5 rounded-full">${count}</span>`;
         bellBtn.parentElement.classList.add('relative');
         bellBtn.parentElement.innerHTML += badge;
+    }
+}
+
+        // Fungsi untuk mengecek notifikasi
+function checkNotifications(data) {
+    const today = new Date();
+    today.setHours(0,0,0,0);
+    
+    // Asumsi: currentUser disimpan saat login
+    const user = localStorage.getItem('currentUser'); 
+    let notificationCount = 0;
+
+    // Mapping Tim Officer (sesuaikan dengan data Anda)
+    const teamMapping = {
+        "Indra": "REVO MF Jakarta",
+        "Faiz": "REVO MF Jakarta",
+        "Edy": "REVO Adira Jakarta"
+    };
+
+    const targetTeam = teamMapping[user];
+
+    data.forEach(row => {
+        if (row['ASSIGN RO'] === targetTeam && row['DUE DATE FULFILLMENT']) {
+            const dateParts = row['DUE DATE FULFILLMENT'].split('/');
+            const dueDate = new Date(dateParts[2], dateParts[1] - 1, dateParts[0]);
+            
+            const diffTime = dueDate - today;
+            const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
+
+            if (diffDays <= 7) {
+                notificationCount++;
+            }
+        }
+    });
+
+    updateNotificationBadge(notificationCount);
+}
+
+// Fungsi untuk memperbarui angka di lonceng
+function updateNotificationBadge(count) {
+    const bellBtn = document.querySelector('button [data-lucide="bell"]');
+    if (count > 0 && bellBtn) {
+        const badge = document.createElement('span');
+        badge.className = "absolute -top-1 -right-1 bg-red-500 text-[10px] text-white px-1.5 rounded-full";
+        badge.innerText = count;
+        bellBtn.parentElement.style.position = 'relative';
+        bellBtn.parentElement.appendChild(badge);
     }
 }
     </script>
