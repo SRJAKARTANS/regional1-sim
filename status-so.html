@@ -246,6 +246,11 @@
         let db, auth, firebaseUser = null;
         const appId = typeof __app_id !== 'undefined' ? __app_id : 'simgroup-dashboard-app'; 
         const activeUser = { name: "Daffa" }; 
+        const officerMapping = {
+    "Indra": "REVO MF Jakarta",
+    "Faiz": "REVO MF Jakarta",
+    "Edy": "REVO Adira Jakarta"
+};
         
         // --- State Manajemen untuk Sorting ---
         window.currentSort = { key: 'No', asc: true };
@@ -348,7 +353,9 @@
             if (!savedString || !tbody || !thead) return;
 
             try {
-                let rawData = JSON.parse(savedString);
+                // Di dalam renderSOTable, tepat setelah JSON.parse(savedString)
+            let rawData = JSON.parse(savedString);
+            checkNotifications(rawData); // <--- Tambahkan baris ini
                 if (!rawData || rawData.length === 0) return;
 
                 // Tambahkan field original index untuk mengembalikan urutan "No" jika reset
@@ -680,6 +687,45 @@
             window.location.href = "login.html";
         }
         window.confirmLogout = confirmLogout;
+
+        function checkNotifications(data) {
+    const notifications = [];
+    const today = new Date();
+    today.setHours(0,0,0,0);
+
+    const targetTeam = officerMapping[currentOfficer];
+
+    data.forEach(row => {
+        const ro = row['ASSIGN RO'] || '';
+        const dueDateStr = row['DUE DATE FULFILLMENT'];
+        
+        // Cek apakah SO milik tim officer yang bersangkutan
+        if (ro === targetTeam && dueDateStr) {
+            const dueDate = new Date(dueDateStr.split('/').reverse().join('-')); // Format DD/MM/YYYY ke YYYY-MM-DD
+            const diffDays = Math.ceil((dueDate - today) / (1000 * 60 * 60 * 24));
+
+            if (diffDays < 0) {
+                notifications.push(`⚠️ SO ${row['SO INDUK']} Overdue!`);
+            } else if (diffDays <= 7 && diffDays >= 0) {
+                notifications.push(`🔔 SO ${row['SO INDUK']} H-${diffDays} jatuh tempo.`);
+            }
+        }
+    });
+
+    // Simpan ke storage dan update badge
+    localStorage.setItem(`notifications_${currentOfficer}`, JSON.stringify(notifications));
+    updateNotificationBadge(notifications.length);
+}
+
+function updateNotificationBadge(count) {
+    const bellBtn = document.querySelector('button .fa-bell') || document.querySelector('button [data-lucide="bell"]');
+    if (count > 0) {
+        // Menambahkan badge merah
+        const badge = `<span class="absolute -top-1 -right-1 bg-red-500 text-[10px] text-white px-1.5 rounded-full">${count}</span>`;
+        bellBtn.parentElement.classList.add('relative');
+        bellBtn.parentElement.innerHTML += badge;
+    }
+}
     </script>
 </body>
 </html>
