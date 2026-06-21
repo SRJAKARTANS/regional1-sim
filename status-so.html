@@ -3,71 +3,151 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Status SO Berjalan</title>
+    <title>Status SO Berjalan - SIMGROUP</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://unpkg.com/lucide@latest"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <script src="https://cdnjs.cloudflare.com/ajax/libs/PapaParse/5.3.2/papaparse.min.js"></script>
+    <style>
+        ::-webkit-scrollbar { width: 10px; height: 8px; }
+        ::-webkit-scrollbar-track { background: rgba(255, 255, 255, 0.05); }
+        ::-webkit-scrollbar-thumb { background: rgba(255, 255, 255, 0.2); border-radius: 4px; }
+        ::-webkit-scrollbar-thumb:hover { background: rgba(255, 255, 255, 0.3); }
+        .sticky-col { box-shadow: 2px 0 5px -2px rgba(0,0,0,0.1); }
+    </style>
 </head>
-<body class="bg-[#116A7B] text-white min-h-screen">
-    
-    <div id="debug-log" class="hidden fixed top-0 w-full bg-red-600 text-white p-2 text-center text-sm z-50"></div>
+<body class="bg-[#116A7B] text-white font-sans min-h-screen flex">
 
-    <div class="p-8">
-        <h1 class="text-2xl font-bold mb-4">Status SO Berjalan</h1>
-        
-        <div class="bg-white text-slate-800 rounded-xl overflow-hidden shadow-xl">
-            <table class="w-full">
-                <thead class="bg-slate-100 border-b">
-                    <tr id="so-table-head">
-                        <th class="p-4">No</th>
-                        <th class="p-4">Data</th>
-                    </tr>
-                </thead>
-                <tbody id="so-table-body">
-                    <tr><td colspan="2" class="p-10 text-center text-slate-500">Memuat sistem... (Pastikan gunakan Live Server!)</td></tr>
-                </tbody>
-            </table>
+    <aside class="w-64 bg-[#0d5360] flex flex-col justify-between border-r border-white/10 shrink-0 min-h-screen">
+        <div class="p-6">
+            <div class="flex items-center space-x-3 mb-8">
+                <div class="bg-white/10 p-2 rounded-lg"><i data-lucide="layers" class="text-teal-300 w-6 h-6"></i></div>
+                <span class="text-xl font-bold tracking-wider text-white">SIMGROUP</span>
+            </div>
+            <nav class="space-y-2">
+                <a href="dashboard-internal.html" class="flex items-center space-x-3 px-4 py-3 rounded-xl text-teal-100 hover:bg-white/5 hover:text-white transition-all duration-200">
+                    <i data-lucide="layout-dashboard" class="w-5 h-5"></i><span>Dashboard</span>
+                </a>
+                <a href="growth-drowning.html" class="flex items-center space-x-3 px-4 py-3 rounded-xl text-teal-100 hover:bg-white/5 hover:text-white transition-all duration-200">
+                    <i data-lucide="trending-up" class="w-5 h-5"></i><span>Growth & Drowning</span>
+                </a>
+                <a href="calendar-event.html" class="flex items-center space-x-3 px-4 py-3 rounded-xl text-teal-100 hover:bg-white/5 hover:text-white transition-all duration-200">
+                    <i data-lucide="calendar" class="w-5 h-5"></i><span>Calendar of Event</span>
+                </a>
+                <a href="status-so.html" class="flex items-center space-x-3 px-4 py-3 rounded-xl bg-white/10 text-white font-medium shadow-inner transition-all duration-200">
+                    <i data-lucide="activity" class="w-5 h-5 text-teal-300"></i><span>Status SO Berjalan</span>
+                </a>
+                <a href="#" class="flex items-center space-x-3 px-4 py-3 rounded-xl text-teal-100 hover:bg-white/5 hover:text-white transition-all duration-200">
+                    <i data-lucide="database" class="w-5 h-5"></i><span>Bank Buffer Management</span>
+                </a>
+            </nav>
         </div>
-    </div>
+        <div class="p-6 border-t border-white/10 bg-black/10">
+            <div class="flex items-center space-x-3 mb-4">
+                <div class="w-10 h-10 rounded-full bg-teal-500/20 border border-teal-300/30 flex items-center justify-center font-bold text-teal-200">DA</div>
+                <div><h4 class="text-sm font-semibold text-white">Daffa</h4><p class="text-xs text-teal-300">Area Operational Mgr</p></div>
+            </div>
+            <button onclick="showLogoutModal()" class="w-full flex items-center justify-center space-x-2 py-2 px-4 rounded-lg bg-red-500/20 hover:bg-red-500/30 text-red-200 hover:text-white border border-red-500/30 transition-all duration-200 text-sm font-medium">
+                <i data-lucide="log-out" class="w-4 h-4"></i><span>Sign Out</span>
+            </button>
+        </div>
+    </aside>
+
+    <main class="flex-1 flex flex-col min-h-screen overflow-y-auto w-full">
+        <header class="h-20 border-b border-white/10 px-8 flex items-center justify-between shrink-0 bg-[#116A7B]/80 backdrop-blur-md sticky top-0 z-10">
+            <div class="flex items-center space-x-2"><span class="text-sm font-semibold text-teal-200">SIMGROUP Activity</span></div>
+            <div id="cloud-status" class="flex items-center gap-2 text-xs font-medium text-slate-300 bg-slate-900/40 px-3 py-1.5 rounded-full border border-white/10">
+                <i class="fa-solid fa-cloud-arrow-down animate-pulse"></i> <span>Connecting cloud...</span>
+            </div>
+        </header>
+
+        <div class="p-8 space-y-8 flex-1 max-w-[98%] w-full mx-auto">
+            <div class="flex flex-col xl:flex-row xl:items-center xl:justify-between gap-4">
+                <div>
+                    <h1 class="text-3xl font-extrabold text-white tracking-tight">Status SO Berjalan</h1>
+                </div>
+                <div class="flex flex-wrap items-center gap-3">
+                    <input type="text" id="search-csv" placeholder="Cari..." class="bg-white/95 text-slate-800 text-sm font-semibold pl-4 py-3 rounded-2xl focus:outline-none w-64">
+                    <button onclick="exportFilteredData()" class="bg-blue-600 hover:bg-blue-700 text-white font-bold py-3 px-5 rounded-2xl text-sm">Export</button>
+                    <label for="csv-file-input" class="cursor-pointer bg-emerald-600 hover:bg-emerald-700 text-white font-bold py-3 px-5 rounded-2xl text-sm">
+                        <span id="btn-sync-text">Sync CSV</span>
+                    </label>
+                    <input type="file" id="csv-file-input" accept=".csv" class="hidden">
+                </div>
+            </div>
+
+            <div class="bg-white/95 text-slate-800 rounded-3xl shadow-xl overflow-hidden border-t-8 border-teal-500">
+                <div class="p-6 border-b border-slate-100 bg-slate-50/80">
+                    <h3 id="tabel-judul" class="font-bold text-slate-900 text-lg">Master Data Service Order</h3>
+                    <p id="last-update-text" class="text-[11px] text-teal-600 font-semibold italic">Mencari data cloud...</p>
+                </div>
+                <div class="overflow-x-auto relative max-h-[600px] overflow-y-auto">
+                    <table class="w-full text-left border-collapse" id="so-master-table">
+                        <thead id="so-table-head" class="sticky top-0 z-40 bg-slate-50"></thead>
+                        <tbody class="divide-y divide-slate-100 text-sm" id="so-table-body">
+                            <tr><td colspan="7" class="py-8 text-center text-slate-400">Menunggu data...</td></tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </main>
 
     <script type="module">
-        // Wrapper global untuk menangkap error
-        window.onerror = function(msg, url, line) {
-            const log = document.getElementById('debug-log');
-            log.classList.remove('hidden');
-            log.innerText = `Error: ${msg} (Baris: ${line})`;
-            return false;
+        import { initializeApp } from 'https://www.gstatic.com/firebasejs/11.6.1/firebase-app.js';
+        import { getAuth, signInAnonymously, signInWithCustomToken, onAuthStateChanged } from 'https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js';
+        import { getFirestore, doc, setDoc, onSnapshot } from 'https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js';
+
+        const firebaseConfig = {
+            apiKey: "AIzaSyDGWDjaE9ZKU1oUm57gdgONlpw_aZnLGpo",
+            authDomain: "jakartans-dashboard.firebaseapp.com",
+            projectId: "jakartans-dashboard",
+            storageBucket: "jakartans-dashboard.firebasestorage.app",
+            messagingSenderId: "648533447432",
+            appId: "1:648533447432:web:f11e41a82a62f766c892bd",
+            measurementId: "G-H5M7GNR99G"
         };
 
-        import { initializeApp } from 'https://www.gstatic.com/firebasejs/11.6.1/firebase-app.js';
-        import { getAuth, signInAnonymously } from 'https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js';
-        import { getFirestore } from 'https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js';
+        let db, auth, firebaseUser = null;
+        const appId = typeof __app_id !== 'undefined' ? __app_id : 'simgroup-dashboard-app'; 
 
-        console.log("Script dimuat...");
-
-        // Inisialisasi aman
-        const firebaseConfig = { /* ... isikan config Anda di sini ... */ };
-        
+        // --- Integrasi Konfigurasi & Token ---
         try {
-            const app = initializeApp(firebaseConfig);
-            console.log("Firebase terinisialisasi");
-            
-            // Coba render tabel dasar segera agar tidak kosong
-            renderPlaceholder();
+            // Cek apakah ada variabel global dari sistem
+            const finalConfig = (typeof __firebase_config !== 'undefined') ? JSON.parse(__firebase_config) : firebaseConfig;
+            const app = initializeApp(finalConfig);
+            auth = getAuth(app);
+            db = getFirestore(app);
+
+            // Logika Auth: Pakai custom token jika ada, kalau tidak, anonymous
+            if (typeof __initial_auth_token !== 'undefined' && __initial_auth_token) {
+                signInWithCustomToken(auth, __initial_auth_token).catch(console.error);
+            } else {
+                signInAnonymously(auth).catch(console.error);
+            }
+
+            onAuthStateChanged(auth, (user) => {
+                firebaseUser = user;
+                if (user) {
+                    document.getElementById('cloud-status').innerHTML = '<i class="fa-solid fa-cloud"></i> Cloud Terhubung';
+                    
+                    const docRef = doc(db, 'artifacts', appId, 'public', 'data', 'csv_uploads', 'latest');
+                    onSnapshot(docRef, (snapshot) => {
+                        if (snapshot.exists()) {
+                            const cloudData = snapshot.data();
+                            localStorage.setItem('savedDashboardData', cloudData.payload);
+                            renderSOTable();
+                            document.getElementById('last-update-text').innerHTML = `Terakhir di-sync pada ${new Date(cloudData.updatedAt).toLocaleString()}`;
+                        }
+                    });
+                }
+            });
         } catch (e) {
-            console.error("Gagal init Firebase:", e);
+            console.warn("Mode Lokal:", e);
         }
 
-        function renderPlaceholder() {
-            const tbody = document.getElementById('so-table-body');
-            if (tbody) tbody.innerHTML = '<tr><td colspan="2" class="p-10 text-center">Data belum tersedia. Silakan upload CSV.</td></tr>';
-        }
-
-        window.renderSOTable = function() {
-            console.log("Render dipanggil");
-            // ... (logika render Anda)
-        }
+        // FUNGSI RENDER, FILTER, DLL... (SAMA SEPERTI KODE SEBELUMNYA)
+        // ... Pastikan fungsi renderSOTable dan applyFilters Anda tetap di sini ...
     </script>
 </body>
 </html>
