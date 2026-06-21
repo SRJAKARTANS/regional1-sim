@@ -233,15 +233,15 @@
         import { getAuth, signInAnonymously, signInWithCustomToken, onAuthStateChanged } from 'https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js';
         import { getFirestore, doc, setDoc, onSnapshot } from 'https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js';
 
-        const firebaseConfig = {
-            apiKey: "AIzaSyDGWDjaE9ZKU1oUm57gdgONlpw_aZnLGpo",
-            authDomain: "jakartans-dashboard.firebaseapp.com",
-            projectId: "jakartans-dashboard",
-            storageBucket: "jakartans-dashboard.firebasestorage.app",
-            messagingSenderId: "648533447432",
-            appId: "1:648533447432:web:f11e41a82a62f766c892bd",
-            measurementId: "G-H5M7GNR99G"
-        };
+       const firebaseConfig = {
+  apiKey: "AIzaSyDGWDjaE9ZKU1oUm57gdgONlpw_aZnLGpo",
+  authDomain: "jakartans-dashboard.firebaseapp.com",
+  projectId: "jakartans-dashboard",
+  storageBucket: "jakartans-dashboard.firebasestorage.app",
+  messagingSenderId: "648533447432",
+  appId: "1:648533447432:web:f11e41a82a62f766c892bd",
+  measurementId: "G-H5M7GNR99G"
+};
 
         let db, auth, firebaseUser = null;
         const appId = typeof __app_id !== 'undefined' ? __app_id : 'simgroup-dashboard-app'; 
@@ -268,18 +268,22 @@
                     
                     const docRef = doc(db, 'artifacts', appId, 'public', 'data', 'csv_uploads', 'latest');
                     onSnapshot(docRef, (snapshot) => {
-                        if (snapshot.exists()) {
-                            const cloudData = snapshot.data();
-                            try {
-                                const parsedData = JSON.parse(cloudData.payload);
-                                localStorage.setItem('savedDashboardData', cloudData.payload);
-                                renderSOTable(); // Otomatis juga memanggil applyFilters() yang akan update chart
-                                
-                                const date = new Date(cloudData.updatedAt);
-                                document.getElementById('last-update-text').innerHTML = `Terakhir di-sync oleh <b>${cloudData.uploader}</b> pada ${date.toLocaleString('id-ID')}`;
-                            } catch(e) {}
-                        }
-                    });
+                     if (snapshot.exists()) {
+        const cloudData = snapshot.data();
+        localStorage.setItem('savedDashboardData', cloudData.payload);
+        renderSOTable(); 
+        console.log("Data berhasil dimuat dari cloud");
+    } else {
+        console.warn("Dokumen tidak ditemukan di path:", docRef.path);
+        // Tambahkan fallback: jika tidak ada di cloud, coba ambil dari local
+        if (localStorage.getItem('savedDashboardData')) {
+            renderSOTable();
+        }
+    }
+}, (error) => {
+    console.error("Gagal terhubung ke Firebase:", error);
+    alert("Gagal ambil data cloud. Cek koneksi atau Firebase Rules Anda.");
+});
                 }
             });
         } catch (error) {
