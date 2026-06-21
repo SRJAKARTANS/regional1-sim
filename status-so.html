@@ -345,17 +345,11 @@
         // ==========================================
         // RENDER DYNAMIC TABLE DENGAN FREEZE & SORT
         // ==========================================
-        function renderSOTable() {
-            const savedString = localStorage.getItem('savedDashboardData');
-            const tbody = document.getElementById('so-table-body');
-            const thead = document.getElementById('so-table-head');
-            
-            if (!savedString || !tbody || !thead) return;
-
-            try {
-                // Di dalam renderSOTable, tepat setelah JSON.parse(savedString)
+                      // Di dalam renderSOTable, tepat setelah JSON.parse(savedString)
             let rawData = JSON.parse(savedString);
                 function renderSOTable() {
+                     const tbody = document.getElementById('so-table-body');
+            const thead = document.getElementById('so-table-head');
                 const savedString = localStorage.getItem('savedDashboardData');
                     try {
             let rawData = JSON.parse(savedString);
@@ -692,20 +686,30 @@
         }
         window.confirmLogout = confirmLogout;
 
-        function checkNotifications(data) {
+      function checkNotifications(data) {
     const notifications = [];
     const today = new Date();
     today.setHours(0,0,0,0);
 
+    // Pastikan currentOfficer sudah terdefinisi, jika belum gunakan default
+    const currentOfficer = localStorage.getItem('currentUser') || "Daffa"; 
     const targetTeam = officerMapping[currentOfficer];
+
+    if (!targetTeam) {
+        console.warn("User tidak memiliki mapping tim");
+        return;
+    }
 
     data.forEach(row => {
         const ro = row['ASSIGN RO'] || '';
         const dueDateStr = row['DUE DATE FULFILLMENT'];
         
         // Cek apakah SO milik tim officer yang bersangkutan
-        if (ro === targetTeam && dueDateStr) {
-            const dueDate = new Date(dueDateStr.split('/').reverse().join('-')); // Format DD/MM/YYYY ke YYYY-MM-DD
+        if (ro === targetTeam && dueDateStr && dueDateStr !== '-') {
+            // Parsing format DD/MM/YYYY ke Date Object
+            const parts = dueDateStr.split('/');
+            const dueDate = new Date(parts[2], parts[1] - 1, parts[0]);
+            
             const diffDays = Math.ceil((dueDate - today) / (1000 * 60 * 60 * 24));
 
             if (diffDays < 0) {
@@ -722,20 +726,21 @@
 }
 
 function updateNotificationBadge(count) {
-    const bellBtn = document.querySelector('button .fa-bell') || document.querySelector('button [data-lucide="bell"]');
-    if (count > 0) {
-        // Menambahkan badge merah
-        const badge = `<span class="absolute -top-1 -right-1 bg-red-500 text-[10px] text-white px-1.5 rounded-full">${count}</span>`;
-        bellBtn.parentElement.classList.add('relative');
-        bellBtn.parentElement.innerHTML += badge;
-    }
-}
-
-        // Fungsi untuk mengecek notifikasi
-function checkNotifications(data) {
-    const today = new Date();
-    today.setHours(0,0,0,0);
+    const bellBtn = document.querySelector('button [data-lucide="bell"]');
+    if (!bellBtn) return;
     
+    // Hapus badge lama jika ada
+    const existingBadge = bellBtn.parentElement.querySelector('.notif-badge');
+    if (existingBadge) existingBadge.remove();
+
+    if (count > 0) {
+        const badge = document.createElement('span');
+        badge.className = "notif-badge absolute -top-1 -right-1 bg-red-500 text-[10px] text-white px-1.5 rounded-full";
+        badge.innerText = count;
+        bellBtn.parentElement.classList.add('relative');
+        bellBtn.parentElement.appendChild(badge);
+    }
+}       
     // Asumsi: currentUser disimpan saat login
     const user = localStorage.getItem('currentUser'); 
     let notificationCount = 0;
