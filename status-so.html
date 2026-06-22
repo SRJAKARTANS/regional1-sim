@@ -746,9 +746,16 @@
                 const rowKat = String(getRowVal(row, "KATEGORI FULFILLMENT")).trim();
                 const rowSla = String(getRowVal(row, "SLA LT OFFERING")).trim();
                 const soInduk = String(getRowVal(row, "SO INDUK")).trim();
+                const soPenambah = String(getRowVal(row, "SO PENAMBAH")).trim();
                 const client = String(getRowVal(row, "NAMA CLIENT")).trim();
                 const posisi = String(getRowVal(row, "NAMA JOB")).trim();
                 const dueDateStr = String(getRowVal(row, "DUE DATE FULFILLMENT")).trim();
+                
+                // Tambahan lajur baharu
+                const agingSS = String(getRowVal(row, "AGING-SS")).trim();
+                const agingNonPending = String(getRowVal(row, "AGING NON PENDING")).trim();
+                const taskId = String(getRowVal(row, "TASK ID")).trim();
+                const roLine = String(getRowVal(row, "RO LINE")).trim();
 
                 const text = Object.values(row).join(" ").toLowerCase();
 
@@ -794,9 +801,14 @@
                     if (offeringVal === 0 && unfulfillVal === 1) { 
                          belumOfferingData.push({
                              "SO INDUK": soInduk,
+                             "SO PENAMBAH": soPenambah,
                              "KLIEN": client,
                              "POSISI": posisi,
                              "ASSIGN RO": rowRo,
+                             "TASK ID": taskId,
+                             "RO LINE": roLine,
+                             "AGING-SS": agingSS,
+                             "AGING NON PENDING": agingNonPending,
                              "DUE DATE": dueDateStr,
                              "KETERANGAN SLA": statusSLA
                          });
@@ -806,9 +818,14 @@
                     if (unfulfillVal === 1) {
                          unfulfillData.push({
                              "SO INDUK": soInduk,
+                             "SO PENAMBAH": soPenambah,
                              "KLIEN": client,
                              "POSISI": posisi,
                              "ASSIGN RO": rowRo,
+                             "TASK ID": taskId,
+                             "RO LINE": roLine,
+                             "AGING-SS": agingSS,
+                             "AGING NON PENDING": agingNonPending,
                              "DUE DATE": dueDateStr,
                              "STATUS SLA": statusSLA,
                              "INDIKASI DUE DATE": keteranganDue
@@ -819,9 +836,14 @@
                     if (diffDays !== null && diffDays <= 3) {
                          dueDateData.push({
                              "SO INDUK": soInduk,
+                             "SO PENAMBAH": soPenambah,
                              "KLIEN": client,
                              "POSISI": posisi,
                              "ASSIGN RO": rowRo,
+                             "TASK ID": taskId,
+                             "RO LINE": roLine,
+                             "AGING-SS": agingSS,
+                             "AGING NON PENDING": agingNonPending,
                              "DUE DATE": dueDateStr,
                              "KETERANGAN DUE DATE": keteranganDue
                          });
