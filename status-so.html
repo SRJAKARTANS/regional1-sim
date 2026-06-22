@@ -75,11 +75,11 @@
 
         <div class="p-6 border-t border-white/10 bg-black/10">
             <div class="flex items-center space-x-3 mb-4">
-                <div class="w-10 h-10 rounded-full bg-teal-500/20 border border-teal-300/30 flex items-center justify-center font-bold text-teal-200">
-                    DA
+                <div id="sidebar-initial" class="w-10 h-10 rounded-full bg-teal-500/20 border border-teal-300/30 flex items-center justify-center font-bold text-teal-200">
+                    --
                 </div>
                 <div>
-                    <h4 class="text-sm font-semibold text-white">Daffa</h4>
+                    <h4 id="sidebar-name" class="text-sm font-semibold text-white">Loading...</h4>
                     <p class="text-xs text-teal-300">Area Operational Mgr</p>
                 </div>
             </div>
@@ -103,7 +103,7 @@
                     <i class="fa-solid fa-cloud-arrow-down animate-pulse"></i>
                     <span>Connecting cloud...</span>
                 </div>
-                <button class="p-2 text-teal-100 hover:text-white hover:bg-white/5 rounded-lg transition-colors">
+                <button class="p-2 text-teal-100 hover:text-white hover:bg-white/5 rounded-lg transition-colors relative">
                     <i data-lucide="bell" class="w-5 h-5"></i>
                 </button>
             </div>
@@ -131,7 +131,8 @@
                         <span>Export Data</span>
                     </button>
 
-                    <label for="csv-file-input" class="cursor-pointer flex items-center justify-center space-x-2 bg-emerald-600 hover:bg-emerald-700 text-white font-bold py-3 px-5 rounded-2xl transition-all shadow-xl text-sm whitespace-nowrap">
+                    <!-- ID upload-csv-btn ditambahkan di sini untuk disembunyikan nanti jika tidak punya akses -->
+                    <label id="upload-csv-btn" for="csv-file-input" class="cursor-pointer flex items-center justify-center space-x-2 bg-emerald-600 hover:bg-emerald-700 text-white font-bold py-3 px-5 rounded-2xl transition-all shadow-xl text-sm whitespace-nowrap">
                         <i data-lucide="upload-cloud" class="w-4 h-4"></i>
                         <span id="btn-sync-text">Sync CSV</span>
                     </label>
@@ -198,8 +199,7 @@
 
                 <div class="overflow-x-auto relative max-h-[600px] overflow-y-auto">
                     <table class="w-full text-left border-collapse" id="so-master-table">
-                        <thead id="so-table-head" class="sticky top-0 z-40 bg-slate-50">
-                            </thead>
+                        <thead id="so-table-head" class="sticky top-0 z-40 bg-slate-50"></thead>
                         <tbody class="divide-y divide-slate-100 text-sm" id="so-table-body">
                             <tr>
                                 <td colspan="7" class="py-8 text-center text-slate-400 font-semibold italic">
@@ -230,34 +230,77 @@
 
     <script type="module">
         import { initializeApp } from 'https://www.gstatic.com/firebasejs/11.6.1/firebase-app.js';
-        import { getAuth, signInAnonymously, signInWithCustomToken, onAuthStateChanged } from 'https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js';
+        import { getAuth, signInAnonymously, onAuthStateChanged } from 'https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js';
         import { getFirestore, doc, setDoc, onSnapshot } from 'https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js';
 
-       const firebaseConfig = {
-  apiKey: "AIzaSyDGWDjaE9ZKU1oUm57gdgONlpw_aZnLGpo",
-  authDomain: "jakartans-dashboard.firebaseapp.com",
-  projectId: "jakartans-dashboard",
-  storageBucket: "jakartans-dashboard.firebasestorage.app",
-  messagingSenderId: "648533447432",
-  appId: "1:648533447432:web:f11e41a82a62f766c892bd",
-  measurementId: "G-H5M7GNR99G"
-};
+        // 1. MANAJEMEN AKUN & AKSES
+        const currentUser = localStorage.getItem('currentUser') || "Daffa"; // Ambil user aktif
+        const allowedToUpload = ["Daffa", "Simon"]; // Hanya Daffa & Simon yang boleh unggah CSV
+        
+        // Penambahan team untuk semua anggota
+        const officerMapping = {
+            "Indra": "REVO MF Jakarta",
+            "Faiz": "REVO MF Jakarta",
+            "Edy": "REVO Adira Jakarta",
+            "Ali": "REVO MF Jakarta", 
+            "Ilham": "REVO MF Jakarta",
+            "Roky": "REVO MF Jakarta",
+            "Daffa": "REVO MF Jakarta", 
+            "Simon": "REVO Adira Jakarta"
+        };
+
+        const firebaseConfig = {
+            apiKey: "AIzaSyDGWDjaE9ZKU1oUm57gdgONlpw_aZnLGpo",
+            authDomain: "jakartans-dashboard.firebaseapp.com",
+            projectId: "jakartans-dashboard",
+            storageBucket: "jakartans-dashboard.firebasestorage.app",
+            messagingSenderId: "648533447432",
+            appId: "1:648533447432:web:f11e41a82a62f766c892bd",
+            measurementId: "G-H5M7GNR99G"
+        };
+
         const appId = 'simgroup-dashboard-app'; 
         const app = initializeApp(firebaseConfig);
         const auth = getAuth(app);
         const db = getFirestore(app);
-   // 1. Coba login otomatis
+
+        window.currentSort = { key: 'No', asc: true };
+
+        // 2. INISIALISASI UI
+        document.addEventListener("DOMContentLoaded", () => {
+            lucide.createIcons();
+            
+            // Set Nama di Sidebar Sesuai Login
+            const sidebarName = document.getElementById('sidebar-name');
+            const sidebarInitial = document.getElementById('sidebar-initial');
+            if (sidebarName && sidebarInitial) {
+                sidebarName.innerText = currentUser;
+                sidebarInitial.innerText = currentUser.substring(0, 2).toUpperCase();
+            }
+
+            // Sembunyikan Butang Upload Jika Tidak Layak
+            const uploadBtn = document.getElementById('upload-csv-btn');
+            if (uploadBtn && !allowedToUpload.includes(currentUser)) {
+                uploadBtn.style.display = 'none'; 
+            }
+
+            // Event listener untuk filter
+            ['search-csv', 'filter-assign-ro', 'filter-kategori', 'filter-sla'].forEach(id => {
+                const el = document.getElementById(id);
+                if(el) el.addEventListener(id === 'search-csv' ? 'input' : 'change', window.applyFilters);
+            });
+        });
+
+        // 3. KONEKSI CLOUD (FIREBASE)
         signInAnonymously(auth).catch(err => console.error("Auth error:", err));
 
-        // 2. Monitoring Status Auth & Koneksi Firestore
         onAuthStateChanged(auth, (user) => {
             const statusUI = document.getElementById('cloud-status');
-            if (!statusUI) return; // Keselamatan tambahan
+            if (!statusUI) return;
 
             if (user) {
                 statusUI.className = "flex items-center gap-2 text-xs font-medium text-emerald-300 bg-emerald-900/40 px-3 py-1.5 rounded-full border border-emerald-500/30";
                 statusUI.innerHTML = '<i class="fa-solid fa-cloud"></i> Cloud Terhubung';
-                
                 loadDataFromCloud();
             } else {
                 statusUI.innerHTML = '<i class="fa-solid fa-cloud-slash"></i> Menunggu Autentikasi...';
@@ -270,106 +313,68 @@
                 if (snapshot.exists()) {
                     const cloudData = snapshot.data();
                     localStorage.setItem('savedDashboardData', cloudData.payload);
-                    document.getElementById('last-update-text').innerText = "Data berhasil dimuat dari cloud";
-                    // renderSOTable(); // Pastikan fungsi ini didefinisikan
+                    document.getElementById('last-update-text').innerText = "Data dimuat dari cloud";
+                    
+                    // FUNGSI INI AKAN MEMAPARKAN DATA KE DALAM JADUAL
+                    window.renderSOTable(); 
                 } else {
                     document.getElementById('last-update-text').innerText = "Data belum tersedia di cloud.";
+                    if(localStorage.getItem('savedDashboardData')) window.renderSOTable();
                 }
             }, (error) => {
                 console.error("Firestore Error:", error);
                 const statusUI = document.getElementById('cloud-status');
                 if (statusUI) statusUI.innerHTML = '<i class="fa-solid fa-triangle-exclamation"></i> Error Cloud';
             });
-
-        let db, auth, firebaseUser = null;
-        const appId = typeof __app_id !== 'undefined' ? __app_id : 'simgroup-dashboard-app'; 
-        const activeUser = { name: "Daffa" }; 
-        const officerMapping = {
-            "Indra": "REVO MF Jakarta",
-            "Faiz": "REVO MF Jakarta",
-            "Edy": "REVO Adira Jakarta"
-};
-        
-        // --- State Manajemen untuk Sorting ---
-        window.currentSort = { key: 'No', asc: true };
-
-        try {
-            const app = initializeApp(firebaseConfig);
-            auth = getAuth(app);
-            db = getFirestore(app);
-
-            signInAnonymously(auth).catch(e => console.log("Auth mode belum diaktifkan."));
-
-            onAuthStateChanged(auth, (user) => {
-                firebaseUser = user;
-                if (user) {
-                    const statusUI = document.getElementById('cloud-status');
-                    if (statusUI) {
-                        statusUI.className = "flex items-center gap-2 text-xs font-medium text-emerald-300 bg-emerald-900/40 px-3 py-1.5 rounded-full border border-emerald-500/30";
-                        statusUI.innerHTML = '<i class="fa-solid fa-cloud"></i> Cloud Terhubung';
-                    }
-                    
-                    const docRef = doc(db, 'artifacts', appId, 'public', 'data', 'csv_uploads', 'latest');
-                    onSnapshot(docRef, (snapshot) => {
-                     if (snapshot.exists()) {
-        const cloudData = snapshot.data();
-        localStorage.setItem('savedDashboardData', cloudData.payload);
-        renderSOTable(); 
-        console.log("Data berhasil dimuat dari cloud");
-    } else {
-        console.warn("Dokumen tidak ditemukan di path:", docRef.path);
-        // Tambahkan fallback: jika tidak ada di cloud, coba ambil dari local
-        if (localStorage.getItem('savedDashboardData')) {
-            renderSOTable();
         }
-    }
-}, (error) => {
-    console.error("Gagal terhubung ke Firebase:", error);
-    alert("Gagal ambil data cloud. Cek koneksi atau Firebase Rules Anda.");
-});
+
+        // 4. UPLOAD CSV LOGIC
+        const fileInput = document.getElementById('csv-file-input');
+        if(fileInput) {
+            fileInput.addEventListener('change', async (event) => {
+                if (!allowedToUpload.includes(currentUser)) {
+                    alert("Akses ditolak. Hanya Daffa & Simon yang boleh muat naik data.");
+                    return;
                 }
-            });
-        } catch (error) {
-            console.warn("Berjalan Mode Lokal");
-        }
-        
-        // ==========================================
-        // FUNGSI UPLOAD CSV
-        // ==========================================
-        async function handleFileUpload(event) {
-            const file = event.target.files[0];
-            if (!file) return;
 
-            const btnLabel = document.getElementById('btn-sync-text');
-            if (btnLabel) btnLabel.innerHTML = 'Memproses...';
+                const file = event.target.files[0];
+                if (!file) return;
 
-            Papa.parse(file, {
-                header: true,
-                skipEmptyLines: true,
-                complete: async function(results) {
-                    const data = results.data;
-                    const stringData = JSON.stringify(data);
-                    
-                    localStorage.setItem('savedDashboardData', stringData);
-                    renderSOTable(); // Chart akan diupdate di dalam applyFilters() yang dipanggil oleh renderSOTable()
+                const btnLabel = document.getElementById('btn-sync-text');
+                if (btnLabel) btnLabel.innerHTML = 'Memproses...';
 
-                    if (firebaseUser && db) {
-                        try {
-                            const docRef = doc(db, 'artifacts', appId, 'public', 'data', 'csv_uploads', 'latest');
-                            await setDoc(docRef, { uploader: activeUser.name, updatedAt: new Date().toISOString(), payload: stringData });
-                            alert("✅ Sukses sinkronisasi ke Cloud.");
-                        } catch (error) { alert("Tersimpan secara lokal. Gagal Cloud."); }
+                Papa.parse(file, {
+                    header: true,
+                    skipEmptyLines: true,
+                    complete: async function(results) {
+                        const data = results.data;
+                        const stringData = JSON.stringify(data);
+                        
+                        localStorage.setItem('savedDashboardData', stringData);
+                        window.renderSOTable(); 
+
+                        if (auth.currentUser && db) {
+                            try {
+                                const docRef = doc(db, 'artifacts', appId, 'public', 'data', 'csv_uploads', 'latest');
+                                await setDoc(docRef, { 
+                                    uploader: currentUser, 
+                                    updatedAt: new Date().toISOString(), 
+                                    payload: stringData 
+                                });
+                                alert("✅ Sukses sinkronisasi ke Cloud.");
+                            } catch (error) { 
+                                console.error(error);
+                                alert("Gagal Cloud. Data hanya tersimpan lokal."); 
+                            }
+                        }
+                        if (btnLabel) btnLabel.innerHTML = 'Sync CSV'; 
+                        event.target.value = ''; 
                     }
-                    if (btnLabel) btnLabel.innerHTML = 'Sync CSV'; 
-                    event.target.value = ''; 
-                }
+                });
             });
         }
-        window.handleFileUpload = handleFileUpload;
 
-        // ==========================================
-        // HELPER: PARSING TANGGAL UNTUK SORTING
-        // ==========================================
+        // 5. HELPER DATES & NOTIFICATIONS
         function parseDateForSort(dateStr) {
             if (!dateStr || dateStr === '-') return 0;
             if (dateStr.includes('/')) {
@@ -380,21 +385,70 @@
             return isNaN(d) ? 0 : d.getTime();
         }
 
-        // ==========================================
-        // RENDER DYNAMIC TABLE DENGAN FREEZE & SORT
-        // ==========================================
-                      // Di dalam renderSOTable, tepat setelah JSON.parse(savedString)
-            let rawData = JSON.parse(savedString);
-                function renderSOTable() {
-                     const tbody = document.getElementById('so-table-body');
+        function checkNotifications(data) {
+            const notifications = [];
+            const today = new Date();
+            today.setHours(0,0,0,0);
+
+            const targetTeam = officerMapping[currentUser];
+
+            if (targetTeam) {
+                data.forEach(row => {
+                    const ro = row['ASSIGN RO'] || '';
+                    const dueDateStr = row['DUE DATE FULFILLMENT'];
+                    
+                    if (ro === targetTeam && dueDateStr && dueDateStr !== '-') {
+                        let dueDate = null;
+                        if (dueDateStr.includes('/')) {
+                            const parts = dueDateStr.split('/');
+                            if (parts.length === 3) dueDate = new Date(parts[2], parts[1] - 1, parts[0]);
+                        } else {
+                            dueDate = new Date(dueDateStr);
+                        }
+                        
+                        if(dueDate && !isNaN(dueDate)) {
+                            const diffDays = Math.ceil((dueDate - today) / (1000 * 60 * 60 * 24));
+                            if (diffDays < 0) {
+                                notifications.push(`⚠️ SO ${row['SO INDUK']} Overdue!`);
+                            } else if (diffDays <= 7 && diffDays >= 0) {
+                                notifications.push(`🔔 SO ${row['SO INDUK']} H-${diffDays} jatuh tempo.`);
+                            }
+                        }
+                    }
+                });
+            }
+            updateNotificationBadge(notifications.length);
+        }
+
+        function updateNotificationBadge(count) {
+            const bellBtn = document.querySelector('button [data-lucide="bell"]');
+            if (!bellBtn) return;
+            
+            const existingBadge = bellBtn.parentElement.querySelector('.notif-badge');
+            if (existingBadge) existingBadge.remove();
+
+            if (count > 0) {
+                const badge = document.createElement('span');
+                badge.className = "notif-badge absolute -top-1 -right-1 bg-red-500 text-[10px] text-white px-1.5 rounded-full";
+                badge.innerText = count;
+                bellBtn.parentElement.appendChild(badge);
+            }
+        }
+
+        // 6. LOGIKA RENDER TABLE
+        window.renderSOTable = function() {
+            const tbody = document.getElementById('so-table-body');
             const thead = document.getElementById('so-table-head');
-                const savedString = localStorage.getItem('savedDashboardData');
-                    try {
-            let rawData = JSON.parse(savedString);
-            checkNotifications(rawData); // <--- Tambahkan baris ini
+            const savedString = localStorage.getItem('savedDashboardData');
+            
+            if(!savedString || !tbody || !thead) return;
+
+            try {
+                let rawData = JSON.parse(savedString);
+                checkNotifications(rawData);
+
                 if (!rawData || rawData.length === 0) return;
 
-                // Tambahkan field original index untuk mengembalikan urutan "No" jika reset
                 rawData = rawData.map((row, idx) => ({ ...row, _originalIndex: idx + 1 }));
 
                 const allowedColumns = [
@@ -405,16 +459,13 @@
                     "PARTICIPATE", "KATEGORI FULFILLMENT"
                 ];
 
-                // SORTING LOGIC SEBELUM RENDER
                 if (window.currentSort.key) {
                     rawData.sort((a, b) => {
                         if (window.currentSort.key === 'No') {
                             return window.currentSort.asc ? a._originalIndex - b._originalIndex : b._originalIndex - a._originalIndex;
                         }
-
                         const keyA = Object.keys(a).find(k => k.trim().toUpperCase() === window.currentSort.key.toUpperCase());
                         const keyB = Object.keys(b).find(k => k.trim().toUpperCase() === window.currentSort.key.toUpperCase());
-                        
                         let valA = keyA ? a[keyA] : "";
                         let valB = keyB ? b[keyB] : "";
 
@@ -435,7 +486,6 @@
                     });
                 }
 
-                // BUAT HEADER THEAD
                 let headHTML = '<tr class="text-slate-500 text-xs uppercase tracking-wider bg-slate-50 border-b border-slate-200">';
                 const noIcon = window.currentSort.key === 'No' ? (window.currentSort.asc ? "fa-sort-up text-teal-600" : "fa-sort-down text-teal-600") : "fa-sort opacity-30";
                 headHTML += `<th class="p-4 font-semibold whitespace-nowrap sticky top-0 left-0 bg-slate-100 z-30 sticky-col cursor-pointer hover:bg-slate-200 transition-colors" style="min-width: 60px;" onclick="handleSort('No')">No <i class="fa-solid ${noIcon} ml-1"></i></th>`;
@@ -459,13 +509,11 @@
                 let bodyHTML = '';
                 rawData.forEach((row) => {
                     const rowKeys = Object.keys(row);
-                    
                     const assignRoKey = rowKeys.find(k => k.trim().toUpperCase() === "ASSIGN RO");
                     const kategoriKey = rowKeys.find(k => k.trim().toUpperCase() === "KATEGORI FULFILLMENT");
                     const slaKey = rowKeys.find(k => k.trim().toUpperCase() === "SLA LT OFFERING");
                     const dueDateKey = rowKeys.find(k => k.trim().toUpperCase() === "DUE DATE FULFILLMENT");
 
-                    // EKSTRAK DATA UNTUK KALKULASI PERSENTASE METRIK
                     const finishKey = rowKeys.find(k => k.trim().toLowerCase() === 'finish');
                     const unfulfillKey = rowKeys.find(k => k.trim().toLowerCase() === 'unfulfill');
                     const offeringKey = rowKeys.find(k => k.trim().toLowerCase() === 'offering');
@@ -508,16 +556,13 @@
                         }
                     }
 
-                    // SUSUPKAN METRIK KE DALAM ATTRIBUTE TR
                     bodyHTML += `<tr class="${rowClass}" data-assign-ro="${roValue}" data-kategori="${kategoriValue}" data-sla="${slaValue}" data-status-badge="${statusBadgeAttr}" data-finish="${finishVal}" data-unfulfill="${unfulfillVal}" data-offering="${offeringVal}">`;
-                    
                     bodyHTML += `<td class="p-4 text-slate-500 font-medium sticky left-0 bg-white group-hover:bg-slate-50 z-10 sticky-col" style="min-width: 60px;">${row._originalIndex}</td>`;
                     
                     allowedColumns.forEach((key, i) => {
                         const matchedKey = rowKeys.find(k => k.trim().toUpperCase() === key.toUpperCase());
                         const cellData = (matchedKey && row[matchedKey]) ? row[matchedKey] : '-';
                         let cellClasses = "p-4 text-slate-700 whitespace-nowrap group-hover:text-slate-900 font-medium";
-                        
                         if (i === 0) cellClasses += " sticky left-[60px] bg-white group-hover:bg-slate-50 z-10 sticky-col";
 
                         if (key === "DUE DATE FULFILLMENT") {
@@ -542,32 +587,22 @@
                 fillDropdown('filter-kategori', kategoriSet);
                 fillDropdown('filter-sla', slaSet);
 
-                applyFilters();
+                window.applyFilters();
 
             } catch (error) { console.error("Gagal merender tabel", error); }
-        }
-        window.renderSOTable = renderSOTable;
+        };
 
-        // ==========================================
-        // FUNGSI TRIGGER SORTING DARI KLIK HEADER
-        // ==========================================
-        function handleSort(columnName) {
+        window.handleSort = function(columnName) {
             if (window.currentSort.key === columnName) {
-                // Balik arah jika diklik lagi
                 window.currentSort.asc = !window.currentSort.asc;
             } else {
-                // Pilih kolom baru, default ascending
                 window.currentSort.key = columnName;
                 window.currentSort.asc = true;
             }
-            renderSOTable(); // Bangun ulang data yang sudah tersortir
-        }
-        window.handleSort = handleSort;
+            window.renderSOTable();
+        };
 
-        // ==========================================
-        // LOGIKA FILTER & UPDATE MINI INSIGHTS + KARTU PERSENTASE
-        // ==========================================
-        function applyFilters() {
+        window.applyFilters = function() {
             const searchInput = document.getElementById('search-csv');
             const filterInput = document.getElementById('filter-assign-ro');
             const filterKategoriInput = document.getElementById('filter-kategori');
@@ -582,16 +617,13 @@
             const filterSla = filterSlaInput ? filterSlaInput.value : "";
             
             const rows = tbody.getElementsByTagName('tr');
-            
             let visibleCount = 0;
             let overdueCount = 0;
             let h3Count = 0;
-
-            // Variabel untuk menampung metrik dinamis
             let terFulfill = 0, belumFulfill = 0, sudahOffering = 0, belumOffering = 0;
 
             Array.from(rows).forEach(row => {
-                if (row.children.length === 1) return; // Skip baris "menunggu data"
+                if (row.children.length === 1) return;
                 
                 const text = row.innerText.toLowerCase();
                 const rowRo = row.getAttribute('data-assign-ro') || "";
@@ -610,7 +642,6 @@
                     if (statusBadge === 'overdue') overdueCount++;
                     if (statusBadge === 'h3') h3Count++;
 
-                    // Kalkulasi angka dari baris yang berhasil ter-filter
                     const finish = parseInt(row.getAttribute('data-finish')) || 0;
                     const unfulfill = parseInt(row.getAttribute('data-unfulfill')) || 0;
                     const offering = parseInt(row.getAttribute('data-offering')) || 0;
@@ -625,12 +656,10 @@
                 }
             });
             
-            // Perbarui Mini Insights (Baris, Overdue, H-3)
             document.getElementById('total-row-count').innerText = `${visibleCount} Baris`;
             document.getElementById('insight-overdue').innerHTML = `<i class="fa-solid fa-circle-exclamation mr-1"></i>${overdueCount} Overdue`;
             document.getElementById('insight-h3').innerHTML = `<i class="fa-solid fa-triangle-exclamation mr-1"></i>${h3Count} H-3`;
 
-            // Perbarui 4 Kartu Metrik Utama
             const totalFulfill = terFulfill + belumFulfill;
             const totalOffering = sudahOffering + belumOffering;
 
@@ -638,23 +667,15 @@
             document.getElementById('text-belum-fulfill').innerText = `${belumFulfill} (${totalFulfill > 0 ? Math.round((belumFulfill / totalFulfill) * 100) : 0}%)`;
             document.getElementById('text-sudah-offering').innerText = `${sudahOffering} (${totalOffering > 0 ? Math.round((sudahOffering / totalOffering) * 100) : 0}%)`;
             document.getElementById('text-belum-offering').innerText = `${belumOffering} (${totalOffering > 0 ? Math.round((belumOffering / totalOffering) * 100) : 0}%)`;
-        }
-        window.applyFilters = applyFilters;
+        };
 
-        // ==========================================
-        // FUNGSI EKSPOR CSV BERDASARKAN FILTER SAAT INI
-        // ==========================================
-        function exportFilteredData() {
+        window.exportFilteredData = function() {
             const tbody = document.getElementById('so-table-body');
             const thead = document.getElementById('so-table-head');
             if (!tbody || !thead) return;
 
             let csvContent = "";
-
-            const headers = Array.from(thead.querySelectorAll('th')).map(th => {
-                let text = th.innerText.replace(/"/g, '""').trim();
-                return `"${text}"`;
-            });
+            const headers = Array.from(thead.querySelectorAll('th')).map(th => `"${th.innerText.replace(/"/g, '""').trim()}"`);
             csvContent += headers.join(",") + "\n";
 
             const rows = tbody.getElementsByTagName('tr');
@@ -671,155 +692,34 @@
 
             const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
             const link = document.createElement("a");
-            const url = URL.createObjectURL(blob);
-            link.setAttribute("href", url);
+            link.setAttribute("href", URL.createObjectURL(blob));
             link.setAttribute("download", `Status_SO_Filtered_${new Date().getTime()}.csv`);
             link.style.visibility = 'hidden';
             document.body.appendChild(link);
             link.click();
             document.body.removeChild(link);
-        }
-        window.exportFilteredData = exportFilteredData;
+        };
 
-        // ==========================================
-        // INISIALISASI HALAMAN
-        // ==========================================
-        document.addEventListener("DOMContentLoaded", () => {
-            lucide.createIcons();
-            
-            ['search-csv', 'filter-assign-ro', 'filter-kategori', 'filter-sla'].forEach(id => {
-                const el = document.getElementById(id);
-                if(el) el.addEventListener(id === 'search-csv' ? 'input' : 'change', applyFilters);
-            });
-
-            const savedData = localStorage.getItem('savedDashboardData');
-            if (savedData) {
-                try {
-                    renderSOTable(); // Render tabel awal yang juga akan otomatis mengupdate chart
-                } catch(e) {}
-            }
-        });
-
-        function showLogoutModal() {
+        window.showLogoutModal = () => {
             const modal = document.getElementById('logout-modal');
             if (modal) {
                 modal.classList.remove('pointer-events-none', 'opacity-0');
                 modal.children[0].classList.remove('scale-95');
             }
-        }
-        window.showLogoutModal = showLogoutModal;
-
-        function hideLogoutModal() {
+        };
+        
+        window.hideLogoutModal = () => {
             const modal = document.getElementById('logout-modal');
             if (modal) {
                 modal.classList.add('pointer-events-none', 'opacity-0');
                 modal.children[0].classList.add('scale-95');
             }
-        }
-        window.hideLogoutModal = hideLogoutModal;
+        };
 
-        function confirmLogout() {
+        window.confirmLogout = () => {
             localStorage.removeItem('currentUser');
             window.location.href = "login.html";
-        }
-        window.confirmLogout = confirmLogout;
-
-      function checkNotifications(data) {
-    const notifications = [];
-    const today = new Date();
-    today.setHours(0,0,0,0);
-
-    // Pastikan currentOfficer sudah terdefinisi, jika belum gunakan default
-    const currentOfficer = localStorage.getItem('currentUser') || "Daffa"; 
-    const targetTeam = officerMapping[currentOfficer];
-
-    if (!targetTeam) {
-        console.warn("User tidak memiliki mapping tim");
-        return;
-    }
-
-    data.forEach(row => {
-        const ro = row['ASSIGN RO'] || '';
-        const dueDateStr = row['DUE DATE FULFILLMENT'];
-        
-        // Cek apakah SO milik tim officer yang bersangkutan
-        if (ro === targetTeam && dueDateStr && dueDateStr !== '-') {
-            // Parsing format DD/MM/YYYY ke Date Object
-            const parts = dueDateStr.split('/');
-            const dueDate = new Date(parts[2], parts[1] - 1, parts[0]);
-            
-            const diffDays = Math.ceil((dueDate - today) / (1000 * 60 * 60 * 24));
-
-            if (diffDays < 0) {
-                notifications.push(`⚠️ SO ${row['SO INDUK']} Overdue!`);
-            } else if (diffDays <= 7 && diffDays >= 0) {
-                notifications.push(`🔔 SO ${row['SO INDUK']} H-${diffDays} jatuh tempo.`);
-            }
-        }
-    });
-
-    // Simpan ke storage dan update badge
-    localStorage.setItem(`notifications_${currentOfficer}`, JSON.stringify(notifications));
-    updateNotificationBadge(notifications.length);
-}
-
-function updateNotificationBadge(count) {
-    const bellBtn = document.querySelector('button [data-lucide="bell"]');
-    if (!bellBtn) return;
-    
-    // Hapus badge lama jika ada
-    const existingBadge = bellBtn.parentElement.querySelector('.notif-badge');
-    if (existingBadge) existingBadge.remove();
-
-    if (count > 0) {
-        const badge = document.createElement('span');
-        badge.className = "notif-badge absolute -top-1 -right-1 bg-red-500 text-[10px] text-white px-1.5 rounded-full";
-        badge.innerText = count;
-        bellBtn.parentElement.classList.add('relative');
-        bellBtn.parentElement.appendChild(badge);
-    }
-}       
-    // Asumsi: currentUser disimpan saat login
-    const user = localStorage.getItem('currentUser'); 
-    let notificationCount = 0;
-
-    // Mapping Tim Officer (sesuaikan dengan data Anda)
-    const teamMapping = {
-        "Indra": "REVO MF Jakarta",
-        "Faiz": "REVO MF Jakarta",
-        "Edy": "REVO Adira Jakarta"
-    };
-
-    const targetTeam = teamMapping[user];
-
-    data.forEach(row => {
-        if (row['ASSIGN RO'] === targetTeam && row['DUE DATE FULFILLMENT']) {
-            const dateParts = row['DUE DATE FULFILLMENT'].split('/');
-            const dueDate = new Date(dateParts[2], dateParts[1] - 1, dateParts[0]);
-            
-            const diffTime = dueDate - today;
-            const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
-
-            if (diffDays <= 7) {
-                notificationCount++;
-            }
-        }
-    });
-
-    updateNotificationBadge(notificationCount);
-}
-
-// Fungsi untuk memperbarui angka di lonceng
-function updateNotificationBadge(count) {
-    const bellBtn = document.querySelector('button [data-lucide="bell"]');
-    if (count > 0 && bellBtn) {
-        const badge = document.createElement('span');
-        badge.className = "absolute -top-1 -right-1 bg-red-500 text-[10px] text-white px-1.5 rounded-full";
-        badge.innerText = count;
-        bellBtn.parentElement.style.position = 'relative';
-        bellBtn.parentElement.appendChild(badge);
-    }
-}
+        };
     </script>
 </body>
 </html>
