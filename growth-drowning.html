@@ -267,11 +267,21 @@
         window.addEventListener('DOMContentLoaded', () => {
             const currentUser = localStorage.getItem('currentUser');
             
-            // Jika tidak ada user (belum login)
             if (!currentUser) {
-                alert("Sesi Anda telah berakhir. Silakan login kembali.");
-                window.location.href = 'login.html'; // Redirect ke login jika dibutuhkan
-                return;
+        alert("Sesi Anda telah berakhir. Silakan login kembali.");
+        window.location.href = 'index.html'; // Ganti dengan nama file login Anda
+    } else {
+        // Jika ada, masukkan nama user ke profil sidebar
+        const profileNameElement = document.getElementById('profile-name');
+        if (profileNameElement) {
+            profileNameElement.innerText = currentUser;
+        }
+    }
+
+    // Fallback Logout (jika diperlukan)
+    function handleLogout() {
+        localStorage.removeItem('currentUser');
+        window.location.href = 'index.html';
             }
 
             // Update Profil di Sidebar
