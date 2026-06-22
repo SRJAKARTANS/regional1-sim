@@ -8,6 +8,8 @@
     <script src="https://cdn.tailwindcss.com"></script>
     <!-- Lucide Icons for consistent look -->
     <script src="https://unpkg.com/lucide@latest"></script>
+    <!-- PapaParse for CSV Parsing -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/PapaParse/5.4.1/papaparse.min.js"></script>
     <style>
         /* Custom scrollbar for premium touch */
         ::-webkit-scrollbar {
@@ -28,7 +30,7 @@
 </head>
 <body class="bg-[#116A7B] text-white font-sans min-h-screen flex">
 
-    <!-- SIDEBAR (Sama persis dengan tema dashboard-internal.html) -->
+    <!-- SIDEBAR -->
     <aside class="w-64 bg-[#0d5360] flex flex-col justify-between border-r border-white/10 shrink-0 min-h-screen">
         <div class="p-6">
             <!-- Brand Logo -->
@@ -82,12 +84,14 @@
         <!-- Sidebar Footer / Profile -->
         <div class="p-6 border-t border-white/10 bg-black/10">
             <div class="flex items-center space-x-3 mb-4">
-                <div class="w-10 h-10 rounded-full bg-teal-500/20 border border-teal-300/30 flex items-center justify-center font-bold text-teal-200">
-                    DA
+                <!-- Ditambahkan ID profile-initial -->
+                <div id="profile-initial" class="w-10 h-10 rounded-full bg-teal-500/20 border border-teal-300/30 flex items-center justify-center font-bold text-teal-200">
+                    --
                 </div>
                 <div>
-                    <h4 class="text-sm font-semibold text-white">Daffa</h4>
-                    <p class="text-xs text-teal-300">Area Operational Mgr</p>
+                    <!-- Ditambahkan ID profile-name dan profile-role -->
+                    <h4 id="profile-name" class="text-sm font-semibold text-white">Loading...</h4>
+                    <p id="profile-role" class="text-xs text-teal-300">User</p>
                 </div>
             </div>
             <button onclick="handleLogout()" class="w-full flex items-center justify-center space-x-2 py-2 px-4 rounded-lg bg-red-500/20 hover:bg-red-500/30 text-red-200 hover:text-white border border-red-500/30 transition-all duration-200 text-sm font-medium">
@@ -121,20 +125,32 @@
         <!-- Dynamic Content Body -->
         <div class="p-8 space-y-8 flex-1 max-w-7xl w-full mx-auto">
             
-            <!-- Header Section -->
+            <!-- Header Section with Upload Button -->
             <div class="flex flex-col md:flex-row md:items-center md:justify-between gap-4">
                 <div>
                     <h1 class="text-3xl font-extrabold text-white tracking-tight flex items-center gap-3">
                         Growth & Drowning
                     </h1>
                     <p class="text-teal-100 mt-1.5 text-sm">
-                        Analisis performa pemenuhan target dan SLA Service Order untuk efisiensi tim.
+                        Analisis masa berlaku kontrak dan deadline Sourcing/TAD dari CSV harian.
                     </p>
                 </div>
-                <!-- Date Badge -->
-                <div class="bg-white/10 border border-white/20 px-4 py-2 rounded-xl flex items-center space-x-2 self-start md:self-auto shadow-sm">
-                    <i data-lucide="calendar-days" class="w-4 h-4 text-teal-300"></i>
-                    <span class="text-xs font-semibold tracking-wide text-teal-100">Bulan Ini: Juni 2026</span>
+                
+                <div class="flex items-center space-x-3 self-start md:self-auto">
+                    <!-- Date Badge -->
+                    <div class="bg-white/10 border border-white/20 px-4 py-2 rounded-xl flex items-center space-x-2 shadow-sm hidden sm:flex">
+                        <i data-lucide="calendar-days" class="w-4 h-4 text-teal-300"></i>
+                        <span class="text-xs font-semibold tracking-wide text-teal-100" id="current-month">Bulan Ini</span>
+                    </div>
+                    
+                    <!-- Upload CSV Button (DISembunyikan secara default, dibuka via JS untuk Daffa & Simon) -->
+                    <div id="upload-section" class="hidden items-center">
+                        <input type="file" id="csvFileInput" accept=".csv" class="hidden">
+                        <button onclick="document.getElementById('csvFileInput').click()" class="bg-teal-400 hover:bg-teal-300 text-teal-950 px-4 py-2 rounded-xl flex items-center space-x-2 shadow-md transition-colors font-semibold text-sm">
+                            <i data-lucide="upload-cloud" class="w-4 h-4"></i>
+                            <span>Upload Data TAD/CSV</span>
+                        </button>
+                    </div>
                 </div>
             </div>
 
@@ -144,14 +160,14 @@
                 <div class="bg-white/95 backdrop-blur-md text-slate-800 rounded-2xl p-6 shadow-xl border-l-8 border-emerald-500 transform hover:scale-[1.01] transition-transform duration-200">
                     <div class="flex justify-between items-start">
                         <div>
-                            <p class="text-xs font-bold text-slate-400 uppercase tracking-wider mb-1">Total Fulfill (Growth)</p>
-                            <h3 class="text-4xl font-extrabold text-slate-800 leading-none">142</h3>
+                            <p class="text-xs font-bold text-slate-400 uppercase tracking-wider mb-1">Area Aman (Kontrak/SLA > 7 Hari)</p>
+                            <h3 class="text-4xl font-extrabold text-slate-800 leading-none" id="growth-count">0</h3>
                             <span class="inline-flex items-center text-xs font-semibold text-emerald-600 bg-emerald-100 px-2 py-0.5 rounded-full mt-2.5">
-                                <i data-lucide="arrow-up-right" class="w-3.5 h-3.5 mr-0.5"></i> 12% dari target
+                                <i data-lucide="check-circle" class="w-3.5 h-3.5 mr-0.5"></i> Berjalan Baik
                             </span>
                         </div>
                         <div class="p-3 bg-emerald-100 rounded-xl text-emerald-600">
-                            <i data-lucide="rocket" class="w-6 h-6"></i>
+                            <i data-lucide="shield-check" class="w-6 h-6"></i>
                         </div>
                     </div>
                 </div>
@@ -160,14 +176,14 @@
                 <div class="bg-white/95 backdrop-blur-md text-slate-800 rounded-2xl p-6 shadow-xl border-l-8 border-rose-500 transform hover:scale-[1.01] transition-transform duration-200">
                     <div class="flex justify-between items-start">
                         <div>
-                            <p class="text-xs font-bold text-slate-400 uppercase tracking-wider mb-1">Overdue SLA (Drowning)</p>
-                            <h3 class="text-4xl font-extrabold text-slate-800 leading-none">18</h3>
+                            <p class="text-xs font-bold text-slate-400 uppercase tracking-wider mb-1">Overdue / Warning (Drowning H-7)</p>
+                            <h3 class="text-4xl font-extrabold text-slate-800 leading-none" id="drowning-count">0</h3>
                             <span class="inline-flex items-center text-xs font-semibold text-rose-600 bg-rose-100 px-2 py-0.5 rounded-full mt-2.5">
-                                <i data-lucide="alert-triangle" class="w-3.5 h-3.5 mr-1"></i> Butuh Perhatian!
+                                <i data-lucide="alert-triangle" class="w-3.5 h-3.5 mr-1"></i> Butuh Eksekusi Cepat!
                             </span>
                         </div>
                         <div class="p-3 bg-rose-100 rounded-xl text-rose-600">
-                            <i data-lucide="skull" class="w-6 h-6"></i>
+                            <i data-lucide="alarm-clock" class="w-6 h-6"></i>
                         </div>
                     </div>
                 </div>
@@ -177,103 +193,56 @@
             <div class="grid grid-cols-1 lg:grid-cols-2 gap-8">
                 
                 <!-- Area Positif Table (Top Fulfill) -->
-                <div class="bg-white/95 backdrop-blur-md text-slate-800 rounded-2xl shadow-xl overflow-hidden flex flex-col">
-                    <div class="p-5 border-b border-slate-100 bg-slate-50 flex items-center justify-between">
+                <div class="bg-white/95 backdrop-blur-md text-slate-800 rounded-2xl shadow-xl overflow-hidden flex flex-col border border-slate-100">
+                    <div class="p-5 border-b border-slate-100 bg-emerald-50/80 flex items-center justify-between">
                         <h3 class="font-bold text-slate-800 flex items-center space-x-2">
-                            <span class="p-1 bg-emerald-100 text-emerald-600 rounded-md">
-                                <i data-lucide="check-circle" class="w-4 h-4"></i>
+                            <span class="p-1.5 bg-emerald-100 text-emerald-600 rounded-lg">
+                                <i data-lucide="trending-up" class="w-4 h-4"></i>
                             </span>
-                            <span>Area Positif (Top Fulfill)</span>
+                            <span>Area Aman (Growth)</span>
                         </h3>
-                        <span class="text-xs text-slate-400 font-medium">Bulan Juni 2026</span>
                     </div>
-                    <div class="overflow-x-auto flex-1">
-                        <table class="w-full text-left border-collapse">
-                            <thead>
-                                <tr class="border-b border-slate-100 text-slate-400 text-xs uppercase tracking-wider">
-                                    <th class="py-4 px-6 font-semibold">Klien & Cabang</th>
-                                    <th class="py-4 px-6 font-semibold">PIC Sourcing</th>
-                                    <th class="py-4 px-6 font-semibold text-right">Status</th>
+                    <div class="overflow-x-auto flex-1 max-h-[450px] overflow-y-auto">
+                        <table class="w-full text-left border-collapse relative">
+                            <thead class="sticky top-0 bg-white z-10">
+                                <tr class="border-b border-slate-100 text-slate-400 text-[11px] font-bold uppercase tracking-wider">
+                                    <th class="py-4 px-6">Nama / Posisi</th>
+                                    <th class="py-4 px-6">PIC / Klien</th>
+                                    <th class="py-4 px-6 text-right">Status</th>
                                 </tr>
                             </thead>
-                            <tbody class="divide-y divide-slate-100 text-sm">
-                                <tr class="hover:bg-slate-50/50 transition-colors">
-                                    <td class="py-4 px-6">
-                                        <div class="font-bold text-slate-800">PT. FIF Group</div>
-                                        <div class="text-xs text-slate-400">Jakarta Pusat</div>
-                                    </td>
-                                    <td class="py-4 px-6 text-slate-600">Bpk. Haryanto</td>
-                                    <td class="py-4 px-6 text-right">
-                                        <span class="inline-block px-2.5 py-1 text-xs font-bold text-emerald-700 bg-emerald-100 rounded-full">Fulfill Cepat</span>
-                                    </td>
-                                </tr>
-                                <tr class="hover:bg-slate-50/50 transition-colors">
-                                    <td class="py-4 px-6">
-                                        <div class="font-bold text-slate-800">Adira Finance</div>
-                                        <div class="text-xs text-slate-400">Kelapa Gading</div>
-                                    </td>
-                                    <td class="py-4 px-6 text-slate-600">Ibu Dian Sastro</td>
-                                    <td class="py-4 px-6 text-right">
-                                        <span class="inline-block px-2.5 py-1 text-xs font-bold text-teal-700 bg-teal-100 rounded-full">Sesuai Target</span>
-                                    </td>
-                                </tr>
+                            <tbody class="divide-y divide-slate-100 text-sm" id="growth-table-body">
+                                <tr><td colspan="3" class="text-center py-8 text-slate-400 text-sm">Belum ada data CSV. Silakan hubungi Daffa/Simon untuk upload.</td></tr>
                             </tbody>
                         </table>
                     </div>
                 </div>
 
                 <!-- Area Kritis Table (SLA Overdue) -->
-                <div class="bg-white/95 backdrop-blur-md text-slate-800 rounded-2xl shadow-xl overflow-hidden flex flex-col">
-                    <div class="p-5 border-b border-slate-100 bg-slate-50 flex items-center justify-between">
+                <div class="bg-white/95 backdrop-blur-md text-slate-800 rounded-2xl shadow-xl overflow-hidden flex flex-col border border-slate-100">
+                    <div class="p-5 border-b border-slate-100 bg-rose-50/80 flex items-center justify-between">
                         <h3 class="font-bold text-slate-800 flex items-center space-x-2">
-                            <span class="p-1 bg-rose-100 text-rose-600 rounded-md">
-                                <i data-lucide="alert-circle" class="w-4 h-4"></i>
+                            <span class="p-1.5 bg-rose-100 text-rose-600 rounded-lg">
+                                <i data-lucide="trending-down" class="w-4 h-4"></i>
                             </span>
-                            <span>Area Kritis (SLA Overdue)</span>
+                            <span>Area Kritis (Drowning)</span>
                         </h3>
-                        <span class="text-xs text-rose-500 font-semibold flex items-center gap-1">
+                        <span class="text-xs text-rose-500 font-bold flex items-center gap-1.5 bg-rose-100 px-2 py-1 rounded-md">
                             <span class="w-1.5 h-1.5 rounded-full bg-rose-500 animate-ping"></span>
-                            Urgent Action Required
+                            Urgent
                         </span>
                     </div>
-                    <div class="overflow-x-auto flex-1">
-                        <table class="w-full text-left border-collapse">
-                            <thead>
-                                <tr class="border-b border-slate-100 text-slate-400 text-xs uppercase tracking-wider">
-                                    <th class="py-4 px-6 font-semibold">Posisi & Klien</th>
-                                    <th class="py-4 px-6 font-semibold">SLA Days</th>
-                                    <th class="py-4 px-6 font-semibold text-right">Action</th>
+                    <div class="overflow-x-auto flex-1 max-h-[450px] overflow-y-auto">
+                        <table class="w-full text-left border-collapse relative">
+                            <thead class="sticky top-0 bg-white z-10">
+                                <tr class="border-b border-slate-100 text-slate-400 text-[11px] font-bold uppercase tracking-wider">
+                                    <th class="py-4 px-6">Nama / Klien</th>
+                                    <th class="py-4 px-6">SLA Date</th>
+                                    <th class="py-4 px-6 text-right">Action</th>
                                 </tr>
                             </thead>
-                            <tbody class="divide-y divide-slate-100 text-sm">
-                                <tr class="hover:bg-rose-50/20 transition-colors">
-                                    <td class="py-4 px-6">
-                                        <div class="font-bold text-slate-800">Sales REVO</div>
-                                        <div class="text-xs text-slate-400">Mandiri Multifinance</div>
-                                    </td>
-                                    <td class="py-4 px-6">
-                                        <span class="inline-flex items-center text-xs font-bold text-rose-600 bg-rose-100 px-2.5 py-1 rounded-lg">
-                                            <i data-lucide="clock" class="w-3.5 h-3.5 mr-1 text-rose-500"></i> > 14 Hari
-                                        </span>
-                                    </td>
-                                    <td class="py-4 px-6 text-right">
-                                        <span class="inline-block px-2.5 py-1 text-xs font-bold text-rose-700 bg-rose-200/60 border border-rose-300 rounded-full cursor-pointer hover:bg-rose-300/80 transition-colors">Eskalasi</span>
-                                    </td>
-                                </tr>
-                                <tr class="hover:bg-amber-50/20 transition-colors">
-                                    <td class="py-4 px-6">
-                                        <div class="font-bold text-slate-800">Admin Credit</div>
-                                        <div class="text-xs text-slate-400">FIF JKT Selatan</div>
-                                    </td>
-                                    <td class="py-4 px-6">
-                                        <span class="inline-flex items-center text-xs font-bold text-amber-600 bg-amber-100 px-2.5 py-1 rounded-lg">
-                                            <i data-lucide="clock" class="w-3.5 h-3.5 mr-1 text-amber-500"></i> 10 Hari
-                                        </span>
-                                    </td>
-                                    <td class="py-4 px-6 text-right">
-                                        <span class="inline-block px-2.5 py-1 text-xs font-bold text-amber-700 bg-amber-200/60 border border-amber-300 rounded-full cursor-pointer hover:bg-amber-300/80 transition-colors">Follow Up</span>
-                                    </td>
-                                </tr>
+                            <tbody class="divide-y divide-slate-100 text-sm" id="drowning-table-body">
+                                <tr><td colspan="3" class="text-center py-8 text-slate-400 text-sm">Belum ada data CSV. Silakan hubungi Daffa/Simon untuk upload.</td></tr>
                             </tbody>
                         </table>
                     </div>
@@ -288,10 +257,225 @@
         // Initialize Lucide Icons
         lucide.createIcons();
 
-        // Logout logic placeholder
+        // Set Bulan Ini
+        const months = ["Januari", "Februari", "Maret", "April", "Mei", "Juni", "Juli", "Agustus", "September", "Oktober", "November", "Desember"];
+        document.getElementById('current-month').innerText = `${new Date().getDate()} ${months[new Date().getMonth()]} ${new Date().getFullYear()}`;
+
+        // -----------------------------------------------------------
+        // 1. SISTEM LOGIN UNIVERSAL & PEMBATASAN HAK AKSES UPLOAD
+        // -----------------------------------------------------------
+        window.addEventListener('DOMContentLoaded', () => {
+            const currentUser = localStorage.getItem('currentUser');
+            
+            // Jika tidak ada user (belum login)
+            if (!currentUser) {
+                alert("Sesi Anda telah berakhir. Silakan login kembali.");
+                window.location.href = 'login.html'; // Redirect ke login jika dibutuhkan
+                return;
+            }
+
+            // Update Profil di Sidebar
+            const profileName = document.getElementById('profile-name');
+            const profileRole = document.getElementById('profile-role');
+            const profileInitial = document.getElementById('profile-initial');
+
+            if (profileName) profileName.innerText = currentUser;
+            if (profileInitial) profileInitial.innerText = currentUser.substring(0, 2).toUpperCase();
+
+            // Set Jabatan (Role) berdasarkan Nama
+            if (profileRole) {
+                if (currentUser === "Daffa" || currentUser === "Simon") {
+                    profileRole.innerText = "Area Operational Mgr";
+                } else if (currentUser === "Ali" || currentUser === "Indra" || currentUser === "Edy" || currentUser === "Faiz") {
+                    profileRole.innerText = "Officer / REVO";
+                } else {
+                    profileRole.innerText = "Tim Admin";
+                }
+            }
+
+            // FILTER AKSES TOMBOL UPLOAD
+            const uploadSection = document.getElementById('upload-section');
+            if (currentUser === "Daffa" || currentUser === "Simon") {
+                // Munculkan tombol jika Daffa atau Simon
+                uploadSection.classList.remove('hidden');
+                uploadSection.classList.add('flex');
+            } else {
+                // Sembunyikan dan cabut dari HTML secara visual
+                uploadSection.style.display = 'none'; 
+            }
+
+            // Muat data tabel saat halaman siap
+            loadDashboardData();
+        });
+
+
+        // -----------------------------------------------------------
+        // 2. EVENT LISTENER UPLOAD CSV (KHUSUS DAFFA & SIMON)
+        // -----------------------------------------------------------
+        document.getElementById('csvFileInput').addEventListener('change', function(e) {
+            const file = e.target.files[0];
+            if (!file) return;
+
+            Papa.parse(file, {
+                header: true,
+                skipEmptyLines: true,
+                complete: function(results) {
+                    localStorage.setItem('savedTADData', JSON.stringify(results.data));
+                    processData(results.data);
+                    alert("Data TAD Harian berhasil diunggah dan disimpan!");
+                }
+            });
+        });
+
+
+        // -----------------------------------------------------------
+        // 3. FUNGSI MUAT DATA DARI LOCAL STORAGE
+        // -----------------------------------------------------------
+        function loadDashboardData() {
+            // Cek file TAD khusus (dari menu ini), jika tidak ada, baca CSV dari dashboard utama
+            const savedData = localStorage.getItem('savedTADData') || localStorage.getItem('savedDashboardData');
+            if (savedData) {
+                try {
+                    processData(JSON.parse(savedData));
+                } catch (e) {
+                    console.error("Gagal memuat data", e);
+                }
+            }
+        }
+
+        function parseDateString(dateStr) {
+            if (!dateStr) return null;
+            let d = null;
+            if (dateStr.includes('/')) {
+                const parts = dateStr.split('/');
+                if (parts.length === 3) d = new Date(parts[2], parts[1] - 1, parts[0]);
+            } else if (dateStr.includes('-')) {
+                const parts = dateStr.split('-');
+                if (parts[0].length === 4) d = new Date(parts[0], parts[1] - 1, parts[2]);
+            }
+            return isNaN(d) ? null : d;
+        }
+
+        // -----------------------------------------------------------
+        // 4. PROSES LOGIKA GROWTH & DROWNING (SLA 7 HARI)
+        // -----------------------------------------------------------
+        function processData(data) {
+            let growthList = [];
+            let drowningList = [];
+            
+            const today = new Date();
+            today.setHours(0, 0, 0, 0); 
+
+            data.forEach(row => {
+                const client = row['Klien Assignment'] || row['klien'] || row['NAMA CLIENT'] || row['CLIENT'] || row['Perusahaan'] || '';
+                const pic = row['RO'] || row['REVO'] || row['ASSIGN RO'] || row['AREA OPERATIONAL MANAGER'] || row['PIC'] || '';
+                const employee = row['EMPLOYEE_NAME'] || row['NAMA KANDIDAT'] || row['job'] || 'Posisi Baru';
+                
+                const dueDateStr = row['tanggal_berakhir'] || row['DUE DATE FULFILLMENT'] || row['DUE DATE'] || '';
+                const statusKaryawan = (row['status_pegawai'] || row['Status Kontrak'] || '').toUpperCase();
+
+                if (!client || !dueDateStr) return; 
+                if (statusKaryawan === 'NON AKTIF' || statusKaryawan === 'TERMINATE') return; 
+
+                let targetDate = parseDateString(dueDateStr);
+                if (!targetDate) return;
+
+                let diffTime = targetDate - today;
+                let daysDiff = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
+                
+                let isDrowning = false;
+                let statusText = "";
+
+                if (daysDiff < 0) {
+                    isDrowning = true;
+                    statusText = `Overdue ${Math.abs(daysDiff)} Hr`;
+                } else if (daysDiff <= 7) {
+                    isDrowning = true;
+                    statusText = `H-${daysDiff} (Warning)`;
+                } else {
+                    statusText = `Aman (> 7 Hr)`;
+                }
+
+                const itemData = { client, pic, employee, statusText, daysDiff, dueDateStr };
+
+                if (isDrowning) {
+                    drowningList.push(itemData);
+                } else {
+                    growthList.push(itemData);
+                }
+            });
+
+            drowningList.sort((a, b) => a.daysDiff - b.daysDiff);
+
+            document.getElementById('growth-count').innerText = growthList.length;
+            document.getElementById('drowning-count').innerText = drowningList.length;
+
+            const gBody = document.getElementById('growth-table-body');
+            gBody.innerHTML = '';
+            if (growthList.length === 0) {
+                gBody.innerHTML = `<tr><td colspan="3" class="text-center py-6 text-slate-400">Tidak ada data berjalan yang aman.</td></tr>`;
+            } else {
+                growthList.slice(0, 50).forEach(item => { 
+                    gBody.innerHTML += `
+                        <tr class="hover:bg-slate-50/50 transition-colors">
+                            <td class="py-3.5 px-6">
+                                <div class="font-bold text-slate-800 text-xs sm:text-sm truncate max-w-[200px]">${item.employee}</div>
+                                <div class="text-xs text-slate-400 truncate max-w-[200px] mt-0.5">${item.client}</div>
+                            </td>
+                            <td class="py-3.5 px-6">
+                                <div class="text-slate-600 font-semibold text-xs">${item.pic}</div>
+                                <div class="text-[10px] text-slate-400 mt-0.5"><i data-lucide="calendar" class="w-3 h-3 inline"></i> ${item.dueDateStr}</div>
+                            </td>
+                            <td class="py-3.5 px-6 text-right">
+                                <span class="inline-block px-3 py-1.5 text-[10px] uppercase font-bold text-emerald-700 bg-emerald-100/80 rounded-full">
+                                    <i data-lucide="shield-check" class="w-3 h-3 inline mr-1"></i> Aman
+                                </span>
+                            </td>
+                        </tr>
+                    `;
+                });
+            }
+
+            const dBody = document.getElementById('drowning-table-body');
+            dBody.innerHTML = '';
+            if (drowningList.length === 0) {
+                dBody.innerHTML = `<tr><td colspan="3" class="text-center py-6 text-slate-400">Semua aman. Tidak ada area kritis!</td></tr>`;
+            } else {
+                drowningList.slice(0, 50).forEach(item => {
+                    let isOverdue = item.daysDiff < 0;
+                    let textClass = isOverdue ? "text-rose-600 bg-rose-50" : "text-amber-600 bg-amber-50";
+                    let badgeClass = isOverdue ? "text-rose-700 bg-rose-100 hover:bg-rose-200" : "text-amber-700 bg-amber-100 hover:bg-amber-200";
+                    let actionText = isOverdue ? "Eskalasi" : "Follow Up";
+
+                    dBody.innerHTML += `
+                        <tr class="hover:bg-slate-50/50 transition-colors border-b border-slate-50">
+                            <td class="py-3.5 px-6">
+                                <div class="font-bold text-slate-800 text-xs sm:text-sm truncate max-w-[180px]">${item.employee}</div>
+                                <div class="text-[11px] font-medium text-slate-500 mt-0.5">${item.client}</div>
+                            </td>
+                            <td class="py-3.5 px-6">
+                                <span class="inline-flex items-center text-[11px] font-bold ${textClass} px-2 py-1 rounded">
+                                    <i data-lucide="alarm-clock" class="w-3.5 h-3.5 mr-1.5"></i> ${item.statusText}
+                                </span>
+                            </td>
+                            <td class="py-3.5 px-6 text-right">
+                                <button class="inline-block px-3 py-1.5 text-[11px] uppercase tracking-wide font-bold ${badgeClass} rounded-md transition-colors shadow-sm">
+                                    ${actionText}
+                                </button>
+                            </td>
+                        </tr>
+                    `;
+                });
+            }
+
+            lucide.createIcons();
+        }
+
+        // FUNGSI LOGOUT UNIVERSAL
         function handleLogout() {
-            if (confirm("Apakah Anda yakin ingin keluar?")) {
-                window.location.href = "login.html"; // Redirect to login
+            if (confirm("Apakah Anda yakin ingin Sign Out?")) {
+                localStorage.removeItem('currentUser'); // Hapus sesi login
+                window.location.href = "login.html"; // Pastikan Anda memiliki file login.html
             }
         }
     </script>
