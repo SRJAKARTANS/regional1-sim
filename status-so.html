@@ -8,6 +8,8 @@
     <script src="https://unpkg.com/lucide@latest"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <script src="https://cdnjs.cloudflare.com/ajax/libs/PapaParse/5.3.2/papaparse.min.js"></script>
+    <!-- Tambahan Library SheetJS untuk Export Excel Multi-Sheet -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
     <style>
         /* Custom scrollbar for visual aesthetic */
         ::-webkit-scrollbar {
@@ -128,7 +130,13 @@
 
                     <button onclick="exportFilteredData()" class="flex items-center justify-center space-x-2 bg-blue-600 hover:bg-blue-700 text-white font-bold py-3 px-5 rounded-2xl transition-all shadow-xl text-sm whitespace-nowrap">
                         <i data-lucide="download" class="w-4 h-4"></i>
-                        <span>Export Data</span>
+                        <span>Export CSV</span>
+                    </button>
+
+                    <!-- Butang baharu untuk Export Excel Multi-sheet -->
+                    <button onclick="exportExcelReport()" class="flex items-center justify-center space-x-2 bg-purple-600 hover:bg-purple-700 text-white font-bold py-3 px-5 rounded-2xl transition-all shadow-xl text-sm whitespace-nowrap">
+                        <i data-lucide="file-spreadsheet" class="w-4 h-4"></i>
+                        <span>Report Excel</span>
                     </button>
 
                     <!-- ID upload-csv-btn ditambahkan di sini untuk disembunyikan nanti jika tidak punya akses -->
@@ -245,8 +253,8 @@
             "Ali": "REVO MF Jakarta", 
             "Ilham": "REVO MF Jakarta",
             "Roky": "REVO MF Jakarta",
-            "Daffa": "Area Operational Manager Jakarta", 
-            "Simon": "RM Jakarta"
+            "Daffa": "REVO MF Jakarta", 
+            "Simon": "REVO Adira Jakarta"
         };
 
         const firebaseConfig = {
@@ -698,6 +706,145 @@
             document.body.appendChild(link);
             link.click();
             document.body.removeChild(link);
+        };
+
+        // FUNGSI BAHARU: EXPORT EXCEL MULTI-SHEET
+        window.exportExcelReport = function() {
+            const savedString = localStorage.getItem('savedDashboardData');
+            if (!savedString) {
+                alert("Tidak ada data untuk diekspor!");
+                return;
+            }
+            
+            let rawData = JSON.parse(savedString);
+            
+            // Dapatkan nilai filter semasa
+            const searchInput = document.getElementById('search-csv');
+            const filterInput = document.getElementById('filter-assign-ro');
+            const filterKategoriInput = document.getElementById('filter-kategori');
+            const filterSlaInput = document.getElementById('filter-sla');
+
+            const searchTerm = searchInput ? searchInput.value.toLowerCase() : "";
+            const filterRo = filterInput ? filterInput.value : "";
+            const filterKat = filterKategoriInput ? filterKategoriInput.value : "";
+            const filterSla = filterSlaInput ? filterSlaInput.value : "";
+
+            const getRowVal = (row, keyName) => {
+                const key = Object.keys(row).find(k => k.trim().toUpperCase() === keyName.toUpperCase());
+                return key && row[key] ? row[key] : '';
+            };
+
+            const today = new Date();
+            today.setHours(0,0,0,0);
+
+            let belumOfferingData = [];
+            let unfulfillData = [];
+            let dueDateData = [];
+
+            rawData.forEach(row => {
+                const rowRo = String(getRowVal(row, "ASSIGN RO")).trim();
+                const rowKat = String(getRowVal(row, "KATEGORI FULFILLMENT")).trim();
+                const rowSla = String(getRowVal(row, "SLA LT OFFERING")).trim();
+                const soInduk = String(getRowVal(row, "SO INDUK")).trim();
+                const client = String(getRowVal(row, "NAMA CLIENT")).trim();
+                const posisi = String(getRowVal(row, "NAMA JOB")).trim();
+                const dueDateStr = String(getRowVal(row, "DUE DATE FULFILLMENT")).trim();
+
+                const text = Object.values(row).join(" ").toLowerCase();
+
+                const matchSearch = text.includes(searchTerm);
+                const matchRo = filterRo === "" || rowRo === filterRo;
+                const matchKat = filterKat === "" || rowKat === filterKat;
+                const matchSla = filterSla === "" || rowSla === filterSla;
+
+                // Hanya proses baris yang menepati filter semasa
+                if (matchSearch && matchRo && matchKat && matchSla) {
+                    
+                    const unfulfillKey = Object.keys(row).find(k => k.trim().toLowerCase() === 'unfulfill');
+                    const offeringKey = Object.keys(row).find(k => k.trim().toLowerCase() === 'offering');
+                    
+                    const unfulfillVal = unfulfillKey ? (parseInt(row[unfulfillKey]) || 0) : 0;
+                    const offeringVal = offeringKey ? (parseInt(row[offeringKey]) || 0) : 0;
+
+                    let diffDays = null;
+                    let keteranganDue = 'Aman';
+                    let statusSLA = 'On SLA';
+
+                    if (dueDateStr && dueDateStr !== '-') {
+                        let dueDateObj = null;
+                        if (dueDateStr.includes('/')) {
+                            const parts = dueDateStr.split('/');
+                            if (parts.length === 3) dueDateObj = new Date(parts[2], parts[1] - 1, parts[0]);
+                        } else { 
+                            dueDateObj = new Date(dueDateStr); 
+                        }
+
+                        if (dueDateObj && !isNaN(dueDateObj)) {
+                            diffDays = Math.ceil((dueDateObj - today) / (1000 * 60 * 60 * 24));
+                            if (diffDays < 0) {
+                                keteranganDue = 'Overdue / Indikasi Over';
+                                statusSLA = 'Over SLA';
+                            } else if (diffDays <= 3) {
+                                keteranganDue = `Mendekati Aging (H-${diffDays})`;
+                            }
+                        }
+                    }
+
+                    // 1. Sheet: Belum Offering
+                    if (offeringVal === 0 && unfulfillVal === 1) { 
+                         belumOfferingData.push({
+                             "SO INDUK": soInduk,
+                             "KLIEN": client,
+                             "POSISI": posisi,
+                             "ASSIGN RO": rowRo,
+                             "DUE DATE": dueDateStr,
+                             "KETERANGAN SLA": statusSLA
+                         });
+                    }
+
+                    // 2. Sheet: Unfulfill & Status SLA
+                    if (unfulfillVal === 1) {
+                         unfulfillData.push({
+                             "SO INDUK": soInduk,
+                             "KLIEN": client,
+                             "POSISI": posisi,
+                             "ASSIGN RO": rowRo,
+                             "DUE DATE": dueDateStr,
+                             "STATUS SLA": statusSLA,
+                             "INDIKASI DUE DATE": keteranganDue
+                         });
+                    }
+
+                    // 3. Sheet: Mendekati Aging / Overdue
+                    if (diffDays !== null && diffDays <= 3) {
+                         dueDateData.push({
+                             "SO INDUK": soInduk,
+                             "KLIEN": client,
+                             "POSISI": posisi,
+                             "ASSIGN RO": rowRo,
+                             "DUE DATE": dueDateStr,
+                             "KETERANGAN DUE DATE": keteranganDue
+                         });
+                    }
+                }
+            });
+
+            if (typeof XLSX === "undefined") {
+                alert("Library Excel belum dimuat sepenuhnya. Sila tunggu beberapa saat atau muat ulang halaman.");
+                return;
+            }
+
+            const wb = XLSX.utils.book_new();
+
+            const ws1 = XLSX.utils.json_to_sheet(belumOfferingData.length ? belumOfferingData : [{"Pesan": "Tiada data Belum Offering"}]);
+            const ws2 = XLSX.utils.json_to_sheet(unfulfillData.length ? unfulfillData : [{"Pesan": "Tiada data Unfulfill"}]);
+            const ws3 = XLSX.utils.json_to_sheet(dueDateData.length ? dueDateData : [{"Pesan": "Tiada data Overdue/Aging"}]);
+
+            XLSX.utils.book_append_sheet(wb, ws1, "Belum Offering");
+            XLSX.utils.book_append_sheet(wb, ws2, "Unfulfill & SLA");
+            XLSX.utils.book_append_sheet(wb, ws3, "Indikasi Aging");
+
+            XLSX.writeFile(wb, `Report_Detail_SO_${new Date().getTime()}.xlsx`);
         };
 
         window.showLogoutModal = () => {
