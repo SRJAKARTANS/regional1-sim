@@ -741,6 +741,11 @@
             let unfulfillData = [];
             let dueDateData = [];
 
+            // Penanda nombor berurutan untuk setiap sheet
+            let noBelumOffering = 1;
+            let noUnfulfill = 1;
+            let noDueDate = 1;
+
             rawData.forEach(row => {
                 const rowRo = String(getRowVal(row, "ASSIGN RO")).trim();
                 const rowKat = String(getRowVal(row, "KATEGORI FULFILLMENT")).trim();
@@ -800,6 +805,7 @@
                     // 1. Sheet: Belum Offering
                     if (offeringVal === 0 && unfulfillVal === 1) { 
                          belumOfferingData.push({
+                             "NO": noBelumOffering++,
                              "SO INDUK": soInduk,
                              "SO PENAMBAH": soPenambah,
                              "KLIEN": client,
@@ -810,13 +816,15 @@
                              "AGING-SS": agingSS,
                              "AGING NON PENDING": agingNonPending,
                              "DUE DATE": dueDateStr,
-                             "KETERANGAN SLA": statusSLA
+                             "STATUS SLA": statusSLA,
+                             "INDIKASI DUE DATE": keteranganDue
                          });
                     }
 
                     // 2. Sheet: Unfulfill & Status SLA
                     if (unfulfillVal === 1) {
                          unfulfillData.push({
+                             "NO": noUnfulfill++,
                              "SO INDUK": soInduk,
                              "SO PENAMBAH": soPenambah,
                              "KLIEN": client,
@@ -835,6 +843,7 @@
                     // 3. Sheet: Mendekati Aging / Overdue
                     if (diffDays !== null && diffDays <= 3) {
                          dueDateData.push({
+                             "NO": noDueDate++,
                              "SO INDUK": soInduk,
                              "SO PENAMBAH": soPenambah,
                              "KLIEN": client,
@@ -845,7 +854,8 @@
                              "AGING-SS": agingSS,
                              "AGING NON PENDING": agingNonPending,
                              "DUE DATE": dueDateStr,
-                             "KETERANGAN DUE DATE": keteranganDue
+                             "STATUS SLA": statusSLA,
+                             "INDIKASI DUE DATE": keteranganDue
                          });
                     }
                 }
