@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Status SO Berjalan - SIMGROUP</title>
+    <title>Status SO Berjalan - JAKARTA TEAM</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://unpkg.com/lucide@latest"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
@@ -242,6 +242,44 @@
   appId: "1:648533447432:web:f11e41a82a62f766c892bd",
   measurementId: "G-H5M7GNR99G"
 };
+        const appId = 'simgroup-dashboard-app'; 
+        const app = initializeApp(firebaseConfig);
+        const auth = getAuth(app);
+        const db = getFirestore(app);
+   // 1. Coba login otomatis
+        signInAnonymously(auth).catch(err => console.error("Auth error:", err));
+
+        // 2. Monitoring Status Auth & Koneksi Firestore
+        onAuthStateChanged(auth, (user) => {
+            const statusUI = document.getElementById('cloud-status');
+            if (!statusUI) return; // Keselamatan tambahan
+
+            if (user) {
+                statusUI.className = "flex items-center gap-2 text-xs font-medium text-emerald-300 bg-emerald-900/40 px-3 py-1.5 rounded-full border border-emerald-500/30";
+                statusUI.innerHTML = '<i class="fa-solid fa-cloud"></i> Cloud Terhubung';
+                
+                loadDataFromCloud();
+            } else {
+                statusUI.innerHTML = '<i class="fa-solid fa-cloud-slash"></i> Menunggu Autentikasi...';
+            }
+        });
+
+        function loadDataFromCloud() {
+            const docRef = doc(db, 'artifacts', appId, 'public', 'data', 'csv_uploads', 'latest');
+            onSnapshot(docRef, (snapshot) => {
+                if (snapshot.exists()) {
+                    const cloudData = snapshot.data();
+                    localStorage.setItem('savedDashboardData', cloudData.payload);
+                    document.getElementById('last-update-text').innerText = "Data berhasil dimuat dari cloud";
+                    // renderSOTable(); // Pastikan fungsi ini didefinisikan
+                } else {
+                    document.getElementById('last-update-text').innerText = "Data belum tersedia di cloud.";
+                }
+            }, (error) => {
+                console.error("Firestore Error:", error);
+                const statusUI = document.getElementById('cloud-status');
+                if (statusUI) statusUI.innerHTML = '<i class="fa-solid fa-triangle-exclamation"></i> Error Cloud';
+            });
 
         let db, auth, firebaseUser = null;
         const appId = typeof __app_id !== 'undefined' ? __app_id : 'simgroup-dashboard-app'; 
