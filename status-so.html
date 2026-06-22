@@ -761,6 +761,7 @@
                 const agingNonPending = String(getRowVal(row, "AGING NON PENDING")).trim();
                 const taskId = String(getRowVal(row, "TASK ID")).trim();
                 const roLine = String(getRowVal(row, "RO LINE")).trim();
+                const groupSla = String(getRowVal(row, "GROUP SLA BELUM OFFERING")).trim();
 
                 const text = Object.values(row).join(" ").toLowerCase();
 
@@ -816,8 +817,8 @@
                              "AGING-SS": agingSS,
                              "AGING NON PENDING": agingNonPending,
                              "DUE DATE": dueDateStr,
-                             "STATUS SLA": statusSLA,
-                             "INDIKASI DUE DATE": keteranganDue
+                             "SLA LT OFFERING": rowSla,
+                             "GROUP SLA BELUM OFFERING": groupSla
                          });
                     }
 
