@@ -8,7 +8,6 @@
     <script src="https://unpkg.com/lucide@latest"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <script src="https://cdnjs.cloudflare.com/ajax/libs/PapaParse/5.3.2/papaparse.min.js"></script>
-    <!-- Tambahan Library SheetJS untuk Export Excel Multi-Sheet -->
     <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
     <style>
         /* Custom scrollbar for visual aesthetic */
@@ -82,7 +81,7 @@
                 </div>
                 <div>
                     <h4 id="sidebar-name" class="text-sm font-semibold text-white">Loading...</h4>
-                    <p class="text-xs text-teal-300">Area Operational Mgr</p>
+                    <p id="sidebar-role" class="text-xs text-teal-300">Memuat Jabatan...</p>
                 </div>
             </div>
             <button onclick="showLogoutModal()" class="w-full flex items-center justify-center space-x-2 py-2 px-4 rounded-lg bg-red-500/20 hover:bg-red-500/30 text-red-200 hover:text-white border border-red-500/30 transition-all duration-200 text-sm font-medium">
@@ -133,13 +132,11 @@
                         <span>Export CSV</span>
                     </button>
 
-                    <!-- Butang baharu untuk Export Excel Multi-sheet -->
                     <button onclick="exportExcelReport()" class="flex items-center justify-center space-x-2 bg-purple-600 hover:bg-purple-700 text-white font-bold py-3 px-5 rounded-2xl transition-all shadow-xl text-sm whitespace-nowrap">
                         <i data-lucide="file-spreadsheet" class="w-4 h-4"></i>
                         <span>Report Excel</span>
                     </button>
 
-                    <!-- ID upload-csv-btn ditambahkan di sini untuk disembunyikan nanti jika tidak punya akses -->
                     <label id="upload-csv-btn" for="csv-file-input" class="cursor-pointer flex items-center justify-center space-x-2 bg-emerald-600 hover:bg-emerald-700 text-white font-bold py-3 px-5 rounded-2xl transition-all shadow-xl text-sm whitespace-nowrap">
                         <i data-lucide="upload-cloud" class="w-4 h-4"></i>
                         <span id="btn-sync-text">Sync CSV</span>
@@ -148,7 +145,6 @@
                 </div>
             </div>
 
-            <!-- Diperbarui: Grid Cols 5 agar memuat Client & Area -->
             <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-4 bg-[#0d5360]/40 p-4 rounded-2xl border border-white/10">
                 <div>
                     <label class="block text-xs font-bold uppercase tracking-wider text-teal-200 mb-1">Filter ASSIGN RO</label>
@@ -168,14 +164,12 @@
                         <option value="">Semua SLA</option>
                     </select>
                 </div>
-                <!-- Filter Baru: NAMA CLIENT -->
                 <div>
                     <label class="block text-xs font-bold uppercase tracking-wider text-teal-200 mb-1">Filter Client</label>
                     <select id="filter-klien" class="w-full bg-white text-slate-800 font-semibold py-2.5 px-3 rounded-xl focus:outline-none focus:ring-2 focus:ring-teal-400 text-sm">
                         <option value="">Semua Client</option>
                     </select>
                 </div>
-                <!-- Filter Baru: NAMA AREA -->
                 <div>
                     <label class="block text-xs font-bold uppercase tracking-wider text-teal-200 mb-1">Filter Area</label>
                     <select id="filter-area" class="w-full bg-white text-slate-800 font-semibold py-2.5 px-3 rounded-xl focus:outline-none focus:ring-2 focus:ring-teal-400 text-sm">
@@ -257,21 +251,26 @@
         import { getFirestore, doc, setDoc, onSnapshot } from 'https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js';
 
         // 1. MANAJEMEN AKUN & AKSES
-        const currentUser = localStorage.getItem('currentUser') || "Daffa"; // Ambil user aktif
+        const sessionStr = localStorage.getItem('userSession'); 
+        
+        // Proteksi Laman: Jika tidak ada sesi login, kembalikan ke login.html
+        if (!sessionStr) {
+            window.location.href = "login.html";
+        }
+
+        let sessionData = {};
+        try {
+            sessionData = JSON.parse(sessionStr);
+        } catch(e) {
+            window.location.href = "login.html";
+        }
+
+        const currentUser = sessionData.name;
+        const currentUserTitle = sessionData.title;
+
         const allowedToUpload = ["Daffa", "Simon"]; // Hanya Daffa & Simon yang boleh unggah CSV
         
         // Penambahan team untuk semua anggota
-        const officerMapping = {
-            "Indra": "REVO MF Jakarta",
-            "Faiz": "REVO MF Jakarta",
-            "Edy": "REVO Adira Jakarta",
-            "Ali": "REVO MF Jakarta", 
-            "Ilham": "REVO MF Jakarta",
-            "Roky": "REVO MF Jakarta",
-            "Daffa": "REVO MF Jakarta", 
-            "Simon": "REVO Adira Jakarta"
-        };
-
         const firebaseConfig = {
             apiKey: "AIzaSyDGWDjaE9ZKU1oUm57gdgONlpw_aZnLGpo",
             authDomain: "jakartans-dashboard.firebaseapp.com",
@@ -293,12 +292,18 @@
         document.addEventListener("DOMContentLoaded", () => {
             lucide.createIcons();
             
-            // Set Nama di Sidebar Sesuai Login
+            // Set Nama dan Jabatan di Sidebar Sesuai Login
             const sidebarName = document.getElementById('sidebar-name');
             const sidebarInitial = document.getElementById('sidebar-initial');
-            if (sidebarName && sidebarInitial) {
+            const sidebarRole = document.getElementById('sidebar-role');
+            
+            if (sidebarName && sidebarInitial && currentUser) {
                 sidebarName.innerText = currentUser;
                 sidebarInitial.innerText = currentUser.substring(0, 2).toUpperCase();
+            }
+
+            if (sidebarRole && currentUserTitle) {
+                sidebarRole.innerText = currentUserTitle;
             }
 
             // Sembunyikan Butang Upload Jika Tidak Layak
@@ -307,7 +312,6 @@
                 uploadBtn.style.display = 'none'; 
             }
 
-            // Event listener untuk filter - Diperbarui dengan filter klien dan area
             ['search-csv', 'filter-assign-ro', 'filter-kategori', 'filter-sla', 'filter-klien', 'filter-area'].forEach(id => {
                 const el = document.getElementById(id);
                 if(el) el.addEventListener(id === 'search-csv' ? 'input' : 'change', window.applyFilters);
@@ -337,8 +341,6 @@
                     const cloudData = snapshot.data();
                     localStorage.setItem('savedDashboardData', cloudData.payload);
                     document.getElementById('last-update-text').innerText = "Data dimuat dari cloud";
-                    
-                    // FUNGSI INI AKAN MEMAPARKAN DATA KE DALAM JADUAL
                     window.renderSOTable(); 
                 } else {
                     document.getElementById('last-update-text').innerText = "Data belum tersedia di cloud.";
@@ -356,7 +358,7 @@
         if(fileInput) {
             fileInput.addEventListener('change', async (event) => {
                 if (!allowedToUpload.includes(currentUser)) {
-                    alert("Akses ditolak. Hanya Daffa & Simon yang boleh muat naik data.");
+                    alert("Akses ditolak. Anda tidak memiliki izin untuk memuat naik data.");
                     return;
                 }
 
@@ -528,7 +530,6 @@
                 const assignRoSet = new Set();
                 const kategoriSet = new Set();
                 const slaSet = new Set();
-                // Set baru untuk Client & Area
                 const klienSet = new Set();
                 const areaSet = new Set();
 
@@ -588,7 +589,6 @@
                         }
                     }
 
-                    // Menambahkan atribut data-klien & data-area pada baris tabel
                     bodyHTML += `<tr class="${rowClass}" data-assign-ro="${roValue}" data-kategori="${kategoriValue}" data-sla="${slaValue}" data-klien="${klienValue}" data-area="${areaValue}" data-status-badge="${statusBadgeAttr}" data-finish="${finishVal}" data-unfulfill="${unfulfillVal}" data-offering="${offeringVal}">`;
                     bodyHTML += `<td class="p-4 text-slate-500 font-medium sticky left-0 bg-white group-hover:bg-slate-50 z-10 sticky-col" style="min-width: 60px;">${row._originalIndex}</td>`;
                     
@@ -612,7 +612,6 @@
                     const el = document.getElementById(id);
                     if (el && el.options.length <= 1) {
                         const current = el.value;
-                        // Reset options kecuali "Semua ..."
                         el.innerHTML = `<option value="">${el.options[0].text}</option>`;
                         Array.from(set).sort().forEach(val => el.innerHTML += `<option value="${val}">${val.replace(/&quot;/g, '"')}</option>`);
                         el.value = current;
@@ -745,7 +744,6 @@
             document.body.removeChild(link);
         };
 
-        // FUNGSI BAHARU: EXPORT EXCEL MULTI-SHEET
         window.exportExcelReport = function() {
             const savedString = localStorage.getItem('savedDashboardData');
             if (!savedString) {
@@ -755,7 +753,6 @@
             
             let rawData = JSON.parse(savedString);
             
-            // Dapatkan nilai filter semasa
             const searchInput = document.getElementById('search-csv');
             const filterInput = document.getElementById('filter-assign-ro');
             const filterKategoriInput = document.getElementById('filter-kategori');
@@ -782,7 +779,6 @@
             let unfulfillData = [];
             let dueDateData = [];
 
-            // Penanda nombor berurutan untuk setiap sheet
             let noBelumOffering = 1;
             let noUnfulfill = 1;
             let noDueDate = 1;
@@ -798,7 +794,6 @@
                 const posisi = String(getRowVal(row, "NAMA JOB")).trim();
                 const dueDateStr = String(getRowVal(row, "DUE DATE FULFILLMENT")).trim();
                 
-                // Tambahan lajur baharu
                 const agingSS = String(getRowVal(row, "AGING-SS")).trim();
                 const agingNonPending = String(getRowVal(row, "AGING NON PENDING")).trim();
                 const taskId = String(getRowVal(row, "TASK ID")).trim();
@@ -814,7 +809,6 @@
                 const matchKlien = filterKlien === "" || client === filterKlien;
                 const matchArea = filterArea === "" || area === filterArea;
 
-                // Hanya proses baris yang menepati filter semasa
                 if (matchSearch && matchRo && matchKat && matchSla && matchKlien && matchArea) {
                     
                     const unfulfillKey = Object.keys(row).find(k => k.trim().toLowerCase() === 'unfulfill');
@@ -847,7 +841,6 @@
                         }
                     }
 
-                    // 1. Sheet: Belum Offering
                     if (offeringVal === 0 && unfulfillVal === 1) { 
                          belumOfferingData.push({
                              "NO": noBelumOffering++,
@@ -866,7 +859,6 @@
                          });
                     }
 
-                    // 2. Sheet: Unfulfill & Status SLA
                     if (unfulfillVal === 1) {
                          unfulfillData.push({
                              "NO": noUnfulfill++,
@@ -885,7 +877,6 @@
                          });
                     }
 
-                    // 3. Sheet: Mendekati Aging / Overdue
                     if (diffDays !== null && diffDays <= 3) {
                          dueDateData.push({
                              "NO": noDueDate++,
@@ -941,7 +932,7 @@
         };
 
         window.confirmLogout = () => {
-            localStorage.removeItem('currentUser');
+            localStorage.removeItem('userSession');
             window.location.href = "login.html";
         };
     </script>
