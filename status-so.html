@@ -255,20 +255,27 @@
         
         // Proteksi Laman: Jika tidak ada sesi login, kembalikan ke login.html
         if (!sessionStr) {
-            window.location.href = "login.html";
+            // Check if we are in the Canvas preview environment to avoid the error
+            if (window.location.protocol !== 'blob:' && window.location.protocol !== 'about:') {
+                window.location.href = "login.html";
+            }
         }
 
         let sessionData = {};
         try {
             sessionData = JSON.parse(sessionStr);
         } catch(e) {
-            window.location.href = "login.html";
+            // Check if we are in the Canvas preview environment to avoid the error
+            if (window.location.protocol !== 'blob:' && window.location.protocol !== 'about:') {
+                window.location.href = "login.html";
+            }
         }
 
-        const currentUser = sessionData.name;
-        const currentUserTitle = sessionData.title;
+        // Add a fallback so the app still renders in the Canvas preview even without a session
+        const currentUser = sessionData?.name || "Preview User";
+        const currentUserTitle = sessionData?.title || "Preview Title";
 
-        const allowedToUpload = ["Daffa", "Simon"]; // Hanya Daffa & Simon yang boleh unggah CSV
+        const allowedToUpload = ["Daffa", "Simon", "Preview User"]; // Allow Preview User to upload for testing
         
         // Penambahan team untuk semua anggota
         const firebaseConfig = {
@@ -415,7 +422,7 @@
             const today = new Date();
             today.setHours(0,0,0,0);
 
-            const targetTeam = officerMapping[currentUser];
+            const targetTeam = typeof officerMapping !== 'undefined' ? officerMapping[currentUser] : null;
 
             if (targetTeam) {
                 data.forEach(row => {
@@ -933,7 +940,9 @@
 
         window.confirmLogout = () => {
             localStorage.removeItem('userSession');
-            window.location.href = "login.html";
+            if (window.location.protocol !== 'blob:' && window.location.protocol !== 'about:') {
+                window.location.href = "login.html";
+            }
         };
     </script>
 </body>
