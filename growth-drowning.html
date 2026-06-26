@@ -84,12 +84,10 @@
         <!-- Sidebar Footer / Profile -->
         <div class="p-6 border-t border-white/10 bg-black/10">
             <div class="flex items-center space-x-3 mb-4">
-                <!-- Ditambahkan ID profile-initial -->
                 <div id="profile-initial" class="w-10 h-10 rounded-full bg-teal-500/20 border border-teal-300/30 flex items-center justify-center font-bold text-teal-200">
                     --
                 </div>
                 <div>
-                    <!-- Ditambahkan ID profile-name dan profile-role -->
                     <h4 id="profile-name" class="text-sm font-semibold text-white">Loading...</h4>
                     <p id="profile-role" class="text-xs text-teal-300">User</p>
                 </div>
@@ -143,7 +141,7 @@
                         <span class="text-xs font-semibold tracking-wide text-teal-100" id="current-month">Bulan Ini</span>
                     </div>
                     
-                    <!-- Upload CSV Button (DISembunyikan secara default, dibuka via JS untuk Daffa & Simon) -->
+                    <!-- Upload CSV Button -->
                     <div id="upload-section" class="hidden items-center">
                         <input type="file" id="csvFileInput" accept=".csv" class="hidden">
                         <button onclick="document.getElementById('csvFileInput').click()" class="bg-teal-400 hover:bg-teal-300 text-teal-950 px-4 py-2 rounded-xl flex items-center space-x-2 shadow-md transition-colors font-semibold text-sm">
@@ -268,23 +266,12 @@
             const currentUser = localStorage.getItem('currentUser');
             
             if (!currentUser) {
-        alert("Sesi Anda telah berakhir. Silakan login kembali.");
-        window.location.href = 'index.html'; // Ganti dengan nama file login Anda
-    } else {
-        // Jika ada, masukkan nama user ke profil sidebar
-        const profileNameElement = document.getElementById('profile-name');
-        if (profileNameElement) {
-            profileNameElement.innerText = currentUser;
-        }
-    }
-
-    // Fallback Logout (jika diperlukan)
-    function handleLogout() {
-        localStorage.removeItem('currentUser');
-        window.location.href = 'index.html';
+                alert("Sesi Anda telah berakhir. Silakan login kembali.");
+                window.location.href = 'index.html'; // Standarisasi menggunakan index.html
+                return; // PENTING: Mencegah eksekusi script selanjutnya yang akan memicu error
             }
 
-            // Update Profil di Sidebar
+            // Memasukkan nama user ke profil sidebar
             const profileName = document.getElementById('profile-name');
             const profileRole = document.getElementById('profile-role');
             const profileInitial = document.getElementById('profile-initial');
@@ -333,6 +320,9 @@
                     localStorage.setItem('savedTADData', JSON.stringify(results.data));
                     processData(results.data);
                     alert("Data TAD Harian berhasil diunggah dan disimpan!");
+                    
+                    // Reset input setelah berhasil di-upload
+                    e.target.value = '';
                 }
             });
         });
@@ -353,15 +343,20 @@
             }
         }
 
+        // PERBAIKAN: Fungsi Parse Date agar lebih tahan banting (support DD-MM-YYYY)
         function parseDateString(dateStr) {
             if (!dateStr) return null;
             let d = null;
             if (dateStr.includes('/')) {
                 const parts = dateStr.split('/');
-                if (parts.length === 3) d = new Date(parts[2], parts[1] - 1, parts[0]);
+                if (parts.length === 3) d = new Date(parts[2], parts[1] - 1, parts[0]); // DD/MM/YYYY
             } else if (dateStr.includes('-')) {
                 const parts = dateStr.split('-');
-                if (parts[0].length === 4) d = new Date(parts[0], parts[1] - 1, parts[2]);
+                if (parts[0].length === 4) {
+                    d = new Date(parts[0], parts[1] - 1, parts[2]); // YYYY-MM-DD
+                } else if (parts.length === 3) {
+                    d = new Date(parts[2], parts[1] - 1, parts[0]); // DD-MM-YYYY
+                }
             }
             return isNaN(d) ? null : d;
         }
@@ -478,14 +473,15 @@
                 });
             }
 
+            // Render ulang icon Lucide untuk baris yang baru disuntikkan secara dinamis
             lucide.createIcons();
         }
 
-        // FUNGSI LOGOUT UNIVERSAL
+        // FUNGSI LOGOUT UNIVERSAL (Diletakkan di global scope agar bisa diakses HTML onclick)
         function handleLogout() {
             if (confirm("Apakah Anda yakin ingin Sign Out?")) {
                 localStorage.removeItem('currentUser'); // Hapus sesi login
-                window.location.href = "login.html"; // Pastikan Anda memiliki file login.html
+                window.location.href = "index.html"; // Diseragamkan kembali ke index.html
             }
         }
     </script>
