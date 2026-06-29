@@ -10,6 +10,7 @@
     <script src="https://unpkg.com/lucide@latest"></script>
     <!-- PapaParse for CSV Parsing -->
     <script src="https://cdnjs.cloudflare.com/ajax/libs/PapaParse/5.4.1/papaparse.min.js"></script>
+    
     <style>
         /* Custom scrollbar for premium touch */
         ::-webkit-scrollbar {
@@ -263,13 +264,19 @@
         // 1. SISTEM LOGIN UNIVERSAL & PEMBATASAN HAK AKSES UPLOAD
         // -----------------------------------------------------------
         window.addEventListener('DOMContentLoaded', () => {
-            const currentUser = localStorage.getItem('currentUser');
             
+            // --- MODIFIKASI: BYPASS LOGIN SEMENTARA ---
+            // Jika memori kosong, sistem otomatis menganggap Anda login sebagai "Simon"
+            const currentUser = localStorage.getItem('currentUser') || "Simon";
+            
+            /* SCRIPT INI KITA MATIKAN SEMENTARA AGAR TIDAK MUNCUL POP-UP / ALERT
             if (!currentUser) {
                 alert("Sesi Anda telah berakhir. Silakan login kembali.");
-                window.location.href = 'index.html'; // Standarisasi menggunakan index.html
-                return; // PENTING: Mencegah eksekusi script selanjutnya yang akan memicu error
+                window.location.href = 'index.html'; 
+                return; 
             }
+            */
+            // -------------------------------------------
 
             // Memasukkan nama user ke profil sidebar
             const profileName = document.getElementById('profile-name');
