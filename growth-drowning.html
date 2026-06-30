@@ -267,15 +267,13 @@
             
             // --- MODIFIKASI: BYPASS LOGIN SEMENTARA ---
             // Jika memori kosong, sistem otomatis menganggap Anda login sebagai "Simon"
-            const currentUser = localStorage.getItem('currentUser') || "Simon";
-            
-            /* SCRIPT INI KITA MATIKAN SEMENTARA AGAR TIDAK MUNCUL POP-UP / ALERT
-            if (!currentUser) {
-                alert("Sesi Anda telah berakhir. Silakan login kembali.");
-                window.location.href = 'index.html'; 
-                return; 
-            }
-            */
+            const currentUser = localStorage.getItem('currentUser') ;
+            // AKTIFKAN KEMBALI: Jika memori kosong (belum login/sesi habis), kembalikan ke halaman login
+        if (!currentUser) {
+        alert("Sesi Anda telah berakhir. Silakan login kembali.");
+        window.location.href = 'index.html'; // Pastikan nama file ini sesuai dengan halaman login kamu
+        return; 
+        }
             // -------------------------------------------
 
             // Memasukkan nama user ke profil sidebar
