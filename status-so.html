@@ -607,18 +607,24 @@
                     }
 
                     bodyHTML += `<tr class="${rowClass}" data-assign-ro="${roValue}" data-kategori="${kategoriValue}" data-sla="${slaValue}" data-klien="${klienValue}" data-area="${areaValue}" data-status-badge="${statusBadgeAttr}" data-finish="${finishVal}" data-unfulfill="${unfulfillVal}" data-offering="${offeringVal}">`;
-                    bodyHTML += `<td class="p-4 text-slate-500 font-medium sticky left-0 bg-white group-hover:bg-slate-50 z-10 sticky-col" style="min-width: 60px;">${row._originalIndex}</td>`;
+                   bodyHTML += `<td class="p-4 text-slate-500 font-medium sticky left-0 bg-white group-hover:bg-slate-50 z-10 sticky-col" style="min-width: 60px;">${row._originalIndex}</td>`;
                     
                     allowedColumns.forEach((key, i) => {
                         const matchedKey = rowKeys.find(k => k.trim().toUpperCase() === key.toUpperCase());
-                        const cellData = (matchedKey && row[matchedKey]) ? row[matchedKey] : '-';
+                        let cellData = (matchedKey && row[matchedKey]) ? row[matchedKey] : '-';
                         let cellClasses = "p-4 text-slate-700 whitespace-nowrap group-hover:text-slate-900 font-medium";
                         if (i === 0) cellClasses += " sticky left-[60px] bg-white group-hover:bg-slate-50 z-10 sticky-col";
 
-                        if (key === "DUE DATE FULFILLMENT" && dueBadge) {
+                        if (key === "DUE DATE FULFILLMENT") {
                             bodyHTML += `<td class="${cellClasses}">${cellData} ${dueBadge}</td>`;
-                        } else if (key === "KATEGORI FULFILLMENT" && kategoriBadge) {
-                            bodyHTML += `<td class="${cellClasses}">${cellData} ${kategoriBadge}</td>`;
+                        } else if (key === "KATEGORI FULFILLMENT") {
+                            const valLower = String(cellData).trim().toLowerCase();
+                            if (valLower === "fulfill on sla" || valLower === "fulfill over sla") {
+                                cellData = `<span class="inline-flex items-center px-2.5 py-1 rounded-lg text-xs font-bold bg-emerald-100 text-emerald-700 border border-emerald-300 shadow-sm"><i class="fa-solid fa-check-circle mr-1.5"></i> Finish</span>`;
+                            } else if (valLower === "unfulfill over sla" || valLower === "unfulfill on sla") {
+                                cellData = `<span class="inline-flex items-center px-2.5 py-1 rounded-lg text-xs font-bold bg-rose-100 text-rose-700 border border-rose-300 shadow-sm"><i class="fa-solid fa-circle-xmark mr-1.5"></i> Unfinish</span>`;
+                            }
+                            bodyHTML += `<td class="${cellClasses}">${cellData}</td>`;
                         } else {
                             bodyHTML += `<td class="${cellClasses}">${cellData}</td>`;
                         }
