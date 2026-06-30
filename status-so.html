@@ -573,9 +573,19 @@
 
                     let rowClass = "hover:bg-slate-50/80 transition-colors border-b border-slate-100 group";
                     let dueBadge = '';
+                    let kategoriBadge = '';
                     let statusBadgeAttr = ''; 
 
-                    if (dueDateStr && dueDateStr !== '-') {
+                    // Cek Trigger Finish untuk Kategori Fulfillment
+                    const lowerKategori = kategoriValue.trim().toLowerCase();
+                    const isFulfill = lowerKategori.includes('fulfill on sla') || lowerKategori.includes('fulfill over sla') || lowerKategori === 'fulfill';
+
+                    if (isFulfill) {
+                        rowClass = "bg-emerald-50 hover:bg-emerald-100 transition-colors border-b border-emerald-200 group text-slate-900";
+                        kategoriBadge = `<span class="ml-2 inline-flex items-center px-2 py-0.5 rounded text-[10px] font-bold bg-emerald-500 text-white shadow-sm"><i class="fa-solid fa-check-circle mr-1"></i> Finish</span>`;
+                        statusBadgeAttr = 'finish';
+                    } else if (dueDateStr && dueDateStr !== '-') {
+                        // Logika Overdue dan H-3 (Hanya berjalan jika belum finish)
                         let dueDateObj = null;
                         if (dueDateStr.includes('/')) {
                             const parts = dueDateStr.split('/');
@@ -605,8 +615,10 @@
                         let cellClasses = "p-4 text-slate-700 whitespace-nowrap group-hover:text-slate-900 font-medium";
                         if (i === 0) cellClasses += " sticky left-[60px] bg-white group-hover:bg-slate-50 z-10 sticky-col";
 
-                        if (key === "DUE DATE FULFILLMENT") {
+                        if (key === "DUE DATE FULFILLMENT" && dueBadge) {
                             bodyHTML += `<td class="${cellClasses}">${cellData} ${dueBadge}</td>`;
+                        } else if (key === "KATEGORI FULFILLMENT" && kategoriBadge) {
+                            bodyHTML += `<td class="${cellClasses}">${cellData} ${kategoriBadge}</td>`;
                         } else {
                             bodyHTML += `<td class="${cellClasses}">${cellData}</td>`;
                         }
@@ -734,7 +746,7 @@
                 if (row.style.display !== 'none' && row.children.length > 1) {
                     const rowData = Array.from(row.children).map(td => {
                         let text = td.innerText.replace(/"/g, '""').trim();
-                        text = text.replace(/Overdue/g, '').replace(/H-\d+/g, '').trim();
+                        text = text.replace(/Overdue/g, '').replace(/H-\d+/g, '').replace(/Finish/g, '').trim();
                         return `"${text}"`;
                     });
                     csvContent += rowData.join(",") + "\n";
