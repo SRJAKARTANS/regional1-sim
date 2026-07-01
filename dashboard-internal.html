@@ -29,15 +29,16 @@
 <body class="bg-[#116A7B] text-white font-sans min-h-screen flex">
 
     <!-- SIDEBAR -->
-    <aside class="w-64 bg-[#0d5360] flex flex-col justify-between border-r border-white/10 shrink-0 min-h-screen">
-        <div class="p-6">
-            <!-- Brand Logo -->
-            <div class="flex items-center space-x-3 mb-8">
-                <div class="bg-white/10 p-2 rounded-lg">
-                    <i data-lucide="layers" class="text-teal-300 w-6 h-6"></i>
-                </div>
-                <span class="text-xl font-bold tracking-wider text-white">JAKARTANS</span>
-            </div>
+    <div class="p-6 border-t border-white/10 bg-black/10">
+    <div class="flex items-center space-x-3 mb-4">
+        <div id="profile-initial" class="w-10 h-10 rounded-full bg-teal-500/20 flex items-center justify-center font-bold text-teal-200">--</div>
+        <div>
+            <h4 id="profile-name" class="text-sm font-semibold text-white">Loading...</h4>
+            <p id="profile-role" class="text-xs text-teal-300">...</p>
+        </div>
+    </div>
+    <button onclick="AppAuth.logout()" class="w-full py-2 bg-red-500/20 text-red-200 rounded-lg text-sm">Sign Out</button>
+</div>
 
             <!-- Navigation Links -->
             <nav class="space-y-2">
@@ -494,7 +495,44 @@
                     document.getElementById('offering-donut-progress').setAttribute('stroke-dasharray', `${oPct}, 100`);
                 }
             }
+            // Module Auth Universal
+    const AppAuth = {
+        init: function() {
+            const sessionStr = localStorage.getItem('userSession');
+            if (!sessionStr) {
+                window.location.href = "login.html";
+                return;
+            }
+            try {
+                const sessionData = JSON.parse(sessionStr);
+                this.renderProfile(sessionData);
+                this.logActivity(sessionData.name); // Mencatat kunjungan ke Dashboard
+            } catch(e) { window.location.href = "login.html"; }
+        },
+        renderProfile: function(sessionData) {
+            // Update elemen sidebar berdasarkan ID yang ada
+            document.getElementById('profile-name').innerText = sessionData.name || "User";
+            document.getElementById('profile-initial').innerText = (sessionData.name || "--").substring(0, 2).toUpperCase();
+            document.getElementById('profile-role').innerText = sessionData.title || "Tim Admin";
+        },
+        logActivity: function(userName) {
+            const history = JSON.parse(localStorage.getItem('userHistory') || '[]');
+            history.push({ page: 'Dashboard', time: new Date().toISOString(), user: userName });
+            localStorage.setItem('userHistory', JSON.stringify(history.slice(-50)));
+        },
+        logout: function() {
+            if (confirm("Sign Out?")) {
+                localStorage.removeItem('userSession');
+                window.location.href = "login.html";
+            }
+        }
+    };
 
+    document.addEventListener('DOMContentLoaded', () => {
+        AppAuth.init();
+        lucide.createIcons();
+    });
+            
             const initAuth = async () => {
                 try {
                     if (typeof __initial_auth_token !== 'undefined' && __initial_auth_token) {
