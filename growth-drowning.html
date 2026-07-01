@@ -153,6 +153,12 @@
                 </div>
             </div>
 
+            <!-- Debug Warning (Akan muncul jika ada data yg ke-skip) -->
+            <div id="debug-warning" class="hidden bg-amber-500/20 border border-amber-500/50 text-amber-200 p-4 rounded-xl text-sm">
+                <i data-lucide="alert-circle" class="w-5 h-5 inline mr-2 mb-1"></i>
+                <span id="debug-text">Beberapa data tidak ditampilkan karena format kolom atau tanggal tidak sesuai. Cek <b>Console (F12)</b> untuk detailnya.</span>
+            </div>
+
             <!-- Summary KPI Cards -->
             <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
                 <!-- TOTAL FULFILL CARD (GROWTH) -->
@@ -260,22 +266,15 @@
         const months = ["Januari", "Februari", "Maret", "April", "Mei", "Juni", "Juli", "Agustus", "September", "Oktober", "November", "Desember"];
         document.getElementById('current-month').innerText = `${new Date().getDate()} ${months[new Date().getMonth()]} ${new Date().getFullYear()}`;
 
-        // -----------------------------------------------------------
-        // 1. SISTEM LOGIN UNIVERSAL & PEMBATASAN HAK AKSES UPLOAD
-        // -----------------------------------------------------------
+        // 1. SISTEM LOGIN UNIVERSAL
         window.addEventListener('DOMContentLoaded', () => {
-            
-            // --- PERBAIKAN LOGIKA SESI LOGIN ---
-            // Membaca `userSession` yang menyimpan objek JSON berisi nama dan title (Sesuai status-so.html)
             const sessionStr = localStorage.getItem('userSession'); 
             
             if (!sessionStr) {
-                // Cegah error redirect saat berada di lingkungan preview
                 if (window.location.protocol !== 'blob:' && window.location.protocol !== 'about:') {
                     alert("Sesi Anda telah berakhir. Silakan login kembali.");
-                    window.location.href = "login.html"; // Redirect ke halaman login yang benar
+                    window.location.href = "login.html"; 
                 }
-                // Jika di preview canvas, kita stop proses lebih lanjut agar tidak error
                 return;
             }
 
@@ -289,12 +288,7 @@
                 return;
             }
 
-            // Ambil nama dari data session (fallback "Preview User" jika tester canvas)
             const currentUser = sessionData?.name || "Preview User";
-            
-            // -------------------------------------------
-
-            // Memasukkan nama user ke profil sidebar
             const profileName = document.getElementById('profile-name');
             const profileRole = document.getElementById('profile-role');
             const profileInitial = document.getElementById('profile-initial');
@@ -302,7 +296,6 @@
             if (profileName) profileName.innerText = currentUser;
             if (profileInitial) profileInitial.innerText = currentUser.substring(0, 2).toUpperCase();
 
-            // Set Jabatan (Role) menggunakan jabatan yang disimpan saat login atau fallback ke perhitungan manual
             if (profileRole) {
                 if (sessionData?.title) {
                     profileRole.innerText = sessionData.title;
@@ -317,99 +310,130 @@
                 }
             }
 
-            // FILTER AKSES TOMBOL UPLOAD
+            // Akses tombol upload
             const uploadSection = document.getElementById('upload-section');
             if (currentUser === "Daffa" || currentUser === "Simon" || currentUser === "Preview User") {
-                // Munculkan tombol jika Daffa, Simon, atau user testing
                 uploadSection.classList.remove('hidden');
                 uploadSection.classList.add('flex');
             } else {
-                // Sembunyikan dan cabut dari HTML secara visual
                 uploadSection.style.display = 'none'; 
             }
 
-            // Muat data tabel saat halaman siap
             loadDashboardData();
         });
 
-        // -----------------------------------------------------------
-        // 2. EVENT LISTENER UPLOAD CSV (KHUSUS DAFFA & SIMON)
-        // -----------------------------------------------------------
+        // 2. EVENT LISTENER UPLOAD CSV
         document.getElementById('csvFileInput').addEventListener('change', function(e) {
             const file = e.target.files[0];
             if (!file) return;
 
+            // Kita tambahin fungsi transformHeader biar ga sensitif sama spasi waktu upload CSV
             Papa.parse(file, {
                 header: true,
                 skipEmptyLines: true,
+                transformHeader: function(header) {
+                    return header.trim(); // ilangin spasi kosong di awal/akhir nama kolom
+                },
                 complete: function(results) {
-                    localStorage.setItem('savedTADData', JSON.stringify(results.data));
-                    processData(results.data);
-                    alert("Data TAD Harian berhasil diunggah dan disimpan!");
+                    console.log("Data CSV Mentah hasil parse:", results.data); // Buat debugging
                     
-                    // Reset input setelah berhasil di-upload
+                    // Filter out rows that are entirely empty before saving/processing
+                    const validData = results.data.filter(row => {
+                       // Cek jika setidaknya punya nama karyawan atau klien
+                       return row['EMPLOYEE_NAME'] || row['klien'] || row['Klien Assignment'];
+                    });
+
+                    localStorage.setItem('savedTADData', JSON.stringify(validData));
+                    processData(validData);
+                    alert("Data TAD Harian berhasil diunggah dan disimpan!");
                     e.target.value = '';
                 }
             });
         });
 
-
-        // -----------------------------------------------------------
         // 3. FUNGSI MUAT DATA DARI LOCAL STORAGE
-        // -----------------------------------------------------------
         function loadDashboardData() {
-            // Cek file TAD khusus (dari menu ini), jika tidak ada, baca CSV dari dashboard utama
-            const savedData = localStorage.getItem('savedTADData') || localStorage.getItem('savedDashboardData');
-            if (savedData) {
-                try {
-                    processData(JSON.parse(savedData));
-                } catch (e) {
-                    console.error("Gagal memuat data", e);
-                }
-            }
-        }
-
-        // PERBAIKAN: Fungsi Parse Date agar lebih tahan banting (support DD-MM-YYYY)
+        // PERBAIKAN: Fungsi Parse Date agar lebih tahan banting (Support native JS Date & Berbagai Format)
         function parseDateString(dateStr) {
             if (!dateStr) return null;
+            
+            // Bersihkan spasi di awal/akhir dan karakter tersembunyi
+            dateStr = dateStr.toString().trim();
+            if (dateStr === '' || dateStr === '#N/A' || dateStr.toLowerCase() === 'null') return null;
+
             let d = null;
+            
+            // Coba parsing format DD/MM/YYYY atau DD/MM/YY
             if (dateStr.includes('/')) {
                 const parts = dateStr.split('/');
-                if (parts.length === 3) d = new Date(parts[2], parts[1] - 1, parts[0]); // DD/MM/YYYY
-            } else if (dateStr.includes('-')) {
-                const parts = dateStr.split('-');
-                if (parts[0].length === 4) {
-                    d = new Date(parts[0], parts[1] - 1, parts[2]); // YYYY-MM-DD
-                } else if (parts.length === 3) {
-                    d = new Date(parts[2], parts[1] - 1, parts[0]); // DD-MM-YYYY
+                if (parts.length >= 3) {
+                    let year = parseInt(parts[2], 10);
+                    // Handle 2-digit years (asumsikan 2000-an)
+                    if (year < 100) year += 2000;
+                    d = new Date(year, parseInt(parts[1], 10) - 1, parseInt(parts[0], 10));
                 }
+            } 
+            // Coba parsing format YYYY-MM-DD atau DD-MM-YYYY
+            else if (dateStr.includes('-')) {
+                const parts = dateStr.split('-');
+                if (parts.length >= 3) {
+                    if (parts[0].length === 4) { // YYYY-MM-DD
+                        d = new Date(parseInt(parts[0], 10), parseInt(parts[1], 10) - 1, parseInt(parts[2], 10)); 
+                    } else { // DD-MM-YYYY
+                        let year = parseInt(parts[2], 10);
+                        if (year < 100) year += 2000;
+                        d = new Date(year, parseInt(parts[1], 10) - 1, parseInt(parts[0], 10)); 
+                    }
+                }
+            } else {
+                // Fallback: Biarkan JavaScript native yang nebak (untuk format teks seperti 12 Oct 2024, dll)
+                d = new Date(dateStr);
             }
-            return isNaN(d) ? null : d;
+            
+            // Validasi apakah hasilnya memang Date yang valid
+            return (d instanceof Date && !isNaN(d.valueOf())) ? d : null;
         }
 
-        // -----------------------------------------------------------
-        // 4. PROSES LOGIKA GROWTH & DROWNING (SLA 7 HARI)
-        // -----------------------------------------------------------
+        // 4. PROSES LOGIKA GROWTH & DROWNING
         function processData(data) {
             let growthList = [];
             let drowningList = [];
+            let skippedRowsCount = 0; // Buat ngelacak data yang kebuang
             
             const today = new Date();
             today.setHours(0, 0, 0, 0); 
 
-            data.forEach(row => {
-                const client = row['Klien Assignment'] || row['klien'] || row['NAMA CLIENT'] || row['CLIENT'] || row['Perusahaan'] || '';
-                const pic = row['RO'] || row['REVO'] || row['ASSIGN RO'] || row['AREA OPERATIONAL MANAGER'] || row['PIC'] || '';
-                const employee = row['EMPLOYEE_NAME'] || row['NAMA KANDIDAT'] || row['job'] || 'Posisi Baru';
+            data.forEach((row, index) => {
+                // MENGAMBIL DATA BERDASARKAN HEADER DARI CONTOH CSV
+                const client = row['Klien Assignment'] || row['klien'] || row['company'] || '';
+                const pic = row['RO'] || row['REVO'] || row['AREA OPERATIONAL MANAGER'] || '';
+                const employee = row['EMPLOYEE_NAME'] || row['job'] || 'Tidak Diketahui';
                 
-                const dueDateStr = row['tanggal_berakhir'] || row['DUE DATE FULFILLMENT'] || row['DUE DATE'] || '';
-                const statusKaryawan = (row['status_pegawai'] || row['Status Kontrak'] || '').toUpperCase();
+                // Prioritaskan tanggal_berakhir, kemudian Kontrak Expired
+                const dueDateStr = row['tanggal_berakhir'] || row['Kontrak Expired'] || '';
+                const statusKaryawan = (row['status_pegawai'] || row['Status Kontrak'] || '').toString().toUpperCase().trim();
 
-                if (!client || !dueDateStr) return; 
-                if (statusKaryawan === 'NON AKTIF' || statusKaryawan === 'TERMINATE') return; 
+                // Pengecekan 1: Nama Klien & Due date ga boleh kosong
+                if (!client || !dueDateStr) {
+                    console.warn(`[Baris ${index + 2} di-skip] Klien atau Due Date kosong. Karyawan: ${employee}`);
+                    skippedRowsCount++;
+                    return; 
+                }
+
+                // Pengecekan 2: Skip kalau kontrak mati
+                if (statusKaryawan === 'NON AKTIF' || statusKaryawan === 'TERMINATE' || statusKaryawan === 'RESIGN' || statusKaryawan.includes('TIDAK AKTIF')) {
+                    // console.info(`[Baris ${index + 2} di-skip] Status Non Aktif. Karyawan: ${employee}`); // Uncomment jika butuh log ini
+                    return; 
+                }
 
                 let targetDate = parseDateString(dueDateStr);
-                if (!targetDate) return;
+                
+                // Pengecekan 3: Tanggal format salah
+                if (!targetDate) {
+                    console.error(`[Baris ${index + 2} di-skip] Format tanggal gagal diparsing: "${dueDateStr}". Data:`, row);
+                    skippedRowsCount++;
+                    return;
+                }
 
                 let diffTime = targetDate - today;
                 let daysDiff = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
@@ -436,6 +460,16 @@
                 }
             });
 
+            // Tampilkan warning di UI kalau ada data yg ke skip karena error format
+            const debugWarning = document.getElementById('debug-warning');
+            if (skippedRowsCount > 0) {
+                debugWarning.classList.remove('hidden');
+                document.getElementById('debug-text').innerHTML = `<b>Warning:</b> Ada ${skippedRowsCount} baris data yang gagal diproses karena format kolom/tanggal tidak sesuai (Kosong atau Error). Silakan buka <b>Developer Tools (F12) -> Console</b> untuk mengecek baris mana yang bermasalah.`;
+            } else {
+                debugWarning.classList.add('hidden');
+            }
+
+            // Sorting dan Render tabel
             drowningList.sort((a, b) => a.daysDiff - b.daysDiff);
 
             document.getElementById('growth-count').innerText = growthList.length;
@@ -499,16 +533,14 @@
                 });
             }
 
-            // Render ulang icon Lucide untuk baris yang baru disuntikkan secara dinamis
             lucide.createIcons();
         }
 
-        // FUNGSI LOGOUT UNIVERSAL (Diletakkan di global scope agar bisa diakses HTML onclick)
         function handleLogout() {
             if (confirm("Apakah Anda yakin ingin Sign Out?")) {
-                localStorage.removeItem('userSession'); // Menggunakan key yang selaras dengan status-so.html
+                localStorage.removeItem('userSession'); 
                 if (window.location.protocol !== 'blob:' && window.location.protocol !== 'about:') {
-                    window.location.href = "login.html"; // Arahkan seragam ke login.html
+                    window.location.href = "login.html"; 
                 }
             }
         }
