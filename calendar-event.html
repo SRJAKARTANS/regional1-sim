@@ -47,6 +47,15 @@
                 <i data-lucide="log-out" class="w-5 h-5"></i><span>Logout</span>
             </a>
         </div>
+        <div class="p-6 border-t border-white/10 bg-black/10 mt-auto">
+    <div class="flex items-center space-x-3 mb-4">
+        <div id="profile-initial" class="w-10 h-10 rounded-full bg-teal-500/20 border border-teal-300/30 flex items-center justify-center font-bold text-teal-200">--</div>
+        <div>
+            <h4 id="profile-name" class="text-sm font-semibold text-white">Loading...</h4>
+        </div>
+    </div>
+    <button onclick="AppAuth.logout()" class="w-full text-xs text-red-200 hover:text-white transition">Sign Out</button>
+</div>
     </aside>
 
     <!-- Main Content -->
@@ -220,6 +229,8 @@
             };
         };
 
+        
+
         function renderCalendarWidget() {
             const calendarDaysDiv = document.getElementById('calendar-days');
             const monthYearLabel = document.getElementById('calendar-month-year');
@@ -271,6 +282,34 @@
                 `;
             }
         }
+        const AppAuth = {
+        init: function() {
+            const sessionStr = localStorage.getItem('userSession');
+            // Jika tidak ada session, tendang ke login
+            if (!sessionStr) {
+                window.location.href = "login.html";
+                return;
+            }
+            try {
+                const sessionData = JSON.parse(sessionStr);
+                this.renderProfile(sessionData);
+            } catch(e) { window.location.href = "login.html"; }
+        },
+        renderProfile: function(sessionData) {
+            // Tambahkan elemen HTML di sidebar nanti agar script ini bisa menulis namanya
+            document.getElementById('profile-name').innerText = sessionData.name || "User";
+            document.getElementById('profile-initial').innerText = (sessionData.name || "--").substring(0, 2).toUpperCase();
+        },
+        logout: function() {
+            localStorage.removeItem('userSession');
+            window.location.href = "login.html";
+        }
+    };
+
+    document.addEventListener('DOMContentLoaded', () => {
+        AppAuth.init();
+        lucide.createIcons();
+    });
 
         async function fetchCalendarEvents() {
             refreshBtn.disabled = true;
