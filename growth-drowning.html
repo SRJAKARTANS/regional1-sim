@@ -60,7 +60,7 @@
                     <span>Calendar of Event</span>
                 </a>
 
-                <a href="#" class="flex items-center space-x-3 px-4 py-3 rounded-xl text-teal-100 hover:bg-white/5 hover:text-white transition-all duration-200">
+                <a href="status-so.html" class="flex items-center space-x-3 px-4 py-3 rounded-xl text-teal-100 hover:bg-white/5 hover:text-white transition-all duration-200">
                     <i data-lucide="activity" class="w-5 h-5"></i>
                     <span>Status SO Berjalan</span>
                 </a>
@@ -265,15 +265,33 @@
         // -----------------------------------------------------------
         window.addEventListener('DOMContentLoaded', () => {
             
-            // --- MODIFIKASI: BYPASS LOGIN SEMENTARA ---
-            // Jika memori kosong, sistem otomatis menganggap Anda login sebagai "Simon"
-            const currentUser = localStorage.getItem('currentUser') ;
-            // AKTIFKAN KEMBALI: Jika memori kosong (belum login/sesi habis), kembalikan ke halaman login
-        if (!currentUser) {
-        alert("Sesi Anda telah berakhir. Silakan login kembali.");
-        window.location.href = 'index.html'; // Pastikan nama file ini sesuai dengan halaman login kamu
-        return; 
-        }
+            // --- PERBAIKAN LOGIKA SESI LOGIN ---
+            // Membaca `userSession` yang menyimpan objek JSON berisi nama dan title (Sesuai status-so.html)
+            const sessionStr = localStorage.getItem('userSession'); 
+            
+            if (!sessionStr) {
+                // Cegah error redirect saat berada di lingkungan preview
+                if (window.location.protocol !== 'blob:' && window.location.protocol !== 'about:') {
+                    alert("Sesi Anda telah berakhir. Silakan login kembali.");
+                    window.location.href = "login.html"; // Redirect ke halaman login yang benar
+                }
+                // Jika di preview canvas, kita stop proses lebih lanjut agar tidak error
+                return;
+            }
+
+            let sessionData = {};
+            try {
+                sessionData = JSON.parse(sessionStr);
+            } catch(e) {
+                if (window.location.protocol !== 'blob:' && window.location.protocol !== 'about:') {
+                    window.location.href = "login.html";
+                }
+                return;
+            }
+
+            // Ambil nama dari data session (fallback "Preview User" jika tester canvas)
+            const currentUser = sessionData?.name || "Preview User";
+            
             // -------------------------------------------
 
             // Memasukkan nama user ke profil sidebar
@@ -284,21 +302,25 @@
             if (profileName) profileName.innerText = currentUser;
             if (profileInitial) profileInitial.innerText = currentUser.substring(0, 2).toUpperCase();
 
-            // Set Jabatan (Role) berdasarkan Nama
+            // Set Jabatan (Role) menggunakan jabatan yang disimpan saat login atau fallback ke perhitungan manual
             if (profileRole) {
-                if (currentUser === "Daffa" || currentUser === "Simon") {
-                    profileRole.innerText = "Area Operational Mgr";
-                } else if (currentUser === "Ali" || currentUser === "Indra" || currentUser === "Edy" || currentUser === "Faiz") {
-                    profileRole.innerText = "Officer / REVO";
+                if (sessionData?.title) {
+                    profileRole.innerText = sessionData.title;
                 } else {
-                    profileRole.innerText = "Tim Admin";
+                    if (currentUser === "Daffa" || currentUser === "Simon" || currentUser === "Preview User") {
+                        profileRole.innerText = "Area Operational Mgr";
+                    } else if (currentUser === "Ali" || currentUser === "Indra" || currentUser === "Edy" || currentUser === "Faiz") {
+                        profileRole.innerText = "Officer / REVO";
+                    } else {
+                        profileRole.innerText = "Tim Admin";
+                    }
                 }
             }
 
             // FILTER AKSES TOMBOL UPLOAD
             const uploadSection = document.getElementById('upload-section');
-            if (currentUser === "Daffa" || currentUser === "Simon") {
-                // Munculkan tombol jika Daffa atau Simon
+            if (currentUser === "Daffa" || currentUser === "Simon" || currentUser === "Preview User") {
+                // Munculkan tombol jika Daffa, Simon, atau user testing
                 uploadSection.classList.remove('hidden');
                 uploadSection.classList.add('flex');
             } else {
@@ -309,7 +331,6 @@
             // Muat data tabel saat halaman siap
             loadDashboardData();
         });
-
 
         // -----------------------------------------------------------
         // 2. EVENT LISTENER UPLOAD CSV (KHUSUS DAFFA & SIMON)
@@ -485,8 +506,10 @@
         // FUNGSI LOGOUT UNIVERSAL (Diletakkan di global scope agar bisa diakses HTML onclick)
         function handleLogout() {
             if (confirm("Apakah Anda yakin ingin Sign Out?")) {
-                localStorage.removeItem('currentUser'); // Hapus sesi login
-                window.location.href = "index.html"; // Diseragamkan kembali ke index.html
+                localStorage.removeItem('userSession'); // Menggunakan key yang selaras dengan status-so.html
+                if (window.location.protocol !== 'blob:' && window.location.protocol !== 'about:') {
+                    window.location.href = "login.html"; // Arahkan seragam ke login.html
+                }
             }
         }
     </script>
